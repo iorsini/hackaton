@@ -343,7 +343,11 @@ export default function RegisterForm() {
         <div className="register-card">
           <div className="logo-container">
             <div className="logo">
-              🍅
+              <img
+                src="/images/pomofy.webp"
+                alt="Logo de Tomate"
+                className="w-55 h-55 object-contain"
+              />
             </div>
           </div>
 
