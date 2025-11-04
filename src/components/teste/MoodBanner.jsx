@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from "react";
 const MOTIVATIONAL_MESSAGES = [
   'Deixe as ideias fluírem! 🎨',

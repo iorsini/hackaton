@@ -1,5 +1,8 @@
+'use client'
+
 import { useState } from "react";
 
+import { Play, Pause, RotateCcw, Plus, X, Menu, Calendar, TrendingUp, Users, Trophy, LogOut, Settings, CheckCircle2, ChevronRight } from 'lucide-react';
 
 
 
