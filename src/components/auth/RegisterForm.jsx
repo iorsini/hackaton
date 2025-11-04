@@ -343,7 +343,7 @@ export default function RegisterForm() {
         <div className="register-card">
           <div className="logo-container">
             <div className="logo">
-              ✨
+              🍅
             </div>
           </div>
 
@@ -442,33 +442,6 @@ export default function RegisterForm() {
               )}
             </button>
           </form>
-
-          <div className="features-list">
-            <div className="feature-item">
-              <div className="feature-icon">
-                <CheckCircle size={12} />
-              </div>
-              <span>Timer Pomodoro adaptável ao seu humor</span>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon">
-                <CheckCircle size={12} />
-              </div>
-              <span>Gerenciamento inteligente de tarefas</span>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon">
-                <CheckCircle size={12} />
-              </div>
-              <span>Mensagens motivacionais personalizadas</span>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon">
-                <CheckCircle size={12} />
-              </div>
-              <span>Acompanhamento de progresso diário</span>
-            </div>
-          </div>
 
           <p className="footer-text">
             Já tem uma conta?{" "}
