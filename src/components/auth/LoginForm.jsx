@@ -31,7 +31,9 @@ function LoginFormContent() {
         Verification: "Verificação falhou. Tente novamente.",
       };
 
-      setError(errorMessages[errorParam] || "Erro de autenticação. Tente novamente.");
+      setError(
+        errorMessages[errorParam] || "Erro de autenticação. Tente novamente."
+      );
 
       setTimeout(() => {
         const newUrl = window.location.pathname;
@@ -357,7 +359,11 @@ function LoginFormContent() {
         <div className="login-card">
           <div className="logo-container">
             <div className="logo">
-              🍅
+              <img
+                src="/images/pomofy.webp"
+                alt="Logo de Tomate"
+                className="w-55 h-55 object-contain"
+              />
             </div>
           </div>
 
@@ -371,11 +377,7 @@ function LoginFormContent() {
               ✓ Conta criada! Faça login para continuar.
             </div>
           )}
-          {error && (
-            <div className="alert alert-error">
-              ✕ {error}
-            </div>
-          )}
+          {error && <div className="alert alert-error">✕ {error}</div>}
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
@@ -387,7 +389,9 @@ function LoginFormContent() {
                   className="form-input"
                   placeholder="seu@email.com"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -402,14 +406,33 @@ function LoginFormContent() {
                   className="form-input"
                   placeholder="••••••••"
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
                   required
                 />
               </div>
             </div>
 
-            <button type="submit" className="submit-btn" disabled={loading}>
-              {loading ? "Entrando..." : "Entrar"}
+            <button
+              type="submit"
+              className="submit-btn"
+              disabled={loading}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px", // espaçamento entre o ícone e o texto
+              }}
+            >
+              {loading ? (
+                "Entrando..."
+              ) : (
+                <>
+                  <Sparkles size={20} color="#FFFFFF" />
+                  Entrar
+                </>
+              )}
             </button>
           </form>
 
@@ -445,10 +468,22 @@ function LoginFormContent() {
               ) : (
                 <>
                   <svg width="20" height="20" viewBox="0 0 20 20">
-                    <path fill="#4285F4" d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z"/>
-                    <path fill="#34A853" d="M13.46 15.13c-.83.59-1.96 1-3.46 1-2.64 0-4.88-1.74-5.68-4.15H1.07v2.52C2.72 17.75 6.09 20 10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45z"/>
-                    <path fill="#FBBC05" d="M3.99 10c0-.69.12-1.35.32-1.97V5.51H1.07A9.973 9.973 0 000 10c0 1.61.39 3.14 1.07 4.49l3.24-2.52c-.2-.62-.32-1.28-.32-1.97z"/>
-                    <path fill="#EA4335" d="M10 3.88c1.88 0 3.13.81 3.85 1.48l2.84-2.76C14.96.99 12.7 0 10 0 6.09 0 2.72 2.25 1.07 5.51l3.24 2.52C5.12 5.62 7.36 3.88 10 3.88z"/>
+                    <path
+                      fill="#4285F4"
+                      d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M13.46 15.13c-.83.59-1.96 1-3.46 1-2.64 0-4.88-1.74-5.68-4.15H1.07v2.52C2.72 17.75 6.09 20 10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M3.99 10c0-.69.12-1.35.32-1.97V5.51H1.07A9.973 9.973 0 000 10c0 1.61.39 3.14 1.07 4.49l3.24-2.52c-.2-.62-.32-1.28-.32-1.97z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M10 3.88c1.88 0 3.13.81 3.85 1.48l2.84-2.76C14.96.99 12.7 0 10 0 6.09 0 2.72 2.25 1.07 5.51l3.24 2.52C5.12 5.62 7.36 3.88 10 3.88z"
+                    />
                   </svg>
                   <span>Google</span>
                 </>
@@ -470,11 +505,23 @@ function LoginFormContent() {
 
 export default function LoginForm() {
   return (
-    <Suspense fallback={
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-        <div style={{ color: 'white', fontSize: '1.5rem' }}>Carregando...</div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div
+          style={{
+            minHeight: "100vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          }}
+        >
+          <div style={{ color: "white", fontSize: "1.5rem" }}>
+            Carregando...
+          </div>
+        </div>
+      }
+    >
       <LoginFormContent />
     </Suspense>
   );
