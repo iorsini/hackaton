@@ -984,6 +984,7 @@ export default function PomodoroApp() {
           <div className="tasks-container">
             {tasks.length === 0 ? (
               <div className="empty-state">
+                <div className="empty-state-icon">📝</div>
                 <p>Nenhuma tarefa ainda</p>
                 <p style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>
                   Adicione sua primeira tarefa abaixo!
@@ -1019,7 +1020,7 @@ export default function PomodoroApp() {
                 <input
                   type="text"
                   className="add-task-input"
-                  
+                  placeholder="Digite sua tarefa..."
                   value={newTaskText}
                   onChange={(e) => setNewTaskText(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && addTask()}

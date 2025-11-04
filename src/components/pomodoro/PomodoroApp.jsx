@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, RotateCcw, Plus, X, Menu, Coffee, Brain, Battery, Zap, Frown, Smile, SkipForward, LogIn, Check, Trash2 } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
+import { Play, Pause, RotateCcw, Plus, X, Coffee, Brain, Battery, Zap, Frown, Smile, SkipForward, Check, Trash2, LogOut } from 'lucide-react';
 
 // ============================================
 // MOODS CONFIGURATION
@@ -159,6 +160,7 @@ const useTimer = (initialMinutes, onComplete) => {
 // MAIN APP
 // ============================================
 export default function PomodoroApp() {
+  const { data: session } = useSession();
   const [tasks, setTasks] = useState([]);
   const [selectedMood, setSelectedMood] = useState(null);
   const [isBreak, setIsBreak] = useState(false);
@@ -269,12 +271,12 @@ export default function PomodoroApp() {
     showNotif(`Humor "${mood.label}" selecionado! ${mood.focusTime}min de foco`);
   };
 
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/login' });
+  };
+
   const completedTasks = tasks.filter(t => t.completed).length;
   const progress = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
-
-  const handleLogin = () => {
-    window.location.href = '/login';
-  };
 
   return (
     <>
@@ -300,6 +302,48 @@ export default function PomodoroApp() {
           gap: 2rem;
           max-width: 1600px;
           margin: 0 auto;
+        }
+
+        /* ===== USER INFO BAR ===== */
+        .user-bar {
+          position: fixed;
+          top: 2rem;
+          right: 2rem;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          z-index: 100;
+        }
+
+        .user-greeting {
+          color: white;
+          font-weight: 600;
+          background: rgba(255,255,255,0.2);
+          padding: 0.75rem 1.25rem;
+          border-radius: 12px;
+          backdrop-filter: blur(10px);
+          font-size: 0.9rem;
+        }
+
+        .logout-btn {
+          padding: 0.75rem 1.25rem;
+          background: white;
+          border: none;
+          border-radius: 12px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-weight: 600;
+          color: #1a1a1a;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+          transition: all 0.2s;
+          font-size: 0.9rem;
+        }
+
+        .logout-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
         }
 
         /* ===== NOTIFICATION POPUP ===== */
@@ -348,31 +392,6 @@ export default function PomodoroApp() {
           font-weight: 600;
           color: #1a1a1a;
           line-height: 1.4;
-        }
-
-        /* ===== LOGIN BUTTON ===== */
-        .login-btn {
-          position: fixed;
-          top: 2rem;
-          right: 2rem;
-          padding: 0.875rem 1.5rem;
-          background: white;
-          border: none;
-          border-radius: 12px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-weight: 600;
-          color: #1a1a1a;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-          transition: all 0.2s;
-          z-index: 100;
-        }
-
-        .login-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
         }
 
         /* ===== MOOD SELECTOR CARD ===== */
@@ -884,8 +903,11 @@ export default function PomodoroApp() {
             order: 2;
           }
 
-          .login-btn {
+          .user-bar {
             order: 0;
+            position: static;
+            margin-bottom: 1rem;
+            justify-content: flex-end;
           }
         }
 
@@ -895,10 +917,18 @@ export default function PomodoroApp() {
             gap: 1rem;
           }
 
-          .login-btn {
-            position: static;
+          .user-bar {
+            flex-direction: column;
+            align-items: stretch;
+          }
+
+          .user-greeting {
+            text-align: center;
+          }
+
+          .logout-btn {
             width: 100%;
-            margin-bottom: 1rem;
+            justify-content: center;
           }
 
           .timer-display {
@@ -923,11 +953,18 @@ export default function PomodoroApp() {
         }
       `}</style>
 
-      {/* LOGIN BUTTON */}
-      <button className="login-btn" onClick={handleLogin}>
-        <LogIn size={20} />
-        Login
-      </button>
+      {/* USER BAR */}
+      {session && (
+        <div className="user-bar">
+          <span className="user-greeting">
+            Olá, {session.user?.name || session.user?.email?.split('@')[0]}! 👋
+          </span>
+          <button className="logout-btn" onClick={handleLogout}>
+            <LogOut size={18} />
+            Sair
+          </button>
+        </div>
+      )}
 
       {/* NOTIFICATION POPUP */}
       {showNotification && (
@@ -984,6 +1021,7 @@ export default function PomodoroApp() {
           <div className="tasks-container">
             {tasks.length === 0 ? (
               <div className="empty-state">
+                <div className="empty-state-icon">📝</div>
                 <p>Nenhuma tarefa ainda</p>
                 <p style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>
                   Adicione sua primeira tarefa abaixo!
@@ -1019,7 +1057,7 @@ export default function PomodoroApp() {
                 <input
                   type="text"
                   className="add-task-input"
-                  
+                  placeholder="Digite sua tarefa..."
                   value={newTaskText}
                   onChange={(e) => setNewTaskText(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && addTask()}

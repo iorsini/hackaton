@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Github } from "lucide-react";
+import { Github, Mail, Lock, Sparkles } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Alert from "@/components/ui/Alert";
@@ -24,14 +24,14 @@ function LoginFormContent() {
   useEffect(() => {
     if (errorParam) {
       const errorMessages = {
-        OAuthSignin: "Error connecting to OAuth provider. Please try again.",
-        OAuthCallback: "Error during authentication. Please try again.",
-        Configuration: "Server configuration error. Please contact support.",
-        AccessDenied: "Access denied. Please check your permissions.",
-        Verification: "Email verification failed. Please try again.",
+        OAuthSignin: "Erro ao conectar. Tente novamente.",
+        OAuthCallback: "Erro na autenticação. Tente novamente.",
+        Configuration: "Erro no servidor. Contacte o suporte.",
+        AccessDenied: "Acesso negado. Verifique suas permissões.",
+        Verification: "Verificação falhou. Tente novamente.",
       };
 
-      setError(errorMessages[errorParam] || "Authentication error. Please try again.");
+      setError(errorMessages[errorParam] || "Erro de autenticação. Tente novamente.");
 
       setTimeout(() => {
         const newUrl = window.location.pathname;
@@ -55,10 +55,10 @@ function LoginFormContent() {
       if (result.error) {
         setError(result.error);
       } else {
-        router.push("/dashboard/home");
+        router.push("/dashboard/pomodoro");
       }
     } catch {
-      setError("Something went wrong");
+      setError("Algo deu errado");
     } finally {
       setLoading(false);
     }
@@ -69,112 +69,410 @@ function LoginFormContent() {
     setOauthLoading(provider);
     try {
       await signIn(provider, {
-        callbackUrl: "/dashboard/home",
+        callbackUrl: "/dashboard/pomodoro",
         redirect: true,
       });
     } catch (error) {
-      setError("OAuth login failed. Please try again.");
+      setError("Login OAuth falhou. Tente novamente.");
       setOauthLoading(null);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-primary p-6">
-      <div className="w-full max-w-md bg-primary rounded-2xl p-12">
-        <div className="flex justify-center mb-8">
-          <div className="w-20 h-20 rounded-full bg-accent flex items-center justify-center text-white text-3xl font-bold">
-            DB
+    <>
+      <style>{`
+        .pomodoro-login {
+          min-height: 100vh;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .pomodoro-login::before {
+          content: '';
+          position: absolute;
+          top: -50%;
+          left: -50%;
+          width: 200%;
+          height: 200%;
+          background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+          background-size: 50px 50px;
+          animation: float 20s linear infinite;
+        }
+
+        @keyframes float {
+          0% { transform: translate(0, 0); }
+          100% { transform: translate(50px, 50px); }
+        }
+
+        .login-card {
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(20px);
+          border-radius: 32px;
+          padding: 3rem;
+          box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
+          width: 100%;
+          max-width: 480px;
+          position: relative;
+          z-index: 1;
+          animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .logo-container {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 2rem;
+        }
+
+        .logo {
+          width: 80px;
+          height: 80px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 2.5rem;
+          box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+          animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+        }
+
+        .login-title {
+          text-align: center;
+          margin-bottom: 2rem;
+        }
+
+        .login-title h1 {
+          font-size: 2rem;
+          font-weight: 700;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin-bottom: 0.5rem;
+        }
+
+        .login-title p {
+          color: #666;
+          font-size: 0.875rem;
+        }
+
+        .form-group {
+          margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+          display: block;
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: #1a1a1a;
+          margin-bottom: 0.5rem;
+        }
+
+        .input-wrapper {
+          position: relative;
+        }
+
+        .input-icon {
+          position: absolute;
+          left: 1rem;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #999;
+          pointer-events: none;
+        }
+
+        .form-input {
+          width: 100%;
+          padding: 1rem 1rem 1rem 3rem;
+          border: 2px solid #e5e7eb;
+          border-radius: 12px;
+          font-size: 1rem;
+          outline: none;
+          transition: all 0.2s;
+          background: white;
+        }
+
+        .form-input:focus {
+          border-color: #667eea;
+          box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .submit-btn {
+          width: 100%;
+          padding: 1rem;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border: none;
+          border-radius: 12px;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          margin-top: 1rem;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .divider {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin: 2rem 0;
+        }
+
+        .divider-line {
+          flex: 1;
+          height: 1px;
+          background: #e5e7eb;
+        }
+
+        .divider-text {
+          color: #999;
+          font-size: 0.75rem;
+          font-weight: 600;
+        }
+
+        .oauth-buttons {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1rem;
+        }
+
+        .oauth-btn {
+          padding: 0.875rem;
+          border: 2px solid #e5e7eb;
+          border-radius: 12px;
+          background: white;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          font-weight: 600;
+          transition: all 0.2s;
+        }
+
+        .oauth-btn:hover:not(:disabled) {
+          border-color: #667eea;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .oauth-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .oauth-btn.github {
+          color: #1a1a1a;
+        }
+
+        .oauth-btn.google {
+          color: #1a1a1a;
+        }
+
+        .footer-text {
+          text-align: center;
+          margin-top: 2rem;
+          color: #666;
+          font-size: 0.875rem;
+        }
+
+        .footer-link {
+          color: #667eea;
+          font-weight: 600;
+          text-decoration: none;
+          transition: color 0.2s;
+        }
+
+        .footer-link:hover {
+          color: #764ba2;
+        }
+
+        .alert {
+          padding: 1rem;
+          border-radius: 12px;
+          margin-bottom: 1.5rem;
+          font-size: 0.875rem;
+          font-weight: 500;
+        }
+
+        .alert-success {
+          background: #d1fae5;
+          color: #065f46;
+          border: 1px solid #6ee7b7;
+        }
+
+        .alert-error {
+          background: #fee2e2;
+          color: #991b1b;
+          border: 1px solid #fca5a5;
+        }
+
+        @media (max-width: 640px) {
+          .login-card {
+            padding: 2rem;
+          }
+
+          .login-title h1 {
+            font-size: 1.5rem;
+          }
+
+          .oauth-buttons {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+
+      <div className="pomodoro-login">
+        <div className="login-card">
+          <div className="logo-container">
+            <div className="logo">
+              🍅
+            </div>
           </div>
-        </div>
 
-        {registered && (
-          <Alert type="success">Account created! Please log in.</Alert>
-        )}
-        {error && <Alert type="error">{error}</Alert>}
+          <div className="login-title">
+            <h1>Bem-vindo de volta!</h1>
+            <p>Entre para continuar seu progresso</p>
+          </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <Input
-            label="Email"
-            type="email"
-            placeholder="your@email.com"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            required
-          />
+          {registered && (
+            <div className="alert alert-success">
+              ✓ Conta criada! Faça login para continuar.
+            </div>
+          )}
+          {error && (
+            <div className="alert alert-error">
+              ✕ {error}
+            </div>
+          )}
 
-          <Input
-            label="Password"
-            type="password"
-            placeholder="••••••••"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            required
-          />
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label className="form-label">Email</label>
+              <div className="input-wrapper">
+                <Mail size={20} className="input-icon" />
+                <input
+                  type="email"
+                  className="form-input"
+                  placeholder="seu@email.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
 
-          <Button type="submit" loading={loading} fullWidth>
-            Sign In
-          </Button>
-        </form>
+            <div className="form-group">
+              <label className="form-label">Senha</label>
+              <div className="input-wrapper">
+                <Lock size={20} className="input-icon" />
+                <input
+                  type="password"
+                  className="form-input"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
 
-        <div className="flex items-center gap-4 my-6">
-          <div className="flex-1 h-px bg-gray-700"></div>
-          <span className="text-gray-400 text-sm">OR LOGIN WITH</span>
-          <div className="flex-1 h-px bg-gray-700"></div>
-        </div>
+            <button type="submit" className="submit-btn" disabled={loading}>
+              {loading ? "Entrando..." : "Entrar"}
+            </button>
+          </form>
 
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={() => handleOAuthSignIn("github")}
-            disabled={oauthLoading === "github"}
-            className="py-3 px-4 rounded-lg bg-gray-800 border border-gray-700 text-white font-semibold flex items-center justify-center gap-2 hover:bg-gray-700 transition disabled:opacity-50"
-          >
-            {oauthLoading === "github" ? (
-              <LoadingSpinner size="sm" />
-            ) : (
-              <>
-                <Github size={20} />
-                GitHub
-              </>
-            )}
-          </button>
+          <div className="divider">
+            <div className="divider-line"></div>
+            <span className="divider-text">OU ENTRE COM</span>
+            <div className="divider-line"></div>
+          </div>
 
-          <button
-            onClick={() => handleOAuthSignIn("google")}
-            disabled={oauthLoading === "google"}
-            className="py-3 px-4 rounded-lg bg-white text-gray-900 font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 transition disabled:opacity-50"
-          >
-            {oauthLoading === "google" ? (
-              <LoadingSpinner size="sm" />
-            ) : (
-              <>
-                <svg width="20" height="20" viewBox="0 0 20 20">
-                  <path fill="#4285F4" d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z"/>
-                  <path fill="#34A853" d="M13.46 15.13c-.83.59-1.96 1-3.46 1-2.64 0-4.88-1.74-5.68-4.15H1.07v2.52C2.72 17.75 6.09 20 10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45z"/>
-                  <path fill="#FBBC05" d="M3.99 10c0-.69.12-1.35.32-1.97V5.51H1.07A9.973 9.973 0 000 10c0 1.61.39 3.14 1.07 4.49l3.24-2.52c-.2-.62-.32-1.28-.32-1.97z"/>
-                  <path fill="#EA4335" d="M10 3.88c1.88 0 3.13.81 3.85 1.48l2.84-2.76C14.96.99 12.7 0 10 0 6.09 0 2.72 2.25 1.07 5.51l3.24 2.52C5.12 5.62 7.36 3.88 10 3.88z"/>
-                </svg>
-                Google
-              </>
-            )}
-          </button>
-        </div>
+          <div className="oauth-buttons">
+            <button
+              onClick={() => handleOAuthSignIn("github")}
+              disabled={oauthLoading === "github"}
+              className="oauth-btn github"
+            >
+              {oauthLoading === "github" ? (
+                <span>...</span>
+              ) : (
+                <>
+                  <Github size={20} />
+                  <span>GitHub</span>
+                </>
+              )}
+            </button>
 
-        <div className="text-center text-gray-400 mt-6 text-sm">
-          Don't have an account?{" "}
-          <Link href="/register" className="text-accent font-semibold hover:text-green-400">
-            Sign up
-          </Link>
+            <button
+              onClick={() => handleOAuthSignIn("google")}
+              disabled={oauthLoading === "google"}
+              className="oauth-btn google"
+            >
+              {oauthLoading === "google" ? (
+                <span>...</span>
+              ) : (
+                <>
+                  <svg width="20" height="20" viewBox="0 0 20 20">
+                    <path fill="#4285F4" d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z"/>
+                    <path fill="#34A853" d="M13.46 15.13c-.83.59-1.96 1-3.46 1-2.64 0-4.88-1.74-5.68-4.15H1.07v2.52C2.72 17.75 6.09 20 10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45z"/>
+                    <path fill="#FBBC05" d="M3.99 10c0-.69.12-1.35.32-1.97V5.51H1.07A9.973 9.973 0 000 10c0 1.61.39 3.14 1.07 4.49l3.24-2.52c-.2-.62-.32-1.28-.32-1.97z"/>
+                    <path fill="#EA4335" d="M10 3.88c1.88 0 3.13.81 3.85 1.48l2.84-2.76C14.96.99 12.7 0 10 0 6.09 0 2.72 2.25 1.07 5.51l3.24 2.52C5.12 5.62 7.36 3.88 10 3.88z"/>
+                  </svg>
+                  <span>Google</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          <p className="footer-text">
+            Não tem uma conta?{" "}
+            <Link href="/register" className="footer-link">
+              Cadastre-se
+            </Link>
+          </p>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
 export default function LoginForm() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-primary">
-        <LoadingSpinner size="lg" />
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+        <div style={{ color: 'white', fontSize: '1.5rem' }}>Carregando...</div>
       </div>
     }>
       <LoginFormContent />
