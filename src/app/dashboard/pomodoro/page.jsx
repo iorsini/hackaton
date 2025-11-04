@@ -166,7 +166,7 @@ export default function PomodoroApp() {
   const [newTaskText, setNewTaskText] = useState('');
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
-  const [showMoodSelector, setShowMoodSelector] = useState(true);
+  const [showMoodSelector, setShowMoodSelector] = useState(false);
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
   const [showAddTask, setShowAddTask] = useState(false);
 

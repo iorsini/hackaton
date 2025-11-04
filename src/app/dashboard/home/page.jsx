@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, RotateCcw, Plus, X, Menu, Coffee, Brain, Battery, Zap, Frown, Smile, SkipForward, LogIn, Check, Trash2 } from 'lucide-react';
+import Sidebar from '@/components/teste/Sidebar';
 
 // ============================================
 // MOODS CONFIGURATION
@@ -971,6 +972,8 @@ export default function PomodoroApp() {
 
       <div className="app-container">
         {/* TASK LIST */}
+        
+        <Sidebar/>
         <div className="task-list-card">
           <div className="task-header">
             <div>
