@@ -18,6 +18,7 @@ import AchievementsPanel from "@/components/progresso/achievements_panel";
 import ActivityHeatmap from "@/components/progresso/activity_heatmap";
 import FocusInsights from "@/components/progresso/focus_insights";
 import StreakCounter from "@/components/progresso/streak_counter";
+import FaqWidget from "@/components/ui/FaqWidget";
 
 export default function ProfileDashboard() {
   const { data: session, status } = useSession();
@@ -29,8 +30,6 @@ export default function ProfileDashboard() {
       router.push("/login");
       return;
     }
-
-    fetchData();
   }, [status, router]);
 
   if (status === "loading") {
@@ -89,6 +88,7 @@ export default function ProfileDashboard() {
           <StreakCounter />
         </section>
       </div>
+      <FaqWidget/>
     </div>
   );
 }
