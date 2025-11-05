@@ -7,7 +7,6 @@ import {
   RotateCcw,
   Plus,
   X,
-  Menu,
   Coffee,
   Brain,
   Battery,
@@ -31,8 +30,11 @@ import {
 } from "lucide-react";
 import Sidebar from "@/components/teste/Sidebar";
 import LofiPlayer from "@/components/teste/LoFiPlayer";
+import RoomsPage from "@/components/pomodoro/RoomsPage";
+import RoomModal from "@/components/pomodoro/RoomModal";
 
 // ============================================
+// TASK CATEGORIES
 // TASK CATEGORIES
 // ============================================
 const TASK_CATEGORIES = {
@@ -232,6 +234,12 @@ const useTimer = (initialMinutes, onComplete) => {
 export default function PomodoroApp() {
   const { data: session, status } = useSession();
 
+  // ===== NAVEGAÇÃO DE PÁGINAS (NOVO) =====
+  const [activePage, setActivePage] = useState("timer");
+  const [showRoomModal, setShowRoomModal] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+
+  // existing states
   const [tasks, setTasks] = useState([]);
   const [selectedMood, setSelectedMood] = useState(null);
   const [isBreak, setIsBreak] = useState(false);
@@ -243,6 +251,7 @@ export default function PomodoroApp() {
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
   const [showAddTask, setShowAddTask] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("outros");
+  const [showCategorySelector, setShowCategorySelector] = useState(false);
   const [showCategorySelector, setShowCategorySelector] = useState(false);
   const [isLoadingTasks, setIsLoadingTasks] = useState(true);
 
@@ -315,13 +324,13 @@ export default function PomodoroApp() {
     }
   };
 
+  // ===== API INTEGRATION =====
   useEffect(() => {
     if (session?.user) {
       loadTasks();
     } else {
       setIsLoadingTasks(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   const loadTasks = async () => {
@@ -501,6 +510,36 @@ export default function PomodoroApp() {
     showNotif(`Humor "${mood.label}" selecionado! ${mood.focusTime}min de foco`);
   };
 
+  // ===== HANDLERS DE SALAS (NOVO) =====
+  const handlePageChange = (page) => {
+    setActivePage(page);
+    setSelectedRoom(null);
+  };
+
+  const handleCreateRoom = () => {
+    setShowRoomModal(true);
+  };
+
+  const handleRoomCreated = (room) => {
+    setShowRoomModal(false);
+    setSelectedRoom(room);
+    window.dispatchEvent(new Event('roomsUpdated'));
+  };
+
+  const handleRoomJoined = (room) => {
+    setShowRoomModal(false);
+    setSelectedRoom(room);
+    window.dispatchEvent(new Event('roomsUpdated'));
+  };
+
+  const handleRoomSelect = (room) => {
+    setSelectedRoom(room);
+  };
+
+  const handleBackToRooms = () => {
+    setSelectedRoom(null);
+  };
+
   const completedTasks = tasks.filter((t) => t.completed).length;
   const progress = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
 
@@ -510,6 +549,358 @@ export default function PomodoroApp() {
 
   const minutes = Math.floor(timer.seconds / 60);
   const secs = timer.seconds % 60;
+
+  // ===== RENDERIZAÇÃO CONDICIONAL POR PÁGINA (NOVO) =====
+  const renderPageContent = () => {
+    switch (activePage) {
+      case "timer":
+        return renderTimerPage();
+      
+      case "progress":
+        return (
+          <div className="page-wrapper">
+            <div className="page-card">
+              <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "1rem" }}>
+                📊 Seu Progresso
+              </h1>
+              <p style={{ color: "#666", marginBottom: "2rem" }}>
+                Acompanhe suas estatísticas e evolução
+              </p>
+              <div style={{ 
+                padding: "3rem", 
+                textAlign: "center", 
+                background: "#f9fafb", 
+                borderRadius: "16px",
+                border: "2px dashed #d1d5db"
+              }}>
+                <p style={{ color: "#6b7280", fontSize: "1.125rem" }}>
+                  Componente de Progresso será implementado aqui
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      
+      case "rooms":
+        return (
+          <div className="rooms-wrapper">
+            {selectedRoom ? (
+              <div className="page-card">
+                <button onClick={handleBackToRooms} className="back-btn-rooms">
+                  ← Voltar para Salas
+                </button>
+                <h1 style={{ fontSize: "2rem", fontWeight: 700, marginTop: "1rem", color: 'gray' }}>
+                  {selectedRoom.name}
+                </h1>
+                <p style={{ color: "#665", marginTop: "0.5rem" }}>
+                  Visualização da sala em desenvolvimento...
+                </p>
+              </div>
+            ) : (
+              <RoomsPage
+                onRoomSelect={handleRoomSelect}
+                onCreateRoom={handleCreateRoom}
+              />
+            )}
+          </div>
+        );
+      
+      case "ranking":
+        return (
+          <div className="page-wrapper">
+            <div className="page-card">
+              <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "1rem" }}>
+                🏆 Ranking
+              </h1>
+              <p style={{ color: "#666", marginBottom: "2rem" }}>
+                Veja os usuários mais dedicados
+              </p>
+              <div style={{ 
+                padding: "3rem", 
+                textAlign: "center", 
+                background: "#f9fafb", 
+                borderRadius: "16px",
+                border: "2px dashed #d1d5db"
+              }}>
+                <p style={{ color: "#6b7280", fontSize: "1.125rem" }}>
+                  Componente de Ranking será implementado aqui
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      
+      default:
+        return renderTimerPage();
+    }
+  };
+
+  const renderTimerPage = () => (
+    <>
+      {/* TASK LIST */}
+      <div className="task-list-card">
+        <div className="task-header">
+          <div>
+            <h2>
+              Minhas Tarefas
+              <span className="task-count">({tasks.length})</span>
+            </h2>
+          </div>
+        </div>
+        
+        {!session && (
+          <div
+            style={{
+              background: "rgba(255, 255, 255, 0.95)",
+              borderRadius: "16px",
+              padding: "1.5rem",
+              marginBottom: "2rem",
+              textAlign: "center",
+              border: "2px dashed #fbbf24",
+            }}
+          >
+            <span style={{ fontSize: "2rem", display: "block", marginBottom: "0.5rem" }}>
+              🔒
+            </span>
+            <p style={{ fontWeight: 600, color: "#1a1a1a", marginBottom: "0.25rem" }}>
+              Suas tarefas não serão salvas
+            </p>
+            <p style={{ fontSize: "0.875rem", color: "#666" }}>
+              Faça login para manter suas tarefas!
+            </p>
+          </div>
+        )}
+
+        <div className="tasks-container">
+          {isLoadingTasks ? (
+            <div className="empty-state">
+              <div className="empty-state-icon">⏳</div>
+              <p>Carregando tarefas...</p>
+            </div>
+          ) : tasks.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-state-icon">📝</div>
+              <p>Nenhuma tarefa ainda</p>
+              <p style={{ fontSize: "0.875rem", marginTop: "0.5rem" }}>
+                Adicione sua primeira tarefa abaixo!
+              </p>
+            </div>
+          ) : (
+            tasks.map((task, index) => (
+              <div
+                key={task.id}
+                className={`task-item ${task.completed ? "completed" : ""} ${
+                  index === currentTaskIndex && !task.completed ? "current" : ""
+                }`}
+                onClick={() => toggleTask(task.id)}
+              >
+                <div className="task-checkbox">{task.completed && <Check size={14} />}</div>
+
+                <span style={{ fontSize: "1.25rem" }}>
+                  {TASK_CATEGORIES[task.category]?.icon || "📌"}
+                </span>
+
+                <div className="task-content">
+                  <div className="task-text">{task.text}</div>
+                  {TASK_CATEGORIES[task.category] && (
+                    <div style={{ fontSize: "0.75rem", color: "#888", marginTop: 6 }}>
+                      {TASK_CATEGORIES[task.category].label}
+                    </div>
+                  )}
+                </div>
+                <button className="delete-task-btn" onClick={(e) => deleteTask(task.id, e)}>
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="add-task-container">
+          {showAddTask ? (
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.5rem",
+                  marginBottom: "0.75rem",
+                  flexWrap: "wrap",
+                }}
+              >
+                {Object.values(TASK_CATEGORIES).map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id)}
+                    style={{
+                      padding: "0.5rem 0.75rem",
+                      border:
+                        selectedCategory === cat.id ? `2px solid ${cat.color}` : "2px solid #e5e7eb",
+                      background: selectedCategory === cat.id ? `${cat.color}15` : "white",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.375rem",
+                      fontSize: "0.8rem",
+                      fontWeight: 600,
+                      color: selectedCategory === cat.id ? cat.color : "#666",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    <span>{cat.icon}</span>
+                    <span>{cat.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="add-task-input-container">
+                <input
+                  type="text"
+                  className="add-task-input"
+                  placeholder="Digite sua tarefa..."
+                  value={newTaskText}
+                  onChange={(e) => setNewTaskText(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && addTask()}
+                  autoFocus
+                />
+                <button className="add-task-submit" onClick={addTask}>
+                  <Plus size={20} />
+                </button>
+                <button
+                  className="control-btn secondary"
+                  style={{ width: 44, height: 44 }}
+                  onClick={() => {
+                    setShowAddTask(false);
+                    setNewTaskText("");
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button className="add-task-btn" onClick={() => setShowAddTask(true)}>
+              <Plus size={18} />
+              Adicionar Tarefa
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* RIGHT PANEL */}
+      <div className="right-panel">
+        <div className="timer-card">
+          <div className={`status-badge ${isBreak ? "break" : ""}`}>
+            <div style={{ width: 8, height: 8, background: "currentColor", borderRadius: "50%" }} />
+            {isBreak ? "Intervalo" : "Tempo de Foco"}
+          </div>
+
+          <div style={{ position: "relative", width: 220, height: 150, margin: "1rem auto 1.5rem" }}>
+            <svg width="220" height="150" viewBox="0 0 220 150">
+              <path
+                d="M 10 120 A 100 100 0 0 1 210 120"
+                fill="none"
+                stroke="#f0f0f0"
+                strokeWidth="14"
+                strokeLinecap="round"
+              />
+              <path
+                d="M 10 120 A 100 100 0 0 1 210 120"
+                fill="none"
+                stroke={selectedMood ? selectedMood.gradient.match(/#[a-f0-9]{6}/i)[0] : "#667eea"}
+                strokeWidth="14"
+                strokeLinecap="round"
+                strokeDasharray={314}
+                strokeDashoffset={314 - (314 * timer.seconds / ((isBreak ? breakTime : focusTime) * 60))}
+                style={{ 
+                  transition: "stroke-dashoffset 1s linear, stroke 0.3s ease"
+                }}
+              />
+            </svg>
+            
+            <div style={{
+              position: "absolute",
+              top: "70%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              textAlign: "center"
+            }}>
+              <div style={{ 
+                fontSize: "3rem", 
+                fontWeight: 700,
+                color: "#1a1a1a",
+                lineHeight: 1,
+                marginBottom: "0.4rem"
+              }}>
+                {String(minutes).padStart(2, "0")}:{String(secs).padStart(2, "0")}
+              </div>
+              <div style={{ 
+                fontSize: "0.8rem", 
+                color: "#999", 
+                fontWeight: 600,
+                maxWidth: "160px",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap"
+              }}>
+                {tasks[currentTaskIndex] && !tasks[currentTaskIndex].completed 
+                  ? tasks[currentTaskIndex].text
+                  : "Nenhuma tarefa"}
+              </div>
+            </div>
+          </div>
+
+          <div className="timer-controls">
+            <button className="control-btn secondary" onClick={() => timer.reset(isBreak ? breakTime : focusTime)}>
+              <RotateCcw size={20} />
+            </button>
+            <button
+              className="control-btn primary"
+              onClick={timer.isActive ? timer.pause : handleStart}
+              disabled={!selectedMood}
+            >
+              {timer.isActive ? <Pause size={28} /> : <Play size={28} style={{ marginLeft: 2 }} />}
+            </button>
+            <button
+              className="control-btn secondary"
+              onClick={() => {
+                setIsBreak(!isBreak);
+                timer.reset(isBreak ? focusTime : breakTime);
+              }}
+            >
+              <SkipForward size={20} />
+            </button>
+          </div>
+
+          {selectedMood ? (
+            <div className="mood-display" onClick={() => setShowMoodSelector(true)}>
+              {React.createElement(selectedMood.icon, { size: 20 })}
+              <span>Humor: {selectedMood.label}</span>
+            </div>
+          ) : (
+            <div className="mood-display mood-display-pulse" onClick={() => setShowMoodSelector(true)}>
+              <span>✨ Selecione seu humor para começar!</span>
+            </div>
+          )}
+        </div>
+
+        <div className="progress-card">
+          <div className="progress-header">
+            <h3>Progresso Diário</h3>
+            <div className="progress-percentage">{progress}%</div>
+          </div>
+          <div className="progress-info">
+            {completedTasks}/{tasks.length} tarefas concluídas • {pomodorosCompleted} pomodoros
+          </div>
+          <div className="progress-bar-container">
+            <div className="progress-bar" style={{ width: `${progress}%` }} />
+          </div>
+        </div>
+
+        <LofiPlayer selectedMood={selectedMood} />
+      </div>
+    </>
+  );
 
   return (
     <>
@@ -528,14 +919,56 @@ export default function PomodoroApp() {
     transition: background 0.8s ease;
   }
 
-  .app-container {
-    min-height: 100vh;
-    padding: 2rem;
-    display: flex;
-    gap: 1.5rem;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
+        .app-container {
+          min-height: 100vh;
+          padding: 2rem;
+          display: flex;
+          gap: 2rem;
+          max-width: 1600px;
+          margin: 0 auto;
+        }
+
+        /* ===== PÁGINAS NOVAS (ADICIONADO) ===== */
+        .page-wrapper {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .page-card {
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(20px);
+          border-radius: 24px;
+          padding: 2rem;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+          flex: 1;
+        }
+
+        .rooms-wrapper {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .back-btn-rooms {
+          padding: 0.75rem 1.5rem;
+          background: white;
+          color: #667eea;
+          border: 2px solid #667eea;
+          border-radius: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .back-btn-rooms:hover {
+          background: #667eea;
+          color: white;
+          transform: translateX(-4px);
+        }
 
   /* ===== NOTIFICATION ===== */
   .notification-popup {
@@ -879,10 +1312,11 @@ export default function PomodoroApp() {
     background: #f8f9ff;
   }
 
-  .add-task-input-container {
-    display: flex;
-    gap: 0.5rem;
-  }
+        .add-task-input-container {
+          display: flex;
+          gap: 0.5rem;
+          color: gray;
+        }
 
   .add-task-input {
     flex: 1;
@@ -1123,21 +1557,24 @@ export default function PomodoroApp() {
       gap: 1rem;
     }
 
-    .login-btn {
-      position: static;
-      margin: 0 0 1rem auto;
-      display: flex;
-    }
+          .login-btn {
+            position: static;
+            margin-bottom: 1rem;
+            margin-top: 1rem;
+            margin-right: 1rem;
+            margin-left: auto;
+            display: flex;
+            justify-content: flex-end;
+          }
 
-    .control-btn.primary {
-      width: 64px;
-      height: 64px;
-    }
+          .timer-display {
+            font-size: 4.5rem;
+          }
 
-    .control-btn.secondary {
-      width: 48px;
-      height: 48px;
-    }
+          .control-btn.primary {
+            width: 70px;
+            height: 70px;
+          }
 
     .mood-grid {
       grid-template-columns: repeat(2, 1fr);
@@ -1215,17 +1652,16 @@ export default function PomodoroApp() {
       )}
 
       <div className="app-container">
-        <Sidebar />
-        <div className="task-list-card">
-          <div className="task-header">
-            <div>
-              <h2>
-                Minhas Tarefas
-                <span className="task-count">({tasks.length})</span>
-              </h2>
-            </div>
-          </div>
+        <Sidebar activePage={activePage} onPageChange={handlePageChange} />
+        {renderPageContent()}
+      </div>
 
+      <RoomModal
+        isOpen={showRoomModal}
+        onClose={() => setShowRoomModal(false)}
+        onRoomCreated={handleRoomCreated}
+        onRoomJoined={handleRoomJoined}
+      />
           {!session && (
             <div
               style={{

@@ -1,4 +1,4 @@
-// components/gamification/StreakCounter.jsx
+// components/gamefication/StreakCounter.jsx
 import { Flame, Trophy } from 'lucide-react';
 
 export default function StreakCounter({ streak = 23, bestStreak = 45 }) {
