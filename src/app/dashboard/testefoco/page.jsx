@@ -46,37 +46,6 @@ const perguntasFoco = [
   },
 ];
 
-const perguntasPomodoro = [
-  {
-    id: 1,
-    texto: "Por quanto tempo você costuma manter o foco antes de se distrair?",
-    opcoes: [
-      { label: "Menos de 15 minutos", valor: "curto" },
-      { label: "Cerca de 25 minutos", valor: "medio" },
-      { label: "40-60 minutos", valor: "longo" },
-      { label: "Mais de 1h30", valor: "extenso" },
-    ],
-  },
-  {
-    id: 2,
-    texto: "Como está o teu nível de energia hoje?",
-    opcoes: [
-      { label: "Baixo, cansado", valor: "baixo" },
-      { label: "Normal", valor: "medio" },
-      { label: "Motivado e energizado", valor: "alto" },
-    ],
-  },
-  {
-    id: 3,
-    texto: "Qual tipo de tarefa você vai fazer?",
-    opcoes: [
-      { label: "Criativa ou artística", valor: "criativo" },
-      { label: "Analítica ou técnica", valor: "tecnico" },
-      { label: "Rotineira ou simples", valor: "rotina" },
-    ],
-  },
-];
-
 const CARDS = [
   {
     id: 1,
@@ -107,56 +76,15 @@ export default function TesteFocoPage() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  const [etapaPomodoro, setEtapaPomodoro] = useState(0);
-  const [respostasPomodoro, setRespostasPomodoro] = useState({});
-  const [resultadoPomodoro, setResultadoPomodoro] = useState(null);
-
   const [perguntaAtualFoco, setPerguntaAtualFoco] = useState(0);
   const [respostasFoco, setRespostasFoco] = useState([]);
   const [resultadoFoco, setResultadoFoco] = useState(null);
-
   const [openCard, setOpenCard] = useState(null);
 
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
 
-  // ====== Funções do teste Pomodoro ======
-  const handleRespostaPomodoro = (id, valor) => {
-    setRespostasPomodoro({ ...respostasPomodoro, [id]: valor });
-    setEtapaPomodoro(etapaPomodoro + 1);
-  };
-
-  const calcularPomodoro = () => {
-    const foco = respostasPomodoro[1];
-    const energia = respostasPomodoro[2];
-    const tipo = respostasPomodoro[3];
-    if (energia === "baixo" || foco === "curto")
-      setResultadoPomodoro({
-        nome: "Suave (15/3)",
-        cor: "#f59e0b",
-        icon: Coffee,
-      });
-    else if (foco === "medio" && energia === "medio")
-      setResultadoPomodoro({
-        nome: "Clássico (25/5)",
-        cor: "#3b82f6",
-        icon: Brain,
-      });
-    else if (foco === "longo" || tipo === "tecnico")
-      setResultadoPomodoro({
-        nome: "Profundo (50/10)",
-        cor: "#10b981",
-        icon: Zap,
-      });
-    else
-      setResultadoPomodoro({
-        nome: "Intenso (90/20)",
-        cor: "#ec4899",
-        icon: Smile,
-      });
-  };
-
-  // ====== Funções do teste de foco ======
+  // ====== Lógica do teste de foco ======
   const handleRespostaFoco = (tipo) => {
     const novasRespostas = [...respostasFoco, tipo];
     setRespostasFoco(novasRespostas);
@@ -175,13 +103,15 @@ export default function TesteFocoPage() {
   };
 
   const estilosFoco = {
-    criativo: { cor: "from-pink-400 to-purple-500" },
-    estrategista: { cor: "from-blue-500 to-indigo-600" },
+    criativo: { cor: "from-pink-500 to-purple-600" },
+    estrategista: { cor: "from-indigo-500 to-blue-600" },
     zen: { cor: "from-green-400 to-teal-500" },
   };
 
   return (
-    <div className="min-h-screen transition-colors duration-300 bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100 px-6 py-12 relative">
+    <div className="min-h-screen transition-colors duration-300 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 text-slate-900 dark:text-slate-100 px-4 sm:px-6 lg:px-10 py-12 relative">
+      
+      {/* Botão tema */}
       <button
         onClick={() => setTheme(theme === "light" ? "dark" : "light")}
         className="absolute top-6 right-6 p-3 rounded-full bg-slate-200 dark:bg-slate-700 hover:scale-110 transition"
@@ -189,15 +119,14 @@ export default function TesteFocoPage() {
         {theme === "light" ? <Moon size={20} /> : <Sun size={22} />}
       </button>
 
-      {/* ====== Topo com duas colunas unificadas ====== */}
-      <div className="flex flex-col lg:flex-row items-start justify-center gap-8 mb-20">
-        {/* Coluna 1 */}
+      {/* ====== Teste de Foco ====== */}
+      <div className="flex flex-col items-center justify-center mb-20">
         <motion.div
-          className="flex-1 bg-slate-100 dark:bg-slate-800/70 backdrop-blur-lg rounded-2xl p-8 shadow-lg"
+          className="w-full max-w-2xl bg-white/70 dark:bg-slate-800/80 backdrop-blur-md rounded-2xl p-8 shadow-lg border border-slate-200/30 dark:border-slate-700/30"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h2 className="text-2xl font-bold mb-6 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-indigo-600 dark:text-indigo-400">
             Descubra seu tipo de foco
           </h2>
           <AnimatePresence mode="wait">
@@ -210,7 +139,7 @@ export default function TesteFocoPage() {
                 transition={{ duration: 0.4 }}
                 className="text-center"
               >
-                <p className="text-lg mb-6">
+                <p className="text-lg mb-6 font-medium">
                   {perguntasFoco[perguntaAtualFoco].texto}
                 </p>
                 <div className="flex flex-col gap-3">
@@ -218,8 +147,9 @@ export default function TesteFocoPage() {
                     <motion.button
                       key={i}
                       onClick={() => handleRespostaFoco(opcao.tipo)}
-                      whileHover={{ scale: 1.05 }}
-                      className="bg-white dark:bg-slate-900 py-3 rounded-xl shadow hover:shadow-md transition"
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 py-3 rounded-xl shadow-sm hover:shadow-md transition text-sm sm:text-base"
                     >
                       {opcao.texto}
                     </motion.button>
@@ -231,51 +161,46 @@ export default function TesteFocoPage() {
                 key="resultadoFoco"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className={`text-center p-6 rounded-2xl bg-gradient-to-br ${estilosFoco[resultadoFoco].cor} text-white shadow-lg`}
+                className={`text-center p-8 rounded-2xl bg-gradient-to-br ${estilosFoco[resultadoFoco].cor} text-white shadow-lg`}
               >
-                <h3 className="text-xl font-bold mb-2">
+                <h3 className="text-xl md:text-2xl font-bold mb-2">
                   Teu foco é {resultadoFoco.toUpperCase()}!
                 </h3>
+                <p className="text-sm opacity-90">
+                  Esse estilo revela como você rende melhor. Explore abaixo!
+                </p>
               </motion.div>
             )}
           </AnimatePresence>
         </motion.div>
-
       </div>
 
-      {/* ====== Cards e mini jogo ====== */}
-      <motion.h2
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
-        className="text-2xl font-semibold mt-8 mb-6 text-center"
-      >
-        Desenvolvimento Pessoal & Foco
-      </motion.h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-16">
         {CARDS.map((card) => {
           const Icon = card.icon;
           const isOpen = openCard === card.id;
           return (
             <motion.div
               key={card.id}
-              className="bg-slate-100 dark:bg-slate-800/70 rounded-2xl p-6 shadow-lg cursor-pointer"
+              className="bg-white dark:bg-slate-800/70 rounded-2xl p-6 shadow-md border border-slate-200/50 dark:border-slate-700/50 cursor-pointer hover:shadow-lg transition"
               onClick={() => setOpenCard(isOpen ? null : card.id)}
               whileHover={{ scale: 1.02 }}
             >
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-3 mb-3">
                 <Icon
-                  size={28}
-                  color={theme === "light" ? "#2563eb" : "#60a5fa"}
+                  size={26}
+                  color={theme === "light" ? "#4338ca" : "#818cf8"}
                 />
-                <h3 className="text-xl font-semibold">{card.title}</h3>
+                <h3 className="text-lg font-semibold">{card.title}</h3>
               </div>
-              <p className="mb-4">{card.summary}</p>
+              <p className="text-sm mb-3 text-slate-600 dark:text-slate-300">
+                {card.summary}
+              </p>
               {isOpen && (
                 <motion.div
-                  className="mt-4 text-sm text-slate-700 dark:text-slate-300"
-                  initial={{ opacity: 0, y: 20 }}
+                  className="mt-3 text-sm text-slate-700 dark:text-slate-300 leading-relaxed"
+                  initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                 >
                   {card.content}
@@ -286,7 +211,10 @@ export default function TesteFocoPage() {
         })}
       </div>
 
-      <DesafioFoco />
+      {/* ====== Mini Jogo / Desafio ====== */}
+      <div className="max-w-5xl mx-auto">
+        <DesafioFoco />
+      </div>
     </div>
   );
 }
