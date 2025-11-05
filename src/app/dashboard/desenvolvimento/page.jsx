@@ -142,6 +142,7 @@ export default function FocoPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 px-4 sm:px-6 md:px-10 py-10 flex flex-col items-center">
       {/* Título e subtítulo */}
+      
       <motion.h1
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}

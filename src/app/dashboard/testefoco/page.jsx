@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
+import { ArrowLeft } from "lucide-react";
 import {
   Brain,
   Heart,
@@ -65,8 +66,7 @@ const CARDS = [
   {
     id: 3,
     title: "Desenvolvimento Cognitivo",
-    summary:
-      "Fortaleça o cérebro com práticas de atenção e aprendizado.",
+    summary: "Fortaleça o cérebro com práticas de atenção e aprendizado.",
     content: "Mindfulness e leitura ativa expandem a capacidade de foco.",
     icon: Brain,
   },
@@ -110,14 +110,10 @@ export default function TesteFocoPage() {
 
   return (
     <div className="min-h-screen transition-colors duration-300 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 text-slate-900 dark:text-slate-100 px-4 sm:px-6 lg:px-10 py-12 relative">
-      
-      {/* Botão tema */}
-      <button
-        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-        className="absolute top-6 right-6 p-3 rounded-full bg-slate-200 dark:bg-slate-700 hover:scale-110 transition"
-      >
-        {theme === "light" ? <Moon size={20} /> : <Sun size={22} />}
-      </button>
+      <button className="back-button" onClick={() => window.history.back()}>
+        <ArrowLeft size={20} />
+        Voltar
+      </button> 
 
       {/* ====== Teste de Foco ====== */}
       <div className="flex flex-col items-center justify-center mb-20">
@@ -174,7 +170,6 @@ export default function TesteFocoPage() {
           </AnimatePresence>
         </motion.div>
       </div>
-
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-16">
         {CARDS.map((card) => {
