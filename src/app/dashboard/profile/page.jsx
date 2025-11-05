@@ -35,7 +35,7 @@ function ProfilePage() {
       }
 
       const data = await response.json();
-      console.log("📊 Dados do perfil:", data);
+      console.log("📊 Dados do perfil recebidos:", data);
       setProfileData(data);
       setError(null);
     } catch (err) {
@@ -61,7 +61,6 @@ function ProfilePage() {
         const { signOut } = await import("next-auth/react");
         await signOut({ callbackUrl: "/" });
       } else {
-        // Removido alert()
         console.error("Erro ao deletar conta");
       }
     } catch (error) {
@@ -93,7 +92,6 @@ function ProfilePage() {
             avatar: data.avatar,
           },
         });
-        // Removido alert() - sucesso silencioso
       } else {
         console.error("Erro ao atualizar avatar");
       }
@@ -121,7 +119,7 @@ function ProfilePage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 flex items-center justify-center">
+      <div className="min-h-screen linear-gradient(135deg, #667eea 0%, #764ba2 100%) flex items-center justify-center">
         <div className="text-white text-xl">Carregando perfil...</div>
       </div>
     );

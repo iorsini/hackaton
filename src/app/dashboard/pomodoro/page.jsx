@@ -1145,9 +1145,6 @@ export default function PomodoroApp() {
             <div className="progress-percentage">{progress}%</div>
           </div>
           <div className="progress-info">
-            <div className="pomodoro-display">
-              🍅 {pomodorosCompleted} pomodoros
-            </div>
             <div>
               {completedTasks}/{tasks.length} tarefas
             </div>

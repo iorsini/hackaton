@@ -25,14 +25,14 @@ export default function AboutPomofy() {
     },
     {
       name: "Isadora Barradas",
-      role: "Frontend Developer",
+      role: "Full-Stack Developer",
       github: "https://github.com/iorsini",
       linkedin: "https://www.linkedin.com/in/isadora-barradas/",
       avatar: "/images/isadora.png",
     },
     {
-      name: "Mishal Saheer",
-      role: "Backend Developer",
+      name: "Jhonathan Tinoco",
+      role: "Full-Stack Developer",
       github: "https://github.com/msaheers",
       linkedin: "https://www.linkedin.com/in/mishal-saheer-a90146323/",
       avatar: "/images/mishal.jpeg",

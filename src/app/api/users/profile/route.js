@@ -1,4 +1,3 @@
-// app/api/users/profile/route.js
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectDB from "@/lib/mongodb";
@@ -15,7 +14,7 @@ export async function GET(request) {
 
     await connectDB();
 
-    // 🔥 CORRIGIDO: Buscar usuário SEM select
+    // ✅ Buscar usuário SEM select para pegar TODOS os campos
     const user = await User.findOne({ email: session.user.email });
 
     if (!user) {
@@ -34,13 +33,13 @@ export async function GET(request) {
     const completionRate =
       totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-    // 🔥 CORRIGIDO: Pegar dados REAIS do banco
+    // ✅ Pegar dados REAIS do banco
     const totalPomodoros = user.totalPomodoros || 0;
     const totalFocusTime = user.stats?.totalFocusTime || 0;
     const totalBreakTime = user.stats?.totalBreakTime || 0;
     const totalMinutes = user.stats?.totalMinutes || 0;
 
-    console.log(`📊 Perfil carregado:`);
+    console.log(`📊 Perfil carregado para ${user.email}:`);
     console.log(`   - Total Pomodoros: ${totalPomodoros}`);
     console.log(`   - Total Focus Time: ${totalFocusTime} min`);
     console.log(`   - Total Break Time: ${totalBreakTime} min`);
@@ -88,7 +87,7 @@ export async function GET(request) {
   }
 }
 
-// 🔥 CORRIGIDO: Calcular streak com base na lastActivity
+// ✅ Calcular streak com base na lastActivity
 function calculateStreak(user) {
   if (!user.stats?.lastActivity) return 0;
 
