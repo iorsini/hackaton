@@ -704,8 +704,7 @@ export default function PomodoroApp() {
                     verticalAlign: "middle",
                   }}
                 />
-                Seu Progresso
-              </h1>
+                Sobre a Pomofy              </h1>
               <p style={{ color: "#666", marginBottom: "2rem" }}>
                 Acompanhe suas estatísticas e evolução
               </p>
