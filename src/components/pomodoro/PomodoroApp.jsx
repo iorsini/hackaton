@@ -201,66 +201,112 @@ export default function PomodoroApp() {
     }
   };
 
-  const handleTimerComplete = () => {
-    if (!isBreak) {
-      // Completar task atual
-      if (tasks[currentTaskIndex] && !tasks[currentTaskIndex].completed) {
-        const newTasks = [...tasks];
-        newTasks[currentTaskIndex].completed = true;
-        setTasks(newTasks);
+  const handleTimerComplete = async () => {
+  if (audioRef.current) {
+    audioRef.current.play().catch((err) => {
+      console.log("Erro ao tocar áudio:", err);
+    });
+  }
+
+  if (!isBreak) {
+    // ========================================
+    // COMPLETOU UM CICLO DE FOCO
+    // ========================================
+    
+    // 1. Marcar task atual como completa
+    if (tasks[currentTaskIndex] && !tasks[currentTaskIndex].completed) {
+      const newTasks = [...tasks];
+      newTasks[currentTaskIndex].completed = true;
+      setTasks(newTasks);
+    }
+
+    // 2. Registrar o pomodoro no backend
+    if (session?.user) {
+      try {
+        const response = await fetch("/api/users/pomodoro", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            focusTimeMinutes: focusTime, // tempo do timer que acabou de completar
+            moodId: selectedMood?.id,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`✅ Pomodoro registrado:`, data);
+          
+          // Atualiza com valor do servidor
+          setPomodorosCompleted(data.totalPomodoros);
+          
+          showNotif(`+${data.pomodorosAdded} pomodoro(s) completado(s)! 🎯`);
+        } else {
+          console.error("❌ Erro ao salvar pomodoro");
+          // Fallback: incrementa localmente
+          setPomodorosCompleted((prev) => prev + 1);
+        }
+      } catch (error) {
+        console.error("❌ Erro ao registrar pomodoro:", error);
+        // Fallback: incrementa localmente
+        setPomodorosCompleted((prev) => prev + 1);
       }
-
-      setPomodorosCompleted((p) => p + 1);
-      setIsBreak(true);
-      timer.reset(breakTime);
-
-      const messages = selectedMood?.breakMessages || [
-        "Beba água! 💧",
-        "Alongue-se!",
-        "Descanse os olhos",
-      ];
-      showNotif(messages[Math.floor(Math.random() * messages.length)]);
     } else {
-      setIsBreak(false);
+      // Usuário não logado: apenas incrementa localmente
+      setPomodorosCompleted((prev) => prev + 1);
+    }
 
-      // Avançar para próxima task não completada
-      const nextIndex = tasks.findIndex(
-        (t, i) => i > currentTaskIndex && !t.completed
-      );
-      if (nextIndex !== -1) {
-        setCurrentTaskIndex(nextIndex);
+    // 3. Mudar para modo pausa
+    setIsBreak(true);
+    timer.reset(breakTime);
+
+    const messages = selectedMood?.breakMessages || [
+      "Beba água! 💧",
+      "Alongue-se!",
+      "Descanse os olhos",
+    ];
+    showNotif(messages[Math.floor(Math.random() * messages.length)]);
+
+  } else {
+    // ========================================
+    // COMPLETOU UMA PAUSA
+    // ========================================
+    
+    // Registrar tempo de pausa (opcional)
+    if (session?.user) {
+      try {
+        await fetch("/api/users/pomodoro", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            breakTimeMinutes: breakTime,
+            moodId: selectedMood?.id,
+          }),
+        });
+      } catch (error) {
+        console.error("Erro ao registrar pausa:", error);
       }
-
-      timer.reset(focusTime);
-
-      const messages = selectedMood?.focusMessages || [
-        "Vamos lá! 💪",
-        "Foco total!",
-      ];
-      showNotif(messages[Math.floor(Math.random() * messages.length)]);
-    }
-  };
-
-  const timer = useTimer(focusTime, handleTimerComplete);
-
-  const handleStart = () => {
-    if (!selectedMood) {
-      showNotif("Selecione seu humor primeiro! 😊");
-      setShowMoodSelector(true);
-      return;
     }
 
-    timer.start();
+    // Voltar para modo foco
+    setIsBreak(false);
 
-    if ("Notification" in window && Notification.permission === "default") {
-      Notification.requestPermission();
+    // Avançar para próxima task não completada
+    const nextIndex = tasks.findIndex(
+      (t, i) => i > currentTaskIndex && !t.completed
+    );
+    if (nextIndex !== -1) {
+      setCurrentTaskIndex(nextIndex);
     }
 
-    if (!isBreak) {
-      const messages = selectedMood?.focusMessages || ["Foco! 💪"];
-      showNotif(messages[Math.floor(Math.random() * messages.length)]);
-    }
-  };
+    timer.reset(focusTime);
+
+    const messages = selectedMood?.focusMessages || [
+      "Vamos lá!",
+      "Foco total!",
+    ];
+    showNotif(messages[Math.floor(Math.random() * messages.length)]);
+  }
+};
 
   const minutes = Math.floor(timer.seconds / 60);
   const secs = timer.seconds % 60;

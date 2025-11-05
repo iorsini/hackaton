@@ -312,67 +312,68 @@ export default function PomodoroApp() {
     }
 
     if (!isBreak) {
-      // Completou um pomodoro de foco
+      // ========================================
+      // COMPLETOU UM CICLO DE FOCO
+      // ========================================
+
+      // 1. Marcar task atual como completa
       if (tasks[currentTaskIndex] && !tasks[currentTaskIndex].completed) {
         const newTasks = [...tasks];
         newTasks[currentTaskIndex].completed = true;
         setTasks(newTasks);
       }
 
-      // 🔥 IMPORTANTE: Calcula quantos minutos foram focados
-      const minutesFocused = focusTime;
-
-      console.log(`⏱️ Timer completo: ${minutesFocused} minutos focados`);
-
-      // 🔥 Registrar no banco de dados
+      // 2. Registrar o pomodoro no backend
       if (session?.user) {
         try {
-          const res = await fetch("/api/users/pomodoro", {
+          const response = await fetch("/api/users/pomodoro", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              focusTimeMinutes: minutesFocused,
+              focusTimeMinutes: focusTime, // tempo do timer que acabou de completar
               moodId: selectedMood?.id,
             }),
           });
 
-          if (res.ok) {
-            const data = await res.json();
-            console.log(
-              `✅ Servidor respondeu: +${data.pomodorosAdded} pomodoros`
-            );
+          if (response.ok) {
+            const data = await response.json();
+            console.log(`✅ Pomodoro registrado:`, data);
 
-            // Atualiza APENAS com o valor que veio do servidor
+            // Atualiza com valor do servidor
             setPomodorosCompleted(data.totalPomodoros);
-            showNotif(`+${data.pomodorosAdded} pomodoros! 🎯`);
+
+            showNotif(`+${data.pomodorosAdded} pomodoro(s) completado(s)! 🎯`);
           } else {
-            console.error("❌ Erro ao salvar no servidor");
-            // Se falhar, incrementa localmente
-            setPomodorosCompleted((p) => p + minutesFocused);
+            console.error("❌ Erro ao salvar pomodoro");
+            // Fallback: incrementa localmente
+            setPomodorosCompleted((prev) => prev + 1);
           }
         } catch (error) {
           console.error("❌ Erro ao registrar pomodoro:", error);
-          // Se der erro, incrementa localmente
-          setPomodorosCompleted((p) => p + minutesFocused);
+          // Fallback: incrementa localmente
+          setPomodorosCompleted((prev) => prev + 1);
         }
       } else {
-        // Se não estiver logado, apenas incrementa localmente
-        setPomodorosCompleted((p) => p + minutesFocused);
+        // Usuário não logado: apenas incrementa localmente
+        setPomodorosCompleted((prev) => prev + 1);
       }
 
+      // 3. Mudar para modo pausa
       setIsBreak(true);
       timer.reset(breakTime);
 
       const messages = selectedMood?.breakMessages || [
-        "Beba água!",
+        "Beba água! 💧",
         "Alongue-se!",
         "Descanse os olhos",
       ];
       showNotif(messages[Math.floor(Math.random() * messages.length)]);
     } else {
-      // Completou uma pausa
+      // ========================================
+      // COMPLETOU UMA PAUSA
+      // ========================================
 
-      // Registrar tempo de pausa no banco de dados (apenas se estiver logado)
+      // Registrar tempo de pausa (opcional)
       if (session?.user) {
         try {
           await fetch("/api/users/pomodoro", {
@@ -388,8 +389,10 @@ export default function PomodoroApp() {
         }
       }
 
+      // Voltar para modo foco
       setIsBreak(false);
 
+      // Avançar para próxima task não completada
       const nextIndex = tasks.findIndex(
         (t, i) => i > currentTaskIndex && !t.completed
       );
