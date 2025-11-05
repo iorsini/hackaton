@@ -1,21 +1,11 @@
 "use client";
-import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { 
-  User, 
-  Mail, 
-  Calendar, 
-  Award, 
-  Target, 
-  TrendingUp, 
-  Camera, 
-  ArrowLeft, 
-  LogOut, 
-  AlertTriangle, 
-  Trash2, 
-  Clock, 
-  Coffee 
+  User, Mail, Calendar, Award, Target, TrendingUp, 
+  ArrowLeft, LogOut, AlertTriangle, Trash2, 
+  Clock, Coffee, Camera, Check 
 } from "lucide-react";
 
 function ProfilePage() {
@@ -57,6 +47,7 @@ function ProfilePage() {
   };
 
   const handleLogout = async () => {
+    const { signOut } = await import("next-auth/react");
     await signOut({ callbackUrl: "/" });
   };
 
@@ -67,13 +58,14 @@ function ProfilePage() {
       });
 
       if (response.ok) {
+        const { signOut } = await import("next-auth/react");
         await signOut({ callbackUrl: "/" });
       } else {
-        alert("Erro ao deletar conta. Tente novamente.");
+        // Removido alert()
+        console.error("Erro ao deletar conta");
       }
     } catch (error) {
       console.error("Erro ao deletar conta:", error);
-      alert("Erro ao deletar conta. Tente novamente.");
     }
   };
 
@@ -87,7 +79,7 @@ function ProfilePage() {
       const formData = new FormData();
       formData.append("avatar", file);
 
-      const res = await fetch("/api/users/me/avatar", {
+      const res = await fetch("/api/users/avatar", {
         method: "POST",
         body: formData,
       });
@@ -101,13 +93,12 @@ function ProfilePage() {
             avatar: data.avatar,
           },
         });
-        alert("Avatar atualizado com sucesso!");
+        // Removido alert() - sucesso silencioso
       } else {
-        alert("Erro ao atualizar avatar");
+        console.error("Erro ao atualizar avatar");
       }
     } catch (error) {
       console.error("Erro:", error);
-      alert("Erro ao atualizar avatar");
     } finally {
       setUploadingAvatar(false);
     }

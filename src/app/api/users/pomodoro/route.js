@@ -6,7 +6,8 @@ import User from "@/models/User";
 
 // 🔥 IMPORTANTE: 1 minuto focado = 1 pomodoro
 function calculatePomodoros(focusTimeMinutes) {
-  return Math.max(0, Math.floor(focusTimeMinutes));
+  const POMODORO_MINUTES = 25;
+  return Math.floor(focusTimeMinutes / POMODORO_MINUTES);
 }
 
 export async function POST(request) {

@@ -20,12 +20,14 @@ export default function AvatarUpload() {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      setError("Please select an image file");
+      setError("Por favor, selecione um arquivo de imagem");
+      setSuccess("");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setError("Image must be less than 5MB");
+      setError("A imagem deve ter menos de 5MB");
+      setSuccess("");
       return;
     }
 
@@ -37,7 +39,7 @@ export default function AvatarUpload() {
       const formData = new FormData();
       formData.append("avatar", file);
 
-      const res = await fetch("/api/users/me/avatar", {
+      const res = await fetch("/api/users/avatar", {
         method: "POST",
         body: formData,
       });
@@ -45,9 +47,10 @@ export default function AvatarUpload() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to upload avatar");
+        throw new Error(data.error || "Erro ao atualizar avatar");
       }
 
+      // ✅ Atualiza a sessão com o novo avatar
       await update({
         ...session,
         user: {
@@ -57,7 +60,10 @@ export default function AvatarUpload() {
         },
       });
 
-      setSuccess("Avatar updated successfully!");
+      setSuccess("Avatar atualizado com sucesso! ✨");
+      
+      // Limpa mensagem de sucesso após 3 segundos
+      setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -71,14 +77,14 @@ export default function AvatarUpload() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/users/me/avatar", {
+      const res = await fetch("/api/users/avatar", {
         method: "DELETE",
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to remove avatar");
+        throw new Error(data.error || "Erro ao remover avatar");
       }
 
       await update({
@@ -90,7 +96,8 @@ export default function AvatarUpload() {
         },
       });
 
-      setSuccess("Avatar removed successfully!");
+      setSuccess("Avatar removido com sucesso!");
+      setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -100,7 +107,7 @@ export default function AvatarUpload() {
 
   return (
     <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-2xl p-6 border border-gray-700/50">
-      <h3 className="text-white text-xl font-bold mb-4">Profile Picture</h3>
+      <h3 className="text-white text-xl font-bold mb-4">Foto de Perfil</h3>
 
       {error && <Alert type="error">{error}</Alert>}
       {success && <Alert type="success">{success}</Alert>}
@@ -141,7 +148,7 @@ export default function AvatarUpload() {
             size="sm"
             disabled={loading}
           >
-            Change Photo
+            Alterar Foto
           </Button>
           {session?.user?.avatar !== "/images/default-avatar.png" && (
             <Button
@@ -151,14 +158,14 @@ export default function AvatarUpload() {
               size="sm"
               disabled={loading}
             >
-              Remove
+              Remover
             </Button>
           )}
         </div>
       </div>
 
       <p className="text-gray-400 text-sm mt-4">
-        Recommended: Square image, at least 400x400px. Max size: 5MB
+        Recomendado: Imagem quadrada, mínimo 400x400px. Tamanho máximo: 5MB
       </p>
     </div>
   );

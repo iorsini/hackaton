@@ -310,7 +310,7 @@ export default function PomodoroApp() {
         console.log("Erro ao tocar áudio:", err);
       });
     }
-    
+
     if (!isBreak) {
       // Completou um pomodoro de foco
       if (tasks[currentTaskIndex] && !tasks[currentTaskIndex].completed) {
@@ -435,10 +435,7 @@ export default function PomodoroApp() {
           const res = await fetch("/api/users/profile");
           if (res.ok) {
             const data = await res.json();
-            console.log(
-              "🎯 Carregando pomodoros do banco:",
-              data.stats.totalPomodoros
-            );
+            console.log("🎯 Carregando pomodoros:", data.stats.totalPomodoros);
             setPomodorosCompleted(data.stats.totalPomodoros || 0);
           }
         } catch (error) {
@@ -704,7 +701,8 @@ export default function PomodoroApp() {
                     verticalAlign: "middle",
                   }}
                 />
-                Sobre a Pomofy              </h1>
+                Sobre a Pomofy{" "}
+              </h1>
               <p style={{ color: "#666", marginBottom: "2rem" }}>
                 Acompanhe suas estatísticas e evolução
               </p>
@@ -1144,8 +1142,12 @@ export default function PomodoroApp() {
             <div className="progress-percentage">{progress}%</div>
           </div>
           <div className="progress-info">
-            {completedTasks}/{tasks.length} tarefas concluídas •{" "}
-            {pomodorosCompleted} pomodoros
+            <div className="pomodoro-display">
+              🍅 {pomodorosCompleted} pomodoros
+            </div>
+            <div>
+              {completedTasks}/{tasks.length} tarefas
+            </div>
           </div>
           <div className="progress-bar-container">
             <div className="progress-bar" style={{ width: `${progress}%` }} />
