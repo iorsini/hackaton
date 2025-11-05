@@ -194,7 +194,7 @@ const MOODS = {
     label: "Do Contra",
     focusTime: 25,
     breakTime: 5,
-gradient: "linear-gradient(135deg, #312e81 0%, #9333ea 100%)",
+    gradient: "linear-gradient(135deg, #312e81 0%, #9333ea 100%)",
     icon: Settings,
     focusMessages: [
       "Nem sempre com vontade, mas sempre capaz.",
@@ -252,6 +252,7 @@ const useTimer = (initialMinutes, onComplete) => {
 // ============================================
 export default function PomodoroApp() {
   const { data: session, status } = useSession();
+  const audioRef = useRef(null);
 
   // Navigation states
   const [activePage, setActivePage] = useState("timer");
@@ -2149,7 +2150,7 @@ export default function PomodoroApp() {
         <Sidebar activePage={activePage} onPageChange={handlePageChange} />
         {renderPageContent()}
       </div>
-
+      <audio ref={audioRef} src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto" />
       <RoomModal
         isOpen={showRoomModal}
         onClose={() => setShowRoomModal(false)}
