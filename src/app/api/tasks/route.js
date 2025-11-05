@@ -1,60 +1,56 @@
-import clientPromise from '@/lib/mongodb'
-import { ObjectId } from 'mongodb'
-import { verificarToken } from '@/middleware/auth'
+// app/api/tasks/route.js
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import dbConnect from '@/lib/mongodb';
+import Task from '@/models/Task';
 
-export default async function handler(req, res) {
-  const userId = verificarToken(req)
-
-  if (!userId) {
-    return res.status(401).json({ erro: 'Não autenticado' })
-  }
-
-  const client = await clientPromise
-  const db = client.db('gestorTarefas')
-
-  // GET - Buscar tarefas do usuário
-  if (req.method === 'GET') {
-    try {
-      const tarefas = await db.collection('tarefas')
-        .find({ userId })
-        .sort({ criadoEm: -1 })
-        .toArray()
-
-      res.status(200).json(tarefas)
-    } catch (error) {
-      console.error(error)
-      res.status(500).json({ erro: 'Erro ao buscar tarefas' })
+export async function GET(request) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session) {
+      return Response.json({ erro: 'Não autorizado' }, { status: 401 });
     }
+
+    await dbConnect();
+    
+    const tasks = await Task.find({ userId: session.user.id })
+      .sort({ createdAt: -1 });
+
+    return Response.json({ tasks });
+  } catch (error) {
+    console.error('Erro ao buscar tasks:', error);
+    return Response.json({ erro: 'Erro ao buscar tarefas' }, { status: 500 });
   }
+}
 
-  // POST - Criar nova tarefa
-  else if (req.method === 'POST') {
-    try {
-      const { nome, tema, checked } = req.body
-
-      const novaTarefa = {
-        nome,
-        tema: tema || 'geral',
-        checked: Boolean(checked),
-        userId,
-        criadoEm: new Date(),
-        atualizadoEm: new Date()
-      }
-
-      const resultado = await db.collection('tarefas').insertOne(novaTarefa)
-
-      res.status(201).json({ 
-        ...novaTarefa, 
-        _id: resultado.insertedId 
-      })
-
-    } catch (error) {
-      console.error(error)
-      res.status(500).json({ erro: 'Erro ao criar tarefa' })
+export async function POST(request) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session) {
+      return Response.json({ erro: 'Não autorizado' }, { status: 401 });
     }
-  }
 
-  else {
-    res.status(405).json({ erro: 'Método não permitido' })
+    const body = await request.json();
+    const { text, category = 'outros' } = body;
+
+    if (!text?.trim()) {
+      return Response.json({ erro: 'Texto obrigatório' }, { status: 400 });
+    }
+
+    await dbConnect();
+
+    const task = await Task.create({
+      userId: session.user.id,
+      text: text.trim(),
+      category,
+      completed: false
+    });
+
+    return Response.json({ task }, { status: 201 });
+  } catch (error) {
+    console.error('Erro ao criar task:', error);
+    return Response.json({ erro: 'Erro ao criar tarefa' }, { status: 500 });
   }
 }
