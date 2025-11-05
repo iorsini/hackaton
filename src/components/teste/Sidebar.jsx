@@ -53,7 +53,7 @@ export default function Sidebar() {
     { key: "testesfoco", label: "Foco e Concentração", icon: <Focus size={20} />, path: "/dashboard/testefoco" },
     { key: "desenvolvimento", label: "Técnica de Produtividade", icon: <Brain size={20} />, path: "/dashboard/desenvolvimento" },
     { key: "Store", label: "Store", icon: <Store size={20} />, path: "/dashboard/store" },
-    { key: "Sobre a Pomofy", label: "Sobre a Pomo", icon: <Info size={20} />, path: "/dashboard/sobre" },
+    { key: "Sobre a Pomofy", label: "Sobre a Pomofy", icon: <Info size={20} />, path: "/dashboard/sobre" },
   ];
 
   return (
@@ -145,7 +145,7 @@ export default function Sidebar() {
       )}
 
       {/* Sidebar Desktop */}
-      <div className="hidden md:flex flex-col justify-between w-64 bg-white border-r h-screen">
+      <div className="hidden md:flex flex-col justify-between w-64 bg-white border-r rounded-xl max-h-[calc(100vh-4rem)] h-screen">
         <div>
           <div className="flex items-center gap-3 p-4 border-b">
             <img
@@ -197,7 +197,7 @@ export default function Sidebar() {
                   </div>
                 )}
                 <div>
-                  <div className="font-medium">{user.name}</div>
+                  <div className="font-medium text-gray-800">{user.name}</div>
                   <div className="text-sm text-gray-500">{user.email}</div>
                 </div>
               </Link>

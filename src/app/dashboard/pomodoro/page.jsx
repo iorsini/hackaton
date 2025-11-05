@@ -6,6 +6,7 @@ import {
   Pause,
   RotateCcw,
   Plus,
+  Sparkle,
   X,
   Coffee,
   Brain,
@@ -191,11 +192,11 @@ const MOODS = {
   },
   CUSTOM: {
     id: "custom",
-    label: "Do Contra",
+    label: "Autêntico",
     focusTime: 25,
     breakTime: 5,
     gradient: "linear-gradient(135deg, #312e81 0%, #9333ea 100%)",
-    icon: Settings,
+    icon: Sparkle,
     focusMessages: [
       "Nem sempre com vontade, mas sempre capaz.",
       "Hoje é no modo 'faço porque preciso'.",
