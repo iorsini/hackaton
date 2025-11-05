@@ -1,12 +1,12 @@
-"use client";
+{/*"use client";
 
-import React, { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { TiPlus } from "react-icons/ti";
-import { BiMenuAltLeft } from "react-icons/bi";
-import { IoFlashOutline } from "react-icons/io5";
-import Sidebar from "@/components/teste/Sidebar";
-import BottomNavbar from "@/components/dashboard/bottomNavBar";
+//import React, { useState, useEffect } from "react";
+//import { useParams, useRouter } from "next/navigation";
+//import { TiPlus } from "react-icons/ti";
+//import { BiMenuAltLeft } from "react-icons/bi";
+//import { IoFlashOutline } from "react-icons/io5";
+//import Sidebar from "@/components/teste/Sidebar";
+//import BottomNavbar from "@/components/dashboard/bottomNavBar";
 //import GroupBanner from "@/components/dashboard/groupBanner";
 //import EventCard from "@/components/dashboard/eventCard";
 //import AddEventModal from "@/components/dashboard/addEventModal";
@@ -233,3 +233,4 @@ export default function GroupDashboard() {
     </div>
   );
 }
+*/}
