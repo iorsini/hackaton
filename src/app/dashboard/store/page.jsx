@@ -1,10 +1,28 @@
 "use client";
+import { GiTomato } from "react-icons/gi";
 
 import { useState } from "react";
-import { ArrowLeft, Grid, List, Zap, Star, Lock, CheckCircle2, TrendingUp, Clock, Trophy, User, Sparkles, Palette, Volume2, Crown } from "lucide-react";
+import {
+  ArrowLeft,
+  Grid,
+  List,
+  Zap,
+  Star,
+  Lock,
+  CheckCircle2,
+  TrendingUp,
+  Clock,
+  Trophy,
+  User,
+  Sparkles,
+  Palette,
+  Volume2,
+  Crown,
+} from "lucide-react";
+
 
 export default function StorePage() {
-  const [xp, setXp] = useState(3450);
+  const [pomodoros, setPomodoros] = useState(3450);
   const [view, setView] = useState("grid");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [purchasedItems, setPurchasedItems] = useState([]);
@@ -14,113 +32,132 @@ export default function StorePage() {
     { id: "themes", label: "Temas", icon: Palette },
     { id: "sounds", label: "Sons", icon: Volume2 },
     { id: "avatars", label: "Avatares", icon: User },
-    { id: "premium", label: "Premium", icon: Crown }
+    { id: "premium", label: "Premium", icon: Crown },
   ];
 
   const storeItems = [
     {
       id: 1,
       name: "Tema Oceano Profundo",
-      description: "Interface azul serena inspirada no oceano, perfeita para concentração profunda.",
-      price: 400,
+      description:
+        "Interface azul serena inspirada no oceano, perfeita para concentração profunda.",
+      price: 40,
       category: "themes",
-      image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop",
       color: "from-blue-400 to-cyan-400",
-      popular: false
+      popular: false,
     },
     {
       id: 2,
       name: "Sons de Chuva",
-      description: "Ambiente relaxante com sons de chuva e trovões suaves para melhorar o foco.",
-      price: 550,
+      description:
+        "Ambiente relaxante com sons de chuva e trovões suaves para melhorar o foco.",
+      price: 55,
       category: "sounds",
-      image: "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=800&h=600&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=800&h=600&fit=crop",
       color: "from-indigo-400 to-purple-400",
-      popular: true
+      popular: true,
     },
     {
       id: 3,
       name: "Avatar Premium - Astronauta",
-      description: "Desbloqueia o avatar exclusivo de astronauta com animações especiais.",
-      price: 800,
+      description:
+        "Desbloqueia o avatar exclusivo de astronauta com animações especiais.",
+      price: 80,
       category: "avatars",
-      image: "https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=800&h=600&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=800&h=600&fit=crop",
       color: "from-purple-400 to-pink-400",
-      popular: true
+      popular: true,
     },
     {
       id: 4,
       name: "Tema Floresta Mística",
-      description: "Tons de verde e marrom que trazem a natureza para sua rotina de estudos.",
-      price: 450,
+      description:
+        "Tons de verde e marrom que trazem a natureza para sua rotina de estudos.",
+      price: 45,
       category: "themes",
-      image: "https://images.unsplash.com/photo-1511497584788-876760111969?w=800&h=600&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1511497584788-876760111969?w=800&h=600&fit=crop",
       color: "from-green-400 to-emerald-400",
-      popular: false
+      popular: false,
     },
     {
       id: 5,
       name: "Relógio Analógico Premium",
-      description: "Visual de tempo clássico e minimalista com ponteiros elegantes.",
-      price: 1000,
+      description:
+        "Visual de tempo clássico e minimalista com ponteiros elegantes.",
+      price: 100,
       category: "premium",
-      image: "https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?w=800&h=600&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?w=800&h=600&fit=crop",
       color: "from-amber-400 to-orange-400",
-      popular: false
+      popular: false,
     },
     {
       id: 6,
       name: "Sons de Café Shop",
-      description: "Ambiente acolhedor de cafeteria com conversas leves e músicas suaves.",
-      price: 600,
+      description:
+        "Ambiente acolhedor de cafeteria com conversas leves e músicas suaves.",
+      price: 60,
       category: "sounds",
-      image: "https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop",
       color: "from-orange-400 to-red-400",
-      popular: false
+      popular: false,
     },
     {
       id: 7,
       name: "Tema Noite Estrelada",
-      description: "Modo escuro elegante com tons de roxo e azul escuro, ideal para sessões noturnas.",
-      price: 500,
+      description:
+        "Modo escuro elegante com tons de roxo e azul escuro, ideal para sessões noturnas.",
+      price: 45,
       category: "themes",
-      image: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&h=600&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&h=600&fit=crop",
       color: "from-indigo-500 to-purple-500",
-      popular: true
+      popular: true,
     },
     {
       id: 8,
       name: "Avatar Premium - Ninja",
-      description: "Avatar exclusivo de ninja com máscaras intercambiáveis e efeitos especiais.",
-      price: 850,
+      description:
+        "Avatar exclusivo de ninja com máscaras intercambiáveis e efeitos especiais.",
+      price: 85,
       category: "avatars",
-      image: "https://images.unsplash.com/photo-1555952517-2e8e729e0b44?w=800&h=600&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1555952517-2e8e729e0b44?w=800&h=600&fit=crop",
       color: "from-red-400 to-pink-400",
-      popular: false
+      popular: false,
     },
     {
       id: 9,
       name: "Pack Premium Completo",
-      description: "Todos os temas, sons e avatares desbloqueados permanentemente.",
-      price: 3000,
+      description:
+        "Todos os temas, sons e avatares desbloqueados permanentemente.",
+      price: 300,
       category: "premium",
-      image: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&h=600&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&h=600&fit=crop",
       color: "from-yellow-400 to-amber-400",
-      popular: true
-    }
+      popular: true,
+    },
   ];
 
-  const filteredItems = selectedCategory === "all" 
-    ? storeItems 
-    : storeItems.filter(item => item.category === selectedCategory);
+  const filteredItems =
+    selectedCategory === "all"
+      ? storeItems
+      : storeItems.filter((item) => item.category === selectedCategory);
 
   const handleBuy = (item) => {
     if (purchasedItems.includes(item.id)) {
       return;
     }
-    
-    if (xp >= item.price) {
-      setXp(xp - item.price);
+
+    if (pomodoros >= item.price) {
+      setPomodoros(pomodoros - item.price);
       setPurchasedItems([...purchasedItems, item.id]);
     }
   };
@@ -132,14 +169,20 @@ export default function StorePage() {
       {/* Header */}
       <div className="bg-white/70 backdrop-blur-md border-b border-neutral-200 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <button className="p-2 hover:bg-neutral-100 rounded-full transition-colors">
+          <button
+            className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
+            onClick={() => window.history.back()}
+          >
+            {" "}
             <ArrowLeft className="w-5 h-5 text-neutral-700" />
           </button>
-          <h1 className="text-lg font-semibold text-neutral-800">Loja Pomofy</h1>
+          <h1 className="text-lg font-semibold text-neutral-800">
+            Loja Pomofy
+          </h1>
           <div className="flex items-center gap-2">
             <div className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-purple-100 to-blue-100 px-3 py-1.5 rounded-full border border-purple-200">
-              <Zap className="w-4 h-4 text-purple-600" />
-              <span className="text-sm font-bold text-purple-800">{xp} XP</span>
+              <GiTomato className="w-4 h-4 text-purple-600" />
+              <span className="text-sm font-bold text-purple-800">{pomodoros} Pomodoros</span>
             </div>
           </div>
         </div>
@@ -155,13 +198,15 @@ export default function StorePage() {
               </div>
               <div>
                 <h2 className="text-xl font-bold mb-1">Seus Pontos</h2>
-                <p className="text-sm text-white/80">Troque XP por recompensas exclusivas</p>
+                <p className="text-sm text-white/80">
+                  Troque Pomodoros por recompensas exclusivas
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-              <Zap className="w-5 h-5 text-yellow-300" />
-              <span className="text-2xl font-bold">{xp}</span>
-              <span className="text-sm text-white/80">XP</span>
+              <GiTomato className="w-5 h-5 text-yellow-300" />
+              <span className="text-2xl font-bold">{pomodoros}</span>
+              <span className="text-sm text-white/80">Pomodoros</span>
             </div>
           </div>
 
@@ -172,7 +217,9 @@ export default function StorePage() {
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20">
               <p className="text-xs text-white/70 mb-1">Disponíveis</p>
-              <p className="text-2xl font-bold">{storeItems.length - purchasedItems.length}</p>
+              <p className="text-2xl font-bold">
+                {storeItems.length - purchasedItems.length}
+              </p>
             </div>
           </div>
         </div>
@@ -203,7 +250,9 @@ export default function StorePage() {
             <button
               onClick={() => setView("grid")}
               className={`p-2 rounded-lg transition-colors ${
-                view === "grid" ? "bg-neutral-100 text-neutral-800" : "text-neutral-500 hover:text-neutral-700"
+                view === "grid"
+                  ? "bg-neutral-100 text-neutral-800"
+                  : "text-neutral-500 hover:text-neutral-700"
               }`}
             >
               <Grid className="w-4 h-4" />
@@ -211,7 +260,9 @@ export default function StorePage() {
             <button
               onClick={() => setView("list")}
               className={`p-2 rounded-lg transition-colors ${
-                view === "list" ? "bg-neutral-100 text-neutral-800" : "text-neutral-500 hover:text-neutral-700"
+                view === "list"
+                  ? "bg-neutral-100 text-neutral-800"
+                  : "text-neutral-500 hover:text-neutral-700"
               }`}
             >
               <List className="w-4 h-4" />
@@ -220,42 +271,48 @@ export default function StorePage() {
         </div>
 
         {/* Items Grid/List */}
-        <div className={`transition-all ${
-          view === "grid"
-            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-            : "flex flex-col gap-3"
-        }`}>
+        <div
+          className={`transition-all ${
+            view === "grid"
+              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+              : "flex flex-col gap-3"
+          }`}
+        >
           {filteredItems.map((item) => {
             const purchased = isPurchased(item.id);
-            const canAfford = xp >= item.price;
+            const canAfford = pomodoros >= item.price;
 
             return (
               <div
                 key={item.id}
                 className={`bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-sm border transition-all duration-200 ${
-                  purchased 
-                    ? "border-green-200" 
+                  purchased
+                    ? "border-green-200"
                     : "border-neutral-200 hover:shadow-md"
                 } ${view === "list" ? "flex flex-row" : "flex flex-col"}`}
               >
                 {/* Image */}
-                <div className={`relative ${
-                  view === "list" ? "w-32 sm:w-40 h-full" : "h-48 w-full"
-                } flex-shrink-0 overflow-hidden`}>
+                <div
+                  className={`relative ${
+                    view === "list" ? "w-32 sm:w-40 h-full" : "h-48 w-full"
+                  } flex-shrink-0 overflow-hidden`}
+                >
                   <img
                     src={item.image}
                     alt={item.name}
                     className="w-full h-full object-cover"
                   />
-                  <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-30`} />
-                  
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-30`}
+                  />
+
                   {item.popular && (
                     <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
                       <Star className="w-3 h-3 fill-white" />
                       Popular
                     </div>
                   )}
-                  
+
                   {purchased && (
                     <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
                       <div className="bg-green-500 text-white p-3 rounded-full">
@@ -268,19 +325,35 @@ export default function StorePage() {
                 {/* Content */}
                 <div className="flex flex-col justify-between p-4 flex-1">
                   <div>
-                    <h3 className={`font-semibold text-neutral-800 mb-1 ${view === "list" ? "text-base" : "text-lg"}`}>
+                    <h3
+                      className={`font-semibold text-neutral-800 mb-1 ${
+                        view === "list" ? "text-base" : "text-lg"
+                      }`}
+                    >
                       {item.name}
                     </h3>
-                    <p className={`text-sm text-neutral-600 leading-snug ${view === "list" ? "line-clamp-2" : "line-clamp-3"}`}>
+                    <p
+                      className={`text-sm text-neutral-600 leading-snug ${
+                        view === "list" ? "line-clamp-2" : "line-clamp-3"
+                      }`}
+                    >
                       {item.description}
                     </p>
                   </div>
 
                   <div className="flex items-center justify-between mt-4 gap-2">
                     <div className="flex items-center gap-1">
-                      <Zap className={`w-4 h-4 ${canAfford ? "text-purple-600" : "text-neutral-400"}`} />
-                      <span className={`text-sm font-bold ${canAfford ? "text-neutral-800" : "text-neutral-400"}`}>
-                        {item.price} XP
+                      <GiTomato
+                        className={`w-4 h-4 ${
+                          canAfford ? "text-purple-600" : "text-neutral-400"
+                        }`}
+                      />
+                      <span
+                        className={`text-sm font-bold ${
+                          canAfford ? "text-neutral-800" : "text-neutral-400"
+                        }`}
+                      >
+                        {item.price} Pomodoros
                       </span>
                     </div>
 
@@ -305,7 +378,7 @@ export default function StorePage() {
                       ) : (
                         <>
                           <Lock className="w-4 h-4" />
-                          XP Insuficiente
+                          Pomodoros Insuficiente
                         </>
                       )}
                     </button>
@@ -322,45 +395,14 @@ export default function StorePage() {
             <div className="w-20 h-20 bg-neutral-100 rounded-full flex items-center justify-center mb-4">
               <Sparkles className="w-10 h-10 text-neutral-400" />
             </div>
-            <h3 className="text-lg font-semibold text-neutral-800 mb-2">Nenhum item encontrado</h3>
-            <p className="text-sm text-neutral-600">Tente selecionar outra categoria</p>
+            <h3 className="text-lg font-semibold text-neutral-800 mb-2">
+              Nenhum item encontrado
+            </h3>
+            <p className="text-sm text-neutral-600">
+              Tente selecionar outra categoria
+            </p>
           </div>
         )}
-      </div>
-
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-neutral-200 px-4 sm:px-6 py-3 z-10">
-        <div className="max-w-6xl mx-auto flex justify-around items-center">
-          <button className="flex flex-col items-center gap-1 text-neutral-400 hover:text-neutral-600 transition-colors">
-            <div className="p-2 rounded-xl">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-            <span className="text-xs hidden sm:block">Tarefas</span>
-          </button>
-          <button className="flex flex-col items-center gap-1 text-neutral-400 hover:text-neutral-600 transition-colors">
-            <div className="p-2 rounded-xl">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-            <span className="text-xs hidden sm:block">Progresso</span>
-          </button>
-          <button className="flex flex-col items-center gap-1">
-            <div className="p-4 bg-gradient-to-r from-purple-400 to-indigo-400 rounded-full shadow-lg -mt-8">
-              <Clock className="w-6 h-6 text-white" />
-            </div>
-          </button>
-          <button className="flex flex-col items-center gap-1 text-neutral-400 hover:text-neutral-600 transition-colors">
-            <div className="p-2 rounded-xl">
-              <Trophy className="w-5 h-5" />
-            </div>
-            <span className="text-xs hidden sm:block">Gamificação</span>
-          </button>
-          <button className="flex flex-col items-center gap-1 text-purple-500">
-            <div className="p-2 bg-purple-100 rounded-xl">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <span className="text-xs font-medium hidden sm:block">Loja</span>
-          </button>
-        </div>
       </div>
     </div>
   );
