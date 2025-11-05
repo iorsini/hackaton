@@ -126,8 +126,13 @@ export default function Sidebar({ activePage, onPageChange }) {
       >
         <div className="p-4">
           <div className="flex items-center gap-2 pb-4 border-b border-gray-200">
-            <div className="text-2xl">🍅</div>
-            <h1 className="text-lg font-bold text-gray-800">FocusFlow</h1>
+<div className="logo">
+              <img
+                src="/images/pomofy.webp"
+                alt="Logo Pomofy"
+                className="w-10 h-10 object-contain"
+              />
+            </div>            <h1 className="text-lg font-bold text-gray-800">Pomofy</h1>
           </div>
 
           {isLoggedIn ? (
