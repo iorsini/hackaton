@@ -1,26 +1,7 @@
-// 🔥 SUBSTITUA todo o conteúdo de src/app/api/users/pomodoro/route.js
-
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
-
-// ========================================
-// CONSTANTES
-// ========================================
-const POMODORO_DURATION = 25; // minutos padrão de um pomodoro
-
-/**
- * Calcula quantos pomodoros foram completados
- * Regra: 1 pomodoro = 1 ciclo de foco completado
- * NÃO dividir por tempo, mas contar CICLOS
- */
-function calculatePomodoros(focusTimeMinutes) {
-  // Se o ciclo foi de 25min, conta 1 pomodoro
-  // Se foi de 50min, conta 2 pomodoros
-  // Se foi de 15min, conta 0.6 pomodoros (arredonda pra baixo)
-  return Math.floor(focusTimeMinutes / POMODORO_DURATION);
-}
 
 // ========================================
 // POST - Registrar tempo de FOCO
@@ -48,8 +29,8 @@ export async function POST(request) {
 
     await connectDB();
 
-    // Calcular quantos pomodoros isso representa
-    const pomodorosToAdd = calculatePomodoros(focusTimeMinutes);
+    // ✅ REGRA: 1 pomodoro completo = 1 ciclo de foco finalizado
+    const pomodorosToAdd = 1;
 
     console.log(`🎯 Registrando foco:`);
     console.log(`   - Tempo: ${focusTimeMinutes} min`);
@@ -80,8 +61,9 @@ export async function POST(request) {
     }
 
     console.log(`✅ Sucesso!`);
-    console.log(`   - Total de pomodoros agora: ${user.totalPomodoros}`);
-    console.log(`   - Total de minutos: ${user.stats.totalMinutes}`);
+    console.log(`   - Total de pomodoros: ${user.totalPomodoros}`);
+    console.log(`   - Tempo total de foco: ${user.stats.totalFocusTime} min`);
+    console.log(`   - Tempo total: ${user.stats.totalMinutes} min`);
 
     return Response.json({
       success: true,
@@ -126,6 +108,10 @@ export async function PATCH(request) {
 
     await connectDB();
 
+    console.log(`☕ Registrando pausa:`);
+    console.log(`   - Tempo: ${breakTimeMinutes} min`);
+    console.log(`   - Mood: ${moodId || "padrão"}`);
+
     const user = await User.findOneAndUpdate(
       { email: session.user.email },
       {
@@ -143,6 +129,10 @@ export async function PATCH(request) {
         { status: 404 }
       );
     }
+
+    console.log(`✅ Pausa registrada!`);
+    console.log(`   - Tempo total de pausa: ${user.stats.totalBreakTime} min`);
+    console.log(`   - Tempo total: ${user.stats.totalMinutes} min`);
 
     return Response.json({
       success: true,
