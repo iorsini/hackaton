@@ -28,12 +28,39 @@ const UserSchema = new Schema(
       type: String,
       default: null,
     },
+
+    // Configurações de pomodoro
     settings: {
-      focusDuration: { type: Number, default: 25 }, // minutos
+      focusDuration: { type: Number, default: 25 },
       shortBreak: { type: Number, default: 5 },
       longBreak: { type: Number, default: 15 },
-      longBreakInterval: { type: Number, default: 4 }, // a cada 4 ciclos
+      longBreakInterval: { type: Number, default: 4 },
     },
+
+    // Estatísticas
+    stats: {
+      totalMinutes: { type: Number, default: 0 }, // all time
+      dailyMinutes: { type: Number, default: 0 },
+      weeklyMinutes: { type: Number, default: 0 },
+      monthlyMinutes: { type: Number, default: 0 },
+      yearlyMinutes: { type: Number, default: 0 },
+      lastActivity: { type: Date, default: null }, // última vez que completou um ciclo
+    },
+
+    // Streak
+    streak: {
+      current: { type: Number, default: 0 },
+      best: { type: Number, default: 0 },
+      lastUpdated: { type: Date, default: null },
+    },
+
+    // Grupos
+    groups: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Group",
+      },
+    ],
   },
   { timestamps: true }
 );
