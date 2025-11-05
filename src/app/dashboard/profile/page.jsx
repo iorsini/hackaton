@@ -1,8 +1,22 @@
 "use client";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { User, Mail, Calendar, Award, Target, TrendingUp, Camera, ArrowLeft, LogOut, AlertTriangle, Trash2, Clock, Coffee } from "lucide-react";
+import { 
+  User, 
+  Mail, 
+  Calendar, 
+  Award, 
+  Target, 
+  TrendingUp, 
+  Camera, 
+  ArrowLeft, 
+  LogOut, 
+  AlertTriangle, 
+  Trash2, 
+  Clock, 
+  Coffee 
+} from "lucide-react";
 
 function ProfilePage() {
   const { data: session, status } = useSession();
@@ -11,6 +25,7 @@ function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -24,7 +39,7 @@ function ProfilePage() {
     try {
       setLoading(true);
       const response = await fetch("/api/users/profile");
-      
+
       if (!response.ok) {
         throw new Error("Erro ao carregar dados do perfil");
       }
@@ -62,11 +77,47 @@ function ProfilePage() {
     }
   };
 
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingAvatar(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const res = await fetch("/api/users/me/avatar", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setProfileData({
+          ...profileData,
+          user: {
+            ...profileData.user,
+            avatar: data.avatar,
+          },
+        });
+        alert("Avatar atualizado com sucesso!");
+      } else {
+        alert("Erro ao atualizar avatar");
+      }
+    } catch (error) {
+      console.error("Erro:", error);
+      alert("Erro ao atualizar avatar");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("pt-BR", {
       month: "long",
-      year: "numeric"
+      year: "numeric",
     });
   };
 
@@ -90,7 +141,7 @@ function ProfilePage() {
       <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 flex items-center justify-center">
         <div className="bg-white p-6 rounded-lg shadow-xl">
           <p className="text-red-500 mb-4">Erro: {error}</p>
-          <button 
+          <button
             onClick={fetchProfileData}
             className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
           >
@@ -107,9 +158,10 @@ function ProfilePage() {
 
   const { user, stats } = profileData;
   const completionRate = stats.completionRate || 0;
-  const monthlyCompletionRate = stats.tasksThisMonth > 0 
-    ? Math.round((stats.completedTasksThisMonth / stats.tasksThisMonth) * 100)
-    : 0;
+  const monthlyCompletionRate =
+    stats.tasksThisMonth > 0
+      ? Math.round((stats.completedTasksThisMonth / stats.tasksThisMonth) * 100)
+      : 0;
 
   return (
     <>
@@ -183,6 +235,25 @@ function ProfilePage() {
           object-fit: cover;
           border: 4px solid white;
           box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+        }
+        .avatar-upload-btn {
+          position: absolute;
+          bottom: 0;
+          right: 0;
+          width: 36px;
+          height: 36px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+          border: 3px solid white;
+          transition: all 0.2s;
+        }
+        .avatar-upload-btn:hover {
+          transform: scale(1.1);
         }
         .user-name {
           font-size: 1.5rem;
@@ -489,7 +560,10 @@ function ProfilePage() {
       `}</style>
 
       <div className="profile-container">
-        <button className="back-button" onClick={() => router.push('/dashboard/pomodoro')}>
+        <button
+          className="back-button"
+          onClick={() => router.push("/dashboard/pomodoro")}
+        >
           <ArrowLeft size={20} />
           Voltar
         </button>
@@ -499,10 +573,26 @@ function ProfilePage() {
           <div className="profile-card">
             <div className="avatar-section">
               <div className="avatar-wrapper">
-                <img 
-                  src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&size=120&background=667eea&color=fff`}
+                <img
+                  src={
+                    user.avatar ||
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      user.name
+                    )}&size=120&background=667eea&color=fff`
+                  }
                   alt={user.name}
                   className="avatar-image"
+                />
+                <label htmlFor="avatar-upload" className="avatar-upload-btn">
+                  <Camera size={18} style={{ color: "white" }} />
+                </label>
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  style={{ display: "none" }}
+                  disabled={uploadingAvatar}
                 />
               </div>
               <h2 className="user-name">{user.name}</h2>
@@ -556,7 +646,9 @@ function ProfilePage() {
                 </div>
                 <div className="info-content">
                   <div className="info-label">Tempo de Foco</div>
-                  <div className="info-value">{formatMinutes(stats.totalFocusTime)}</div>
+                  <div className="info-value">
+                    {formatMinutes(stats.totalFocusTime)}
+                  </div>
                 </div>
               </div>
 
@@ -566,7 +658,9 @@ function ProfilePage() {
                 </div>
                 <div className="info-content">
                   <div className="info-label">Tempo de Pausa</div>
-                  <div className="info-value">{formatMinutes(stats.totalBreakTime)}</div>
+                  <div className="info-value">
+                    {formatMinutes(stats.totalBreakTime)}
+                  </div>
                 </div>
               </div>
             </div>
@@ -584,7 +678,8 @@ function ProfilePage() {
               </div>
               <div className="danger-zone-subtitle">Deletar essa conta</div>
               <p className="danger-zone-text">
-                Uma vez que a conta seja eliminada, não há volta atrás. Por favor, tenha a certeza.
+                Uma vez que a conta seja eliminada, não há volta atrás. Por
+                favor, tenha a certeza.
               </p>
               <button
                 className="delete-account-btn"
@@ -637,7 +732,7 @@ function ProfilePage() {
               </div>
             </div>
 
-            <h3 className="section-title" style={{ marginTop: '2rem' }}>
+            <h3 className="section-title" style={{ marginTop: "2rem" }}>
               <Target size={20} />
               Progresso
             </h3>
@@ -645,20 +740,35 @@ function ProfilePage() {
             <div className="progress-item">
               <div className="progress-header">
                 <span className="progress-label">Tarefas do Mês</span>
-                <span className="progress-value">{stats.completedTasksThisMonth}/{stats.tasksThisMonth}</span>
+                <span className="progress-value">
+                  {stats.completedTasksThisMonth}/{stats.tasksThisMonth}
+                </span>
               </div>
               <div className="progress-bar-container">
-                <div className="progress-bar" style={{ width: `${monthlyCompletionRate}%` }} />
+                <div
+                  className="progress-bar"
+                  style={{ width: `${monthlyCompletionRate}%` }}
+                />
               </div>
             </div>
 
             <div className="progress-item">
               <div className="progress-header">
                 <span className="progress-label">Meta de Pomodoros</span>
-                <span className="progress-value">{stats.totalPomodoros}/100</span>
+                <span className="progress-value">
+                  {stats.totalPomodoros}/100
+                </span>
               </div>
               <div className="progress-bar-container">
-                <div className="progress-bar" style={{ width: `${Math.min((stats.totalPomodoros / 100) * 100, 100)}%` }} />
+                <div
+                  className="progress-bar"
+                  style={{
+                    width: `${Math.min(
+                      (stats.totalPomodoros / 100) * 100,
+                      100
+                    )}%`,
+                  }}
+                />
               </div>
             </div>
 
@@ -668,42 +778,58 @@ function ProfilePage() {
                 <span className="progress-value">{stats.streakDays}/30</span>
               </div>
               <div className="progress-bar-container">
-                <div className="progress-bar" style={{ width: `${Math.min((stats.streakDays / 30) * 100, 100)}%` }} />
+                <div
+                  className="progress-bar"
+                  style={{
+                    width: `${Math.min((stats.streakDays / 30) * 100, 100)}%`,
+                  }}
+                />
               </div>
             </div>
 
             <div className="progress-item">
               <div className="progress-header">
                 <span className="progress-label">Total de Tarefas</span>
-                <span className="progress-value">{stats.completedTasks}/{stats.totalTasks}</span>
+                <span className="progress-value">
+                  {stats.completedTasks}/{stats.totalTasks}
+                </span>
               </div>
               <div className="progress-bar-container">
-                <div className="progress-bar" style={{ width: `${completionRate}%` }} />
+                <div
+                  className="progress-bar"
+                  style={{ width: `${completionRate}%` }}
+                />
               </div>
             </div>
 
             {/* Achievement Section */}
             {stats.streakDays >= 7 && (
-              <div style={{ 
-                marginTop: '2rem',
-                padding: '1.5rem',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                borderRadius: '16px',
-                color: 'white'
-              }}>
-                <h4 style={{ 
-                  fontSize: '1rem',
-                  fontWeight: '700',
-                  marginBottom: '0.75rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}>
+              <div
+                style={{
+                  marginTop: "2rem",
+                  padding: "1.5rem",
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  borderRadius: "16px",
+                  color: "white",
+                }}
+              >
+                <h4
+                  style={{
+                    fontSize: "1rem",
+                    fontWeight: "700",
+                    marginBottom: "0.75rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                >
                   <Award size={20} />
                   Conquista Recente
                 </h4>
-                <p style={{ fontSize: '0.875rem', opacity: 0.9 }}>
-                  Parabéns! Você completou {stats.streakDays} dias seguidos de produtividade!
+                <p style={{ fontSize: "0.875rem", opacity: 0.9 }}>
+                  Parabéns! Você completou {stats.streakDays} dias seguidos de
+                  produtividade!
                 </p>
               </div>
             )}
@@ -713,15 +839,19 @@ function ProfilePage() {
 
       {/* Delete Account Modal */}
       {showDeleteModal && (
-        <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
+        <div
+          className="modal-overlay"
+          onClick={() => setShowDeleteModal(false)}
+        >
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-icon">
               <AlertTriangle size={32} />
             </div>
             <h2 className="modal-title">Deletar Conta?</h2>
             <p className="modal-text">
-              Esta ação é <strong>permanente</strong> e não pode ser desfeita. 
-              Todos os seus dados, incluindo tarefas, pomodoros e progresso serão perdidos para sempre.
+              Esta ação é <strong>permanente</strong> e não pode ser desfeita.
+              Todos os seus dados, incluindo tarefas, pomodoros e progresso
+              serão perdidos para sempre.
             </p>
             <div className="modal-actions">
               <button

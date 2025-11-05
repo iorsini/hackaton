@@ -18,7 +18,7 @@ export async function GET(request) {
 
     await connectDB();
 
-    // Buscar usuário COM TODOS OS DADOS
+    // 🔥 CORRIGIDO: Buscar usuário SEM select
     const user = await User.findOne({ email: session.user.email });
 
     if (!user) {
@@ -31,22 +31,27 @@ export async function GET(request) {
     // Buscar todas as tarefas do usuário
     const tasks = await Task.find({ userId: user._id });
 
-    // Calcular estatísticas
+    // Calcular estatísticas de tarefas
     const totalTasks = tasks.length;
     const completedTasks = tasks.filter(task => task.completed).length;
     const completionRate = totalTasks > 0 
       ? Math.round((completedTasks / totalTasks) * 100) 
       : 0;
 
-    // 🔥 PEGAR POMODOROS DO BANCO DE DADOS
+    // 🔥 CORRIGIDO: Pegar dados REAIS do banco
     const totalPomodoros = user.totalPomodoros || 0;
     const totalFocusTime = user.stats?.totalFocusTime || 0;
     const totalBreakTime = user.stats?.totalBreakTime || 0;
+    const totalMinutes = user.stats?.totalMinutes || 0;
 
-    console.log(`📊 Perfil carregado: ${totalPomodoros} pomodoros, ${totalFocusTime} min foco`);
+    console.log(`📊 Perfil carregado:`);
+    console.log(`   - Total Pomodoros: ${totalPomodoros}`);
+    console.log(`   - Total Focus Time: ${totalFocusTime} min`);
+    console.log(`   - Total Break Time: ${totalBreakTime} min`);
+    console.log(`   - Total Minutes: ${totalMinutes} min`);
 
-    // Calcular streak (dias seguidos)
-    const streakDays = calculateStreak(tasks);
+    // Calcular streak (dias seguidos com atividade)
+    const streakDays = calculateStreak(user);
 
     // Buscar tarefas do mês atual
     const now = new Date();
@@ -72,6 +77,7 @@ export async function GET(request) {
         totalPomodoros,
         totalFocusTime,
         totalBreakTime,
+        totalMinutes,
         totalTasks,
         completedTasks,
         completionRate,
@@ -81,7 +87,7 @@ export async function GET(request) {
       },
     });
   } catch (error) {
-    console.error("Erro ao buscar perfil:", error);
+    console.error("❌ Erro ao buscar perfil:", error);
     return Response.json(
       { error: "Erro ao buscar perfil" },
       { status: 500 }
@@ -89,49 +95,28 @@ export async function GET(request) {
   }
 }
 
-// Função para calcular sequência de dias
-function calculateStreak(tasks) {
-  if (tasks.length === 0) return 0;
+// 🔥 CORRIGIDO: Calcular streak com base na lastActivity
+function calculateStreak(user) {
+  if (!user.stats?.lastActivity) return 0;
 
-  const completedTasks = tasks
-    .filter(task => {
-      if (!task.updatedAt) return false;
-      const date = new Date(task.updatedAt);
-      return task.completed && !isNaN(date.getTime());
-    })
-    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-
-  if (completedTasks.length === 0) return 0;
-
-  let streak = 0;
-  let currentDate = new Date();
-  currentDate.setHours(0, 0, 0, 0);
-
-  const tasksByDay = {};
-  completedTasks.forEach(task => {
-    try {
-      const date = new Date(task.updatedAt);
-      if (isNaN(date.getTime())) return;
-      
-      date.setHours(0, 0, 0, 0);
-      const dateKey = date.toISOString().split('T')[0];
-      tasksByDay[dateKey] = true;
-    } catch (error) {
-      console.error('Erro ao processar data da task:', error);
-    }
-  });
-
-  while (true) {
-    const dateKey = currentDate.toISOString().split('T')[0];
-    if (tasksByDay[dateKey]) {
-      streak++;
-      currentDate.setDate(currentDate.getDate() - 1);
-    } else {
-      break;
-    }
+  const now = new Date();
+  const lastActivity = new Date(user.stats.lastActivity);
+  
+  // Normalizar datas para meia-noite
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const lastActivityDay = new Date(lastActivity.getFullYear(), lastActivity.getMonth(), lastActivity.getDate());
+  
+  // Calcular diferença em dias
+  const diffTime = today.getTime() - lastActivityDay.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  
+  // Se a última atividade foi hoje ou ontem, mantém streak
+  if (diffDays <= 1) {
+    return user.stats.longestStreak || 1;
   }
-
-  return streak;
+  
+  // Se passou mais de 1 dia, streak quebrou
+  return 0;
 }
 
 // API para atualizar avatar
@@ -174,7 +159,7 @@ export async function PATCH(request) {
       },
     });
   } catch (error) {
-    console.error("Erro ao atualizar avatar:", error);
+    console.error("❌ Erro ao atualizar avatar:", error);
     return Response.json(
       { error: "Erro ao atualizar avatar" },
       { status: 500 }

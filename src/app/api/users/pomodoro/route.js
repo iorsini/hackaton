@@ -6,7 +6,6 @@ import User from "@/models/User";
 
 // 🔥 IMPORTANTE: 1 minuto focado = 1 pomodoro
 function calculatePomodoros(focusTimeMinutes) {
-  // Garante que sempre retorna um número inteiro >= 0
   return Math.max(0, Math.floor(focusTimeMinutes));
 }
 
@@ -33,18 +32,21 @@ export async function POST(request) {
 
     await connectDB();
 
-    // Calcula quantos pomodoros com base no tempo focado
     const pomodorosToAdd = calculatePomodoros(focusTimeMinutes);
 
     console.log(`🎯 Registrando ${pomodorosToAdd} pomodoros para ${focusTimeMinutes} minutos`);
 
-    // Incrementar pomodoros calculados e tempo de foco
+    // 🔥 CORRIGIDO: Incrementar TODOS os campos necessários
     const user = await User.findOneAndUpdate(
       { email: session.user.email },
       {
         $inc: {
           totalPomodoros: pomodorosToAdd,
           "stats.totalFocusTime": focusTimeMinutes,
+          "stats.totalMinutes": focusTimeMinutes, // ADICIONADO
+        },
+        $set: {
+          "stats.lastActivity": new Date(), // ADICIONADO: atualiza última atividade
         },
       },
       { new: true }
@@ -58,16 +60,18 @@ export async function POST(request) {
     }
 
     console.log(`✅ Total de pomodoros agora: ${user.totalPomodoros}`);
+    console.log(`✅ Total de minutos agora: ${user.stats.totalMinutes}`);
 
     return Response.json({
       success: true,
       pomodorosAdded: pomodorosToAdd,
       totalPomodoros: user.totalPomodoros,
       totalFocusTime: user.stats.totalFocusTime,
+      totalMinutes: user.stats.totalMinutes,
       moodUsed: moodId || "default",
     });
   } catch (error) {
-    console.error("Erro ao registrar pomodoro:", error);
+    console.error("❌ Erro ao registrar pomodoro:", error);
     return Response.json(
       { error: "Erro ao registrar pomodoro" },
       { status: 500 }
@@ -104,6 +108,7 @@ export async function PATCH(request) {
       {
         $inc: {
           "stats.totalBreakTime": breakTimeMinutes,
+          "stats.totalMinutes": breakTimeMinutes, // ADICIONADO: pausa também conta nos minutos totais
         },
       },
       { new: true }
@@ -119,11 +124,12 @@ export async function PATCH(request) {
     return Response.json({
       success: true,
       totalBreakTime: user.stats.totalBreakTime,
+      totalMinutes: user.stats.totalMinutes,
       breakTimeAdded: breakTimeMinutes,
       moodUsed: moodId || "default",
     });
   } catch (error) {
-    console.error("Erro ao registrar pausa:", error);
+    console.error("❌ Erro ao registrar pausa:", error);
     return Response.json(
       { error: "Erro ao registrar pausa" },
       { status: 500 }

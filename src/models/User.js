@@ -39,9 +39,17 @@ const UserSchema = new mongoose.Schema(
         type: Number,
         default: 0, // em minutos
       },
+      totalMinutes: {
+        type: Number,
+        default: 0, // ADICIONADO: total de minutos (foco + pausa)
+      },
       longestStreak: {
         type: Number,
         default: 0,
+      },
+      lastActivity: {
+        type: Date,
+        default: null, // ADICIONADO: para calcular streak
       },
     },
   },

@@ -305,6 +305,12 @@ export default function PomodoroApp() {
   };
 
   const handleTimerComplete = async () => {
+    if (audioRef.current) {
+      audioRef.current.play().catch((err) => {
+        console.log("Erro ao tocar áudio:", err);
+      });
+    }
+    
     if (!isBreak) {
       // Completou um pomodoro de foco
       if (tasks[currentTaskIndex] && !tasks[currentTaskIndex].completed) {
