@@ -276,8 +276,9 @@ export default function PomodoroApp() {
     }
   };
 
-  const handleTimerComplete = () => {
+  const handleTimerComplete = async () => {
     if (!isBreak) {
+      // Completou um pomodoro de foco
       if (tasks[currentTaskIndex] && !tasks[currentTaskIndex].completed) {
         const newTasks = [...tasks];
         newTasks[currentTaskIndex].completed = true;
@@ -285,12 +286,45 @@ export default function PomodoroApp() {
       }
 
       setPomodorosCompleted((p) => p + 1);
+
+      // Registrar pomodoro no banco de dados (apenas se estiver logado)
+      if (session?.user) {
+        try {
+          await fetch("/api/users/pomodoro", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              focusTimeMinutes: focusTime,
+            }),
+          });
+        } catch (error) {
+          console.error("Erro ao registrar pomodoro:", error);
+        }
+      }
+
       setIsBreak(true);
       timer.reset(breakTime);
 
       const messages = selectedMood?.breakMessages || ["Beba água!", "Alongue-se!", "Descanse os olhos"];
       showNotif(messages[Math.floor(Math.random() * messages.length)]);
     } else {
+      // Completou uma pausa
+      
+      // Registrar tempo de pausa no banco de dados (apenas se estiver logado)
+      if (session?.user) {
+        try {
+          await fetch("/api/users/pomodoro", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              breakTimeMinutes: breakTime,
+            }),
+          });
+        } catch (error) {
+          console.error("Erro ao registrar pausa:", error);
+        }
+      }
+
       setIsBreak(false);
 
       const nextIndex = tasks.findIndex((t, i) => i > currentTaskIndex && !t.completed);

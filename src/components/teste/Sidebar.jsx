@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import {
   Calendar,
@@ -192,22 +193,31 @@ export default function Sidebar({ activePage, onPageChange }) {
           <div className="flex items-center justify-between pt-4 border-t border-gray-200 mt-2">
             {isLoggedIn ? (
               <>
-                <div className="flex items-center gap-3">
-                  {user.avatar ? (
-                    <img
-                      src={user.avatar}
-                      alt="Avatar"
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center font-bold text-white">
-                      {user.name?.[0]?.toUpperCase() || "?"}
+                <div className="user-info flex items-center gap-3">
+                  <Link
+                    href="/dashboard/profile"
+                    className="flex items-center gap-3"
+                  >
+                    {user.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt="Avatar"
+                        className="w-10 h-10 rounded-full object-cover cursor-pointer"
+                      />
+                    ) : (
+                      <div className="user-avatar w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-bold cursor-pointer">
+                        {user.name?.[0]?.toUpperCase() || "?"}
+                      </div>
+                    )}
+                    </Link>
+                    <div className="user-details">
+                      <div className="user-name text-[#1a1a1a] font-medium cursor-pointer">
+                        {user.name}
+                      </div>
+                      <div className="user-email text-[#1a1a1a] text-white">
+                        {user.email}
+                      </div>
                     </div>
-                  )}
-                  <div>
-                    <div className="user-name-mobile">{user.name}</div>
-                    <div className="user-email-mobile">{user.email}</div>
-                  </div>
                 </div>
                 <button
                   className="text-gray-500 hover:text-red-500 transition p-2"
@@ -241,10 +251,10 @@ export default function Sidebar({ activePage, onPageChange }) {
         <div>
           <div className="sidebar-header flex items-center gap-2 p-4">
             <img
-          src="/images/pomofy.webp"
-          alt="Pomofy Logo"
-          className="w-14 h-14 rounded-full object-cover ring-2 ring-green-500/30"
-        />
+              src="/images/pomofy.webp"
+              alt="Pomofy Logo"
+              className="w-14 h-14 rounded-full object-cover ring-2 ring-green-500/30"
+            />
             <h1 className="text-lg font-bold">Pomofy</h1>
           </div>
 
@@ -295,17 +305,22 @@ export default function Sidebar({ activePage, onPageChange }) {
           {isLoggedIn ? (
             <>
               <div className="user-info flex items-center gap-3">
-                {user.avatar ? (
-                  <img
-                    src={user.avatar}
-                    alt="Avatar"
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="user-avatar w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-bold">
-                    {user.name?.[0]?.toUpperCase() || "?"}
-                  </div>
-                )}
+                <Link
+                    href="/dashboard/profile"
+                    className="flex items-center gap-3"
+                  >
+                    {user.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt="Avatar"
+                        className="w-10 h-10 rounded-full object-cover cursor-pointer"
+                      />
+                    ) : (
+                      <div className="user-avatar w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-bold cursor-pointer">
+                        {user.name?.[0]?.toUpperCase() || "?"}
+                      </div>
+                    )}
+                    </Link>
                 <div className="user-details">
                   <div className="user-name font-medium">{user.name}</div>
                   <div className="user-email text-sm text-white">
