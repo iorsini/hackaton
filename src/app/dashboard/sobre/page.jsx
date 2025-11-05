@@ -10,7 +10,6 @@ import {
   Sparkles,
   Target
 } from "lucide-react";
-import  ThemeSwitcher  from "@/components/ui/ThemeSwitcher";
 import FaqWidget from "@/components/ui/FaqWidget";
 import  Footer  from "@/components/layout/Footer";
 
@@ -282,11 +281,6 @@ export default function SobrePage() {
           </div>
         </div>
       )}
-
-      {/* === FIXED COMPONENTS === */}
-      <div className="fixed top-4 right-4 z-50">
-        <ThemeSwitcher />
-      </div>
 
       <div className="fixed bottom-6 right-6 z-40">
         <FaqWidget />
