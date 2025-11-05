@@ -575,18 +575,18 @@ function ProfilePage() {
             <div className="danger-zone">
               <div className="danger-zone-title">
                 <AlertTriangle size={20} />
-                Danger Zone
+                Zona de Perigo
               </div>
-              <div className="danger-zone-subtitle">Delete this account</div>
+              <div className="danger-zone-subtitle">Deletar essa conta</div>
               <p className="danger-zone-text">
-                Once you delete an account, there is no going back. Please be certain.
+                Uma vez que a conta seja eliminada, não há volta atrás. Por favor, tenha a certeza.
               </p>
               <button
                 className="delete-account-btn"
                 onClick={() => setShowDeleteModal(true)}
               >
                 <Trash2 size={18} />
-                Delete account
+                Deletar conta
               </button>
             </div>
           </div>
