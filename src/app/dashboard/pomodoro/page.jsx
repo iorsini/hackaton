@@ -305,94 +305,101 @@ export default function PomodoroApp() {
   };
 
   const handleTimerComplete = async () => {
-  if (!isBreak) {
-    // Completou um pomodoro de foco
-    if (tasks[currentTaskIndex] && !tasks[currentTaskIndex].completed) {
-      const newTasks = [...tasks];
-      newTasks[currentTaskIndex].completed = true;
-      setTasks(newTasks);
-    }
+    if (!isBreak) {
+      // Completou um pomodoro de foco
+      if (tasks[currentTaskIndex] && !tasks[currentTaskIndex].completed) {
+        const newTasks = [...tasks];
+        newTasks[currentTaskIndex].completed = true;
+        setTasks(newTasks);
+      }
 
-    // 🔥 IMPORTANTE: Calcula quantos minutos foram focados
-    const minutesFocused = focusTime;
+      // 🔥 IMPORTANTE: Calcula quantos minutos foram focados
+      const minutesFocused = focusTime;
 
-    // 🔥 Registrar no banco de dados ANTES de incrementar localmente
-    if (session?.user) {
-      try {
-        const res = await fetch("/api/users/pomodoro", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            focusTimeMinutes: minutesFocused,
-            moodId: selectedMood?.id
-          }),
-        });
-        
-        if (res.ok) {
-          const data = await res.json();
-          // Atualiza com os pomodoros que ganhou (1 por minuto)
-          setPomodorosCompleted(prev => prev + data.pomodorosAdded);
-          showNotif(`+${data.pomodorosAdded} pomodoros! 🎯`);
-        } else {
-          // Se falhar, incrementa localmente pelo tempo focado
-          setPomodorosCompleted(p => p + minutesFocused);
+      console.log(`⏱️ Timer completo: ${minutesFocused} minutos focados`);
+
+      // 🔥 Registrar no banco de dados
+      if (session?.user) {
+        try {
+          const res = await fetch("/api/users/pomodoro", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              focusTimeMinutes: minutesFocused,
+              moodId: selectedMood?.id,
+            }),
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            console.log(
+              `✅ Servidor respondeu: +${data.pomodorosAdded} pomodoros`
+            );
+
+            // Atualiza APENAS com o valor que veio do servidor
+            setPomodorosCompleted(data.totalPomodoros);
+            showNotif(`+${data.pomodorosAdded} pomodoros! 🎯`);
+          } else {
+            console.error("❌ Erro ao salvar no servidor");
+            // Se falhar, incrementa localmente
+            setPomodorosCompleted((p) => p + minutesFocused);
+          }
+        } catch (error) {
+          console.error("❌ Erro ao registrar pomodoro:", error);
+          // Se der erro, incrementa localmente
+          setPomodorosCompleted((p) => p + minutesFocused);
         }
-      } catch (error) {
-        console.error("Erro ao registrar pomodoro:", error);
-        // Se der erro, incrementa localmente
-        setPomodorosCompleted(p => p + minutesFocused);
+      } else {
+        // Se não estiver logado, apenas incrementa localmente
+        setPomodorosCompleted((p) => p + minutesFocused);
       }
+
+      setIsBreak(true);
+      timer.reset(breakTime);
+
+      const messages = selectedMood?.breakMessages || [
+        "Beba água!",
+        "Alongue-se!",
+        "Descanse os olhos",
+      ];
+      showNotif(messages[Math.floor(Math.random() * messages.length)]);
     } else {
-      // Se não estiver logado, apenas incrementa localmente
-      setPomodorosCompleted(p => p + minutesFocused);
-    }
+      // Completou uma pausa
 
-    setIsBreak(true);
-    timer.reset(breakTime);
-
-    const messages = selectedMood?.breakMessages || [
-      "Beba água!",
-      "Alongue-se!",
-      "Descanse os olhos",
-    ];
-    showNotif(messages[Math.floor(Math.random() * messages.length)]);
-  } else {
-    // Completou uma pausa
-    
-    // Registrar tempo de pausa no banco de dados (apenas se estiver logado)
-    if (session?.user) {
-      try {
-        await fetch("/api/users/pomodoro", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            breakTimeMinutes: breakTime,
-            moodId: selectedMood?.id
-          }),
-        });
-      } catch (error) {
-        console.error("Erro ao registrar pausa:", error);
+      // Registrar tempo de pausa no banco de dados (apenas se estiver logado)
+      if (session?.user) {
+        try {
+          await fetch("/api/users/pomodoro", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              breakTimeMinutes: breakTime,
+              moodId: selectedMood?.id,
+            }),
+          });
+        } catch (error) {
+          console.error("Erro ao registrar pausa:", error);
+        }
       }
+
+      setIsBreak(false);
+
+      const nextIndex = tasks.findIndex(
+        (t, i) => i > currentTaskIndex && !t.completed
+      );
+      if (nextIndex !== -1) {
+        setCurrentTaskIndex(nextIndex);
+      }
+
+      timer.reset(focusTime);
+
+      const messages = selectedMood?.focusMessages || [
+        "Vamos lá!",
+        "Foco total!",
+      ];
+      showNotif(messages[Math.floor(Math.random() * messages.length)]);
     }
-
-    setIsBreak(false);
-
-    const nextIndex = tasks.findIndex(
-      (t, i) => i > currentTaskIndex && !t.completed
-    );
-    if (nextIndex !== -1) {
-      setCurrentTaskIndex(nextIndex);
-    }
-
-    timer.reset(focusTime);
-
-    const messages = selectedMood?.focusMessages || [
-      "Vamos lá!",
-      "Foco total!",
-    ];
-    showNotif(messages[Math.floor(Math.random() * messages.length)]);
-  }
-};
+  };
 
   const timer = useTimer(focusTime, handleTimerComplete);
 
@@ -414,6 +421,28 @@ export default function PomodoroApp() {
       showNotif(messages[Math.floor(Math.random() * messages.length)]);
     }
   };
+
+  useEffect(() => {
+    const loadUserPomodoros = async () => {
+      if (session?.user) {
+        try {
+          const res = await fetch("/api/users/profile");
+          if (res.ok) {
+            const data = await res.json();
+            console.log(
+              "🎯 Carregando pomodoros do banco:",
+              data.stats.totalPomodoros
+            );
+            setPomodorosCompleted(data.stats.totalPomodoros || 0);
+          }
+        } catch (error) {
+          console.error("Erro ao carregar pomodoros:", error);
+        }
+      }
+    };
+
+    loadUserPomodoros();
+  }, [session]);
 
   // API INTEGRATION
   useEffect(() => {
@@ -2150,7 +2179,11 @@ export default function PomodoroApp() {
         <Sidebar activePage={activePage} onPageChange={handlePageChange} />
         {renderPageContent()}
       </div>
-      <audio ref={audioRef} src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto" />
+      <audio
+        ref={audioRef}
+        src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"
+        preload="auto"
+      />
       <RoomModal
         isOpen={showRoomModal}
         onClose={() => setShowRoomModal(false)}

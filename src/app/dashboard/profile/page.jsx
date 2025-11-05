@@ -1,8 +1,8 @@
 "use client";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { User, Mail, Calendar, Award, Target, TrendingUp, Camera, ArrowLeft, LogOut, AlertTriangle, Trash2 } from "lucide-react";
+import { User, Mail, Calendar, Award, Target, TrendingUp, Camera, ArrowLeft, LogOut, AlertTriangle, Trash2, Clock, Coffee } from "lucide-react";
 
 function ProfilePage() {
   const { data: session, status } = useSession();
@@ -30,6 +30,7 @@ function ProfilePage() {
       }
 
       const data = await response.json();
+      console.log("📊 Dados do perfil:", data);
       setProfileData(data);
       setError(null);
     } catch (err) {
@@ -67,6 +68,13 @@ function ProfilePage() {
       month: "long",
       year: "numeric"
     });
+  };
+
+  const formatMinutes = (minutes) => {
+    if (minutes < 60) return `${minutes}min`;
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours}h ${mins}min`;
   };
 
   if (status === "loading" || loading) {
@@ -175,26 +183,6 @@ function ProfilePage() {
           object-fit: cover;
           border: 4px solid white;
           box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
-        }
-        .avatar-upload-btn {
-          position: absolute;
-          bottom: 0;
-          right: 0;
-          width: 40px;
-          height: 40px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border: 3px solid white;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.2s;
-          color: white;
-        }
-        .avatar-upload-btn:hover {
-          transform: scale(1.1);
-          box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
         }
         .user-name {
           font-size: 1.5rem;
@@ -501,7 +489,7 @@ function ProfilePage() {
       `}</style>
 
       <div className="profile-container">
-        <button className="back-button" onClick={() => router.push('/')}>
+        <button className="back-button" onClick={() => router.push('/dashboard/pomodoro')}>
           <ArrowLeft size={20} />
           Voltar
         </button>
@@ -516,9 +504,6 @@ function ProfilePage() {
                   alt={user.name}
                   className="avatar-image"
                 />
-                <button className="avatar-upload-btn">
-                  <Camera size={20} />
-                </button>
               </div>
               <h2 className="user-name">{user.name}</h2>
               <p className="user-email">{user.email}</p>
@@ -562,6 +547,26 @@ function ProfilePage() {
                 <div className="info-content">
                   <div className="info-label">Sequência</div>
                   <div className="info-value">{stats.streakDays} dias</div>
+                </div>
+              </div>
+
+              <div className="info-item">
+                <div className="info-icon">
+                  <Clock size={20} />
+                </div>
+                <div className="info-content">
+                  <div className="info-label">Tempo de Foco</div>
+                  <div className="info-value">{formatMinutes(stats.totalFocusTime)}</div>
+                </div>
+              </div>
+
+              <div className="info-item">
+                <div className="info-icon">
+                  <Coffee size={20} />
+                </div>
+                <div className="info-content">
+                  <div className="info-label">Tempo de Pausa</div>
+                  <div className="info-value">{formatMinutes(stats.totalBreakTime)}</div>
                 </div>
               </div>
             </div>

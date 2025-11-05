@@ -18,7 +18,7 @@ export async function GET(request) {
 
     await connectDB();
 
-    // Buscar usuário
+    // Buscar usuário COM TODOS OS DADOS
     const user = await User.findOne({ email: session.user.email });
 
     if (!user) {
@@ -38,11 +38,14 @@ export async function GET(request) {
       ? Math.round((completedTasks / totalTasks) * 100) 
       : 0;
 
-    // Calcular pomodoros (assumindo que cada tarefa completa = 1 pomodoro)
-    // Você pode ajustar isso baseado na sua lógica
+    // 🔥 PEGAR POMODOROS DO BANCO DE DADOS
     const totalPomodoros = user.totalPomodoros || 0;
+    const totalFocusTime = user.stats?.totalFocusTime || 0;
+    const totalBreakTime = user.stats?.totalBreakTime || 0;
 
-    // Calcular streak (dias seguidos) - com proteção contra erros
+    console.log(`📊 Perfil carregado: ${totalPomodoros} pomodoros, ${totalFocusTime} min foco`);
+
+    // Calcular streak (dias seguidos)
     const streakDays = calculateStreak(tasks);
 
     // Buscar tarefas do mês atual
@@ -67,6 +70,8 @@ export async function GET(request) {
       },
       stats: {
         totalPomodoros,
+        totalFocusTime,
+        totalBreakTime,
         totalTasks,
         completedTasks,
         completionRate,
@@ -88,10 +93,8 @@ export async function GET(request) {
 function calculateStreak(tasks) {
   if (tasks.length === 0) return 0;
 
-  // Filtrar tarefas completadas e ordenar por data
   const completedTasks = tasks
     .filter(task => {
-      // Verificar se a task tem updatedAt válido
       if (!task.updatedAt) return false;
       const date = new Date(task.updatedAt);
       return task.completed && !isNaN(date.getTime());
@@ -104,12 +107,11 @@ function calculateStreak(tasks) {
   let currentDate = new Date();
   currentDate.setHours(0, 0, 0, 0);
 
-  // Agrupar tarefas por dia
   const tasksByDay = {};
   completedTasks.forEach(task => {
     try {
       const date = new Date(task.updatedAt);
-      if (isNaN(date.getTime())) return; // Pular datas inválidas
+      if (isNaN(date.getTime())) return;
       
       date.setHours(0, 0, 0, 0);
       const dateKey = date.toISOString().split('T')[0];
@@ -119,7 +121,6 @@ function calculateStreak(tasks) {
     }
   });
 
-  // Calcular streak
   while (true) {
     const dateKey = currentDate.toISOString().split('T')[0];
     if (tasksByDay[dateKey]) {

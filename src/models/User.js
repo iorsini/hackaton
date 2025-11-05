@@ -15,7 +15,7 @@ const UserSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      select: false, // Não retorna a senha por padrão
+      select: false,
     },
     avatar: {
       type: String,
@@ -30,7 +30,6 @@ const UserSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    // Estatísticas adicionais
     stats: {
       totalFocusTime: {
         type: Number,
@@ -50,8 +49,5 @@ const UserSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-// Remover o índice manual para evitar duplicação
-// UserSchema.index({ email: 1 }); <- REMOVIDO (já tem unique: true)
 
 export default mongoose.models.User || mongoose.model("User", UserSchema);

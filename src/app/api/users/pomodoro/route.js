@@ -4,26 +4,10 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 
-// Definição dos moods e seus tempos
-const MOODS = {
-  CREATIVE: { focusTime: 25, breakTime: 5 },
-  UNMOTIVATED: { focusTime: 15, breakTime: 5 },
-  STRESSED: { focusTime: 20, breakTime: 7 },
-  FOCUSED: { focusTime: 30, breakTime: 5 },
-  TIRED: { focusTime: 15, breakTime: 10 },
-  ENERGIZED: { focusTime: 35, breakTime: 5 },
-  CUSTOM: { focusTime: 25, breakTime: 5 },
-};
-
-// Função para calcular pomodoros baseado no tempo e mood
-function calculatePomodoros(focusTimeMinutes, moodId) {
-  // 🔥 NOVO: Cada minuto focado = 1 pomodoro!
-  // Não importa o mood, o que conta é quantos minutos você realmente focou
-  // Exemplo: focou 1 min = 1 pomodoro
-  // Exemplo: focou 25 min = 25 pomodoros
-  // Exemplo: focou 35 min = 35 pomodoros
-  
-  return Math.max(Math.floor(focusTimeMinutes), focusTimeMinutes > 0 ? 1 : 0);
+// 🔥 IMPORTANTE: 1 minuto focado = 1 pomodoro
+function calculatePomodoros(focusTimeMinutes) {
+  // Garante que sempre retorna um número inteiro >= 0
+  return Math.max(0, Math.floor(focusTimeMinutes));
 }
 
 export async function POST(request) {
@@ -50,7 +34,9 @@ export async function POST(request) {
     await connectDB();
 
     // Calcula quantos pomodoros com base no tempo focado
-    const pomodorosToAdd = calculatePomodoros(focusTimeMinutes, moodId);
+    const pomodorosToAdd = calculatePomodoros(focusTimeMinutes);
+
+    console.log(`🎯 Registrando ${pomodorosToAdd} pomodoros para ${focusTimeMinutes} minutos`);
 
     // Incrementar pomodoros calculados e tempo de foco
     const user = await User.findOneAndUpdate(
@@ -70,6 +56,8 @@ export async function POST(request) {
         { status: 404 }
       );
     }
+
+    console.log(`✅ Total de pomodoros agora: ${user.totalPomodoros}`);
 
     return Response.json({
       success: true,
