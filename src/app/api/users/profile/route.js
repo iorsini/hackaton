@@ -10,10 +10,7 @@ export async function GET(request) {
     const session = await getServerSession(authOptions);
 
     if (!session) {
-      return Response.json(
-        { error: "Não autenticado" },
-        { status: 401 }
-      );
+      return Response.json({ error: "Não autenticado" }, { status: 401 });
     }
 
     await connectDB();
@@ -33,10 +30,9 @@ export async function GET(request) {
 
     // Calcular estatísticas de tarefas
     const totalTasks = tasks.length;
-    const completedTasks = tasks.filter(task => task.completed).length;
-    const completionRate = totalTasks > 0 
-      ? Math.round((completedTasks / totalTasks) * 100) 
-      : 0;
+    const completedTasks = tasks.filter((task) => task.completed).length;
+    const completionRate =
+      totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
     // 🔥 CORRIGIDO: Pegar dados REAIS do banco
     const totalPomodoros = user.totalPomodoros || 0;
@@ -56,13 +52,13 @@ export async function GET(request) {
     // Buscar tarefas do mês atual
     const now = new Date();
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const tasksThisMonth = tasks.filter(task => {
+    const tasksThisMonth = tasks.filter((task) => {
       if (!task.createdAt) return false;
       const taskDate = new Date(task.createdAt);
       return !isNaN(taskDate.getTime()) && taskDate >= firstDayOfMonth;
     });
     const completedTasksThisMonth = tasksThisMonth.filter(
-      task => task.completed
+      (task) => task.completed
     ).length;
 
     return Response.json({
@@ -88,10 +84,7 @@ export async function GET(request) {
     });
   } catch (error) {
     console.error("❌ Erro ao buscar perfil:", error);
-    return Response.json(
-      { error: "Erro ao buscar perfil" },
-      { status: 500 }
-    );
+    return Response.json({ error: "Erro ao buscar perfil" }, { status: 500 });
   }
 }
 
@@ -101,20 +94,24 @@ function calculateStreak(user) {
 
   const now = new Date();
   const lastActivity = new Date(user.stats.lastActivity);
-  
+
   // Normalizar datas para meia-noite
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const lastActivityDay = new Date(lastActivity.getFullYear(), lastActivity.getMonth(), lastActivity.getDate());
-  
+  const lastActivityDay = new Date(
+    lastActivity.getFullYear(),
+    lastActivity.getMonth(),
+    lastActivity.getDate()
+  );
+
   // Calcular diferença em dias
   const diffTime = today.getTime() - lastActivityDay.getTime();
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  
+
   // Se a última atividade foi hoje ou ontem, mantém streak
   if (diffDays <= 1) {
     return user.stats.longestStreak || 1;
   }
-  
+
   // Se passou mais de 1 dia, streak quebrou
   return 0;
 }
@@ -125,10 +122,7 @@ export async function PATCH(request) {
     const session = await getServerSession(authOptions);
 
     if (!session) {
-      return Response.json(
-        { error: "Não autenticado" },
-        { status: 401 }
-      );
+      return Response.json({ error: "Não autenticado" }, { status: 401 });
     }
 
     const body = await request.json();

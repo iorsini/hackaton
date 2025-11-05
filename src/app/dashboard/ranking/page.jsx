@@ -28,7 +28,7 @@ export default function AboutPomofy() {
       role: "Frontend Developer",
       github: "https://github.com/iorsini",
       linkedin: "https://www.linkedin.com/in/isadora-barradas/",
-      avatar: "/images/isadora.jpeg",
+      avatar: "/images/isadora.png",
     },
     {
       name: "Mishal Saheer",

@@ -7,10 +7,10 @@ import { BiMenuAltLeft } from "react-icons/bi";
 import { IoFlashOutline } from "react-icons/io5";
 import Sidebar from "@/components/teste/Sidebar";
 import BottomNavbar from "@/components/dashboard/bottomNavBar";
-import GroupBanner from "@/components/dashboard/groupBanner";
-import EventCard from "@/components/dashboard/eventCard";
-import AddEventModal from "@/components/dashboard/addEventModal";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
+//import GroupBanner from "@/components/dashboard/groupBanner";
+//import EventCard from "@/components/dashboard/eventCard";
+//import AddEventModal from "@/components/dashboard/addEventModal";
+//import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function GroupDashboard() {
   const params = useParams();
