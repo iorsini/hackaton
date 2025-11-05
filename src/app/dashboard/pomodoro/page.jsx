@@ -1,8 +1,26 @@
-'use client'
-
-import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, RotateCcw, Plus, X, Menu, Coffee, Brain, Battery, Zap, Frown, Smile, SkipForward, LogIn, Check, Trash2 } from 'lucide-react';
-import Sidebar from '@/components/teste/Sidebar';
+"use client";
+import { useSession } from "next-auth/react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Play,
+  Pause,
+  RotateCcw,
+  Plus,
+  X,
+  Menu,
+  Coffee,
+  Brain,
+  Battery,
+  Zap,
+  Frown,
+  Smile,
+  SkipForward,
+  LogIn,
+  Check,
+  Trash2,
+} from "lucide-react";
+import Sidebar from "@/components/teste/Sidebar";
+import LofiPlayer from "@/components/teste/LoFiPlayer";
 
 // ============================================
 // MOODS CONFIGURATION
@@ -1114,6 +1132,8 @@ export default function PomodoroApp() {
               <div className="progress-bar" style={{ width: `${progress}%` }} />
             </div>
           </div>
+                      <LofiPlayer selectedMood={selectedMood} />
+
         </div>
       </div>
     </>
