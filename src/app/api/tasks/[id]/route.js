@@ -4,21 +4,25 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/mongodb';
 import Task from '@/models/Task';
 
-export async function PATCH(request, { params }) {
+export async function PATCH(request, context) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
       return Response.json({ erro: 'Não autorizado' }, { status: 401 });
     }
 
-    const { id } = params;
+    // Next.js 15 usa await params
+    const { id } = await context.params;
     const body = await request.json();
+
+    console.log('PATCH Task - ID:', id, 'Body:', body); // Debug
 
     await dbConnect();
 
     const task = await Task.findOne({ _id: id, userId: session.user.id });
     
     if (!task) {
+      console.log('Task não encontrada:', id, session.user.id);
       return Response.json({ erro: 'Tarefa não encontrada' }, { status: 404 });
     }
 
@@ -32,21 +36,26 @@ export async function PATCH(request, { params }) {
 
     await task.save();
 
+    console.log('Task atualizada:', task); // Debug
+
     return Response.json({ task });
   } catch (error) {
     console.error('Erro ao atualizar task:', error);
-    return Response.json({ erro: 'Erro ao atualizar tarefa' }, { status: 500 });
+    return Response.json({ erro: 'Erro ao atualizar tarefa', detalhes: error.message }, { status: 500 });
   }
 }
 
-export async function DELETE(request, { params }) {
+export async function DELETE(request, context) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
       return Response.json({ erro: 'Não autorizado' }, { status: 401 });
     }
 
-    const { id } = params;
+    // Next.js 15 usa await params
+    const { id } = await context.params;
+
+    console.log('DELETE Task - ID:', id); // Debug
 
     await dbConnect();
 
@@ -59,6 +68,6 @@ export async function DELETE(request, { params }) {
     return Response.json({ sucesso: true });
   } catch (error) {
     console.error('Erro ao deletar task:', error);
-    return Response.json({ erro: 'Erro ao deletar tarefa' }, { status: 500 });
+    return Response.json({ erro: 'Erro ao deletar tarefa', detalhes: error.message }, { status: 500 });
   }
 }

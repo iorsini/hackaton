@@ -23,117 +23,159 @@ import Sidebar from "@/components/teste/Sidebar";
 import LofiPlayer from "@/components/teste/LoFiPlayer";
 
 // ============================================
+// TASK CATEGORIES (ADICIONADO)
+// ============================================
+const TASK_CATEGORIES = {
+  trabalho: {
+    id: "trabalho",
+    label: "Trabalho",
+    icon: "💼",
+    color: "#3b82f6",
+  },
+  "saude-fisica": {
+    id: "saude-fisica",
+    label: "Saúde Física",
+    icon: "💪",
+    color: "#10b981",
+  },
+  "saude-mental": {
+    id: "saude-mental",
+    label: "Saúde Mental",
+    icon: "🧘",
+    color: "#a855f7",
+  },
+  estudo: {
+    id: "estudo",
+    label: "Estudo",
+    icon: "📚",
+    color: "#f59e0b",
+  },
+  pessoal: {
+    id: "pessoal",
+    label: "Pessoal",
+    icon: "🏠",
+    color: "#ec4899",
+  },
+  outros: {
+    id: "outros",
+    label: "Outros",
+    icon: "📌",
+    color: "#6b7280",
+  },
+};
+
+// ============================================
 // MOODS CONFIGURATION
 // ============================================
 const MOODS = {
-  CREATIVE: { 
-    id: 'creative',
-    label: 'Criativo', 
-    focusTime: 25, 
+  CREATIVE: {
+    id: "creative",
+    label: "Criativo",
+    focusTime: 25,
     breakTime: 5,
-    gradient: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
+    gradient: "linear-gradient(135deg, #a855f7 0%, #ec4899 100%)",
     icon: Brain,
     focusMessages: [
-      'Deixe as ideias fluírem! 🎨',
-      'Sua criatividade está no auge!',
-      'Momento perfeito para inovar!'
+      "Deixe as ideias fluírem! 🎨",
+      "Sua criatividade está no auge!",
+      "Momento perfeito para inovar!",
     ],
     breakMessages: [
-      'Beba água e deixe sua mente vagar 💧',
-      'Alongue os ombros e respire fundo',
-      'Olhe para longe e relaxe os olhos'
-    ]
+      "Beba água e deixe sua mente vagar 💧",
+      "Alongue os ombros e respire fundo",
+      "Olhe para longe e relaxe os olhos",
+    ],
   },
-  UNMOTIVATED: { 
-    id: 'unmotivated',
-    label: 'Desmotivado', 
-    focusTime: 15, 
+  UNMOTIVATED: {
+    id: "unmotivated",
+    label: "Desmotivado",
+    focusTime: 15,
     breakTime: 5,
-    gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
+    gradient: "linear-gradient(135deg, #64748b 0%, #475569 100%)",
     icon: Frown,
     focusMessages: [
-      'Você consegue! Um passo de cada vez 💪',
-      'Pequenos progressos ainda são progressos',
-      'Seja gentil consigo mesmo hoje'
+      "Você consegue! Um passo de cada vez 💪",
+      "Pequenos progressos ainda são progressos",
+      "Seja gentil consigo mesmo hoje",
     ],
     breakMessages: [
-      'Respire fundo 3 vezes e beba água 💧',
-      'Levante e caminhe um pouco',
-      'Alongue o corpo todo devagar'
-    ]
+      "Respire fundo 3 vezes e beba água 💧",
+      "Levante e caminhe um pouco",
+      "Alongue o corpo todo devagar",
+    ],
   },
-  STRESSED: { 
-    id: 'stressed',
-    label: 'Estressado', 
-    focusTime: 20, 
+  STRESSED: {
+    id: "stressed",
+    label: "Estressado",
+    focusTime: 20,
     breakTime: 7,
-    gradient: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+    gradient: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
     icon: Zap,
     focusMessages: [
-      'Respire fundo. Você está indo bem 🧘',
-      'Um passo de cada vez. Sem pressa',
-      'Foco no presente, não no resultado'
+      "Respire fundo. Você está indo bem 🧘",
+      "Um passo de cada vez. Sem pressa",
+      "Foco no presente, não no resultado",
     ],
     breakMessages: [
-      'RESPIRE: 4 segundos dentro, 4 fora 🫁',
-      'Beba água gelada devagar 💧',
-      'Alongue pescoço e ombros'
-    ]
+      "RESPIRE: 4 segundos dentro, 4 fora 🫁",
+      "Beba água gelada devagar 💧",
+      "Alongue pescoço e ombros",
+    ],
   },
-  FOCUSED: { 
-    id: 'focused',
-    label: 'Focado', 
-    focusTime: 30, 
+  FOCUSED: {
+    id: "focused",
+    label: "Focado",
+    focusTime: 30,
     breakTime: 5,
-    gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+    gradient: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
     icon: Smile,
     focusMessages: [
-      'Foco impecável! Continue assim 🎯',
-      'Você está no flow perfeito',
-      'Mantenha esse ritmo incrível!'
+      "Foco impecável! Continue assim 🎯",
+      "Você está no flow perfeito",
+      "Mantenha esse ritmo incrível!",
     ],
     breakMessages: [
-      'Olhe para longe por 20 segundos 👀',
-      'Beba água e hidrate-se 💧',
-      'Levante e movimente as pernas'
-    ]
+      "Olhe para longe por 20 segundos 👀",
+      "Beba água e hidrate-se 💧",
+      "Levante e movimente as pernas",
+    ],
   },
-  TIRED: { 
-    id: 'tired',
-    label: 'Cansado', 
-    focusTime: 15, 
+  TIRED: {
+    id: "tired",
+    label: "Cansado",
+    focusTime: 15,
     breakTime: 10,
-    gradient: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+    gradient: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",
     icon: Coffee,
     focusMessages: [
-      'Devagar e sempre. Você consegue 😴',
-      'Está tudo bem ir no seu ritmo',
-      'Faça o que puder por agora'
+      "Devagar e sempre. Você consegue 😴",
+      "Está tudo bem ir no seu ritmo",
+      "Faça o que puder por agora",
     ],
     breakMessages: [
-      'Beba água ou café ☕💧',
-      'Considere um cochilo de 5min',
-      'Alongue todo o corpo'
-    ]
+      "Beba água ou café ☕💧",
+      "Considere um cochilo de 5min",
+      "Alongue todo o corpo",
+    ],
   },
-  ENERGIZED: { 
-    id: 'energized',
-    label: 'Energizado', 
-    focusTime: 35, 
+  ENERGIZED: {
+    id: "energized",
+    label: "Energizado",
+    focusTime: 35,
     breakTime: 5,
-    gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+    gradient: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
     icon: Battery,
     focusMessages: [
-      'Energia máxima! Você está voando! ⚡',
-      'Incrível! Mantenha esse ritmo',
-      'Aproveite esse pico de produtividade'
+      "Energia máxima! Você está voando! ⚡",
+      "Incrível! Mantenha esse ritmo",
+      "Aproveite esse pico de produtividade",
     ],
     breakMessages: [
-      'Beba água para manter a energia 💧',
-      'Alongamento rápido de 30 segundos',
-      'Olhe pela janela e respire'
-    ]
-  }
+      "Beba água para manter a energia 💧",
+      "Alongamento rápido de 30 segundos",
+      "Olhe pela janela e respire",
+    ],
+  },
 };
 
 // ============================================
@@ -147,7 +189,7 @@ const useTimer = (initialMinutes, onComplete) => {
   useEffect(() => {
     if (isActive && seconds > 0) {
       intervalRef.current = setInterval(() => {
-        setSeconds(s => {
+        setSeconds((s) => {
           if (s <= 1) {
             setIsActive(false);
             onComplete?.();
@@ -178,16 +220,25 @@ const useTimer = (initialMinutes, onComplete) => {
 // MAIN APP
 // ============================================
 export default function PomodoroApp() {
+  // === session (ADICIONADO) ===
+  const { data: session, status } = useSession();
+
+  // existing states
   const [tasks, setTasks] = useState([]);
   const [selectedMood, setSelectedMood] = useState(null);
   const [isBreak, setIsBreak] = useState(false);
   const [pomodorosCompleted, setPomodorosCompleted] = useState(0);
-  const [newTaskText, setNewTaskText] = useState('');
+  const [newTaskText, setNewTaskText] = useState("");
   const [showNotification, setShowNotification] = useState(false);
-  const [notificationMessage, setNotificationMessage] = useState('');
+  const [notificationMessage, setNotificationMessage] = useState("");
   const [showMoodSelector, setShowMoodSelector] = useState(false);
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
   const [showAddTask, setShowAddTask] = useState(false);
+
+  // === new states for categories & loading (ADICIONADOS) ===
+  const [selectedCategory, setSelectedCategory] = useState("outros");
+  const [showCategorySelector, setShowCategorySelector] = useState(false); // not heavily used but kept per request
+  const [isLoadingTasks, setIsLoadingTasks] = useState(true);
 
   const focusTime = selectedMood?.focusTime || 25;
   const breakTime = selectedMood?.breakTime || 5;
@@ -196,9 +247,9 @@ export default function PomodoroApp() {
     setNotificationMessage(message);
     setShowNotification(true);
     setTimeout(() => setShowNotification(false), 4000);
-    
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('Pomodoro Timer', { body: message });
+
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification("Pomodoro Timer", { body: message });
     }
   };
 
@@ -210,25 +261,26 @@ export default function PomodoroApp() {
         newTasks[currentTaskIndex].completed = true;
         setTasks(newTasks);
       }
-      
-      setPomodorosCompleted(p => p + 1);
+
+      setPomodorosCompleted((p) => p + 1);
       setIsBreak(true);
       timer.reset(breakTime);
-      
-      const messages = selectedMood?.breakMessages || ['Beba água! 💧', 'Alongue-se!', 'Descanse os olhos'];
+
+      const messages =
+        selectedMood?.breakMessages || ["Beba água! 💧", "Alongue-se!", "Descanse os olhos"];
       showNotif(messages[Math.floor(Math.random() * messages.length)]);
     } else {
       setIsBreak(false);
-      
+
       // Avançar para próxima task não completada
       const nextIndex = tasks.findIndex((t, i) => i > currentTaskIndex && !t.completed);
       if (nextIndex !== -1) {
         setCurrentTaskIndex(nextIndex);
       }
-      
+
       timer.reset(focusTime);
-      
-      const messages = selectedMood?.focusMessages || ['Vamos lá! 💪', 'Foco total!'];
+
+      const messages = selectedMood?.focusMessages || ["Vamos lá! 💪", "Foco total!"];
       showNotif(messages[Math.floor(Math.random() * messages.length)]);
     }
   };
@@ -237,47 +289,219 @@ export default function PomodoroApp() {
 
   const handleStart = () => {
     if (!selectedMood) {
-      showNotif('Selecione seu humor primeiro! 😊');
+      showNotif("Selecione seu humor primeiro! 😊");
       setShowMoodSelector(true);
       return;
     }
-    
+
     timer.start();
-    
-    if ('Notification' in window && Notification.permission === 'default') {
+
+    if ("Notification" in window && Notification.permission === "default") {
       Notification.requestPermission();
     }
-    
+
     if (!isBreak) {
-      const messages = selectedMood?.focusMessages || ['Foco! 💪'];
+      const messages = selectedMood?.focusMessages || ["Foco! 💪"];
       showNotif(messages[Math.floor(Math.random() * messages.length)]);
     }
   };
 
-  const minutes = Math.floor(timer.seconds / 60);
-  const secs = timer.seconds % 60;
+  // =========================================
+  // API Integration: loadTasks, addTask, toggleTask, deleteTask, updateTaskText
+  // - When session exists -> call API endpoints
+  // - When no session -> use local-only behavior (tasks kept in memory)
+  // =========================================
 
-  const addTask = () => {
-    if (newTaskText.trim()) {
-      setTasks([...tasks, {
-        id: Date.now(),
-        text: newTaskText.trim(),
-        completed: false,
-        createdAt: new Date().toISOString()
-      }]);
-      setNewTaskText('');
-      setShowAddTask(false);
+  // CARREGAR TASKS AO LOGAR
+  useEffect(() => {
+    if (session?.user) {
+      loadTasks();
+    } else {
+      // reset local tasks (we keep whatever was local but set loading false)
+      setIsLoadingTasks(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session]);
+
+  const loadTasks = async () => {
+    try {
+      setIsLoadingTasks(true);
+      const res = await fetch("/api/tasks");
+      const data = await res.json();
+
+      if (res.ok) {
+        setTasks(
+          data.tasks.map((t) => ({
+            ...t,
+            id: t._id, // MongoDB _id -> id
+          }))
+        );
+      } else {
+        showNotif("Erro ao carregar tarefas 😢");
+      }
+    } catch (error) {
+      console.error("Erro ao carregar tasks:", error);
+      showNotif("Erro ao carregar tarefas 😢");
+    } finally {
+      setIsLoadingTasks(false);
     }
   };
 
-  const toggleTask = (id) => {
-    setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+  // adicionar tarefa (usa API se estiver logado, caso contrário cria localmente)
+  const addTask = async () => {
+    if (!newTaskText.trim()) return;
+
+    if (session?.user) {
+      try {
+        const res = await fetch("/api/tasks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: newTaskText.trim(),
+            category: selectedCategory,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          setTasks([
+            {
+              ...data.task,
+              id: data.task._id,
+            },
+            ...tasks,
+          ]);
+          setNewTaskText("");
+          setShowAddTask(false);
+          showNotif("Tarefa adicionada! ✅");
+        } else {
+          console.error("Erro do servidor ao adicionar task:", data);
+          showNotif("Erro ao adicionar tarefa 😢");
+        }
+      } catch (error) {
+        console.error("Erro ao adicionar task:", error);
+        showNotif("Erro ao adicionar tarefa 😢");
+      }
+    } else {
+      // local fallback (não salva no backend)
+      setTasks([
+        {
+          id: Date.now(),
+          text: newTaskText.trim(),
+          completed: false,
+          category: selectedCategory || "outros",
+          createdAt: new Date().toISOString(),
+        },
+        ...tasks,
+      ]);
+      setNewTaskText("");
+      setShowAddTask(false);
+      showNotif("Tarefa adicionada localmente (faça login para salvar).");
+    }
   };
 
-  const deleteTask = (id, e) => {
-    e.stopPropagation();
-    setTasks(tasks.filter(t => t.id !== id));
+  const toggleTask = async (id) => {
+    if (session?.user) {
+      const task = tasks.find((t) => t.id === id);
+      if (!task) return;
+      const newCompleted = !task.completed;
+
+      // Otimistic update
+      setTasks(
+        tasks.map((t) => (t.id === id ? { ...t, completed: newCompleted } : t))
+      );
+
+      try {
+        const res = await fetch(`/api/tasks/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ completed: newCompleted }),
+        });
+
+        if (!res.ok) {
+          // Reverter se der erro
+          setTasks(
+            tasks.map((t) => (t.id === id ? { ...t, completed: !newCompleted } : t))
+          );
+          showNotif("Erro ao atualizar tarefa 😢");
+        }
+      } catch (error) {
+        console.error("Erro ao toggle task:", error);
+        setTasks(
+          tasks.map((t) => (t.id === id ? { ...t, completed: !newCompleted } : t))
+        );
+      }
+    } else {
+      // local toggle
+      setTasks(tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)));
+    }
   };
+
+  const deleteTask = async (id, e) => {
+    e.stopPropagation();
+
+    if (session?.user) {
+      // Otimistic delete
+      const oldTasks = [...tasks];
+      setTasks(tasks.filter((t) => t.id !== id));
+
+      try {
+        const res = await fetch(`/api/tasks/${id}`, {
+          method: "DELETE",
+        });
+
+        if (!res.ok) {
+          setTasks(oldTasks);
+          showNotif("Erro ao deletar tarefa 😢");
+        } else {
+          showNotif("Tarefa removida! 🗑️");
+        }
+      } catch (error) {
+        console.error("Erro ao deletar task:", error);
+        setTasks(oldTasks);
+        showNotif("Erro ao deletar tarefa 😢");
+      }
+    } else {
+      // local delete
+      setTasks(tasks.filter((t) => t.id !== id));
+    }
+  };
+
+  const updateTaskText = async (id, newText) => {
+    if (!newText.trim()) return;
+
+    if (session?.user) {
+      try {
+        const res = await fetch(`/api/tasks/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: newText.trim() }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setTasks(tasks.map((t) => (t.id === id ? { ...data.task, id: data.task._id } : t)));
+          showNotif("Tarefa atualizada! ✏️");
+        } else {
+          const error = await res.json();
+          console.error("Erro do servidor:", error);
+          showNotif("Erro ao atualizar tarefa 😢");
+        }
+      } catch (error) {
+        console.error("Erro ao atualizar texto:", error);
+        showNotif("Erro ao atualizar tarefa 😢");
+      }
+    } else {
+      // local update
+      setTasks(tasks.map((t) => (t.id === id ? { ...t, text: newText.trim() } : t)));
+      showNotif("Tarefa atualizada localmente (faça login para salvar).");
+    }
+  };
+
+  // =========================================
+  // End API integration
+  // =========================================
 
   const handleMoodChange = (mood) => {
     setSelectedMood(mood);
@@ -288,12 +512,15 @@ export default function PomodoroApp() {
     showNotif(`Humor "${mood.label}" selecionado! ${mood.focusTime}min de foco`);
   };
 
-  const completedTasks = tasks.filter(t => t.completed).length;
+  const completedTasks = tasks.filter((t) => t.completed).length;
   const progress = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
 
   const handleLogin = () => {
-    window.location.href = '/login';
+    window.location.href = "/login";
   };
+
+  const minutes = Math.floor(timer.seconds / 60);
+  const secs = timer.seconds % 60;
 
   return (
     <>
@@ -306,7 +533,7 @@ export default function PomodoroApp() {
 
         body {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          background: ${selectedMood?.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'};
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
           min-height: 100vh;
           overflow-x: hidden;
           transition: background 0.8s ease;
@@ -352,7 +579,7 @@ export default function PomodoroApp() {
         .notification-icon {
           width: 48px;
           height: 48px;
-          background: ${selectedMood?.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'};
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
           border-radius: 12px;
           display: flex;
           align-items: center;
@@ -560,7 +787,7 @@ export default function PomodoroApp() {
         }
 
         .task-item.current {
-          background: ${selectedMood?.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'};
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
           box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
         }
 
@@ -657,8 +884,8 @@ export default function PomodoroApp() {
         }
 
         .add-task-btn:hover {
-          border-color: ${selectedMood?.gradient?.split(' ')[2] || '#667eea'};
-          color: ${selectedMood?.gradient?.split(' ')[2] || '#667eea'};
+          border-color: ${selectedMood?.gradient?.split(" ")[2] || "#667eea"};
+          color: ${selectedMood?.gradient?.split(" ")[2] || "#667eea"};
           background: #f8f9ff;
         }
 
@@ -678,12 +905,12 @@ export default function PomodoroApp() {
         }
 
         .add-task-input:focus {
-          border-color: ${selectedMood?.gradient?.split(' ')[2] || '#667eea'};
+          border-color: ${selectedMood?.gradient?.split(" ")[2] || "#667eea"};
         }
 
         .add-task-submit {
           padding: 0.875rem 1.25rem;
-          background: ${selectedMood?.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'};
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
           color: white;
           border: none;
           border-radius: 12px;
@@ -741,7 +968,7 @@ export default function PomodoroApp() {
         .progress-percentage {
           font-size: 2.5rem;
           font-weight: 700;
-          background: ${selectedMood?.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'};
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -763,7 +990,7 @@ export default function PomodoroApp() {
 
         .progress-bar {
           height: 100%;
-          background: ${selectedMood?.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'};
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
           transition: width 0.5s ease;
           border-radius: 4px;
         }
@@ -785,7 +1012,7 @@ export default function PomodoroApp() {
           align-items: center;
           gap: 0.5rem;
           padding: 0.5rem 1rem;
-          background: ${selectedMood?.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'};
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
           color: white;
           border-radius: 20px;
           font-size: 0.875rem;
@@ -827,7 +1054,7 @@ export default function PomodoroApp() {
         .control-btn.primary {
           width: 80px;
           height: 80px;
-          background: ${selectedMood?.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'};
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
           color: white;
           box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
         }
@@ -857,7 +1084,7 @@ export default function PomodoroApp() {
 
         .mood-display {
           padding: 1rem 2rem;
-          background: ${selectedMood?.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'};
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
           color: white;
           border-radius: 16px;
           display: flex;
@@ -951,9 +1178,7 @@ export default function PomodoroApp() {
       {/* NOTIFICATION POPUP */}
       {showNotification && (
         <div className="notification-popup">
-          <div className="notification-icon">
-            {isBreak ? '☕' : '🎯'}
-          </div>
+          <div className="notification-icon">{isBreak ? "☕" : "🎯"}</div>
           <div className="notification-text">{notificationMessage}</div>
         </div>
       )}
@@ -974,7 +1199,7 @@ export default function PomodoroApp() {
                   <button
                     key={mood.id}
                     onClick={() => handleMoodChange(mood)}
-                    className={`mood-btn ${selectedMood?.id === mood.id ? 'selected' : ''}`}
+                    className={`mood-btn ${selectedMood?.id === mood.id ? "selected" : ""}`}
                     style={selectedMood?.id === mood.id ? { background: mood.gradient } : {}}
                   >
                     <Icon size={28} />
@@ -987,10 +1212,10 @@ export default function PomodoroApp() {
           </div>
         </>
       )}
-      
+
       <div className="app-container">
         {/* TASK LIST */}
-        <Sidebar/>
+        <Sidebar />
         <div className="task-list-card">
           <div className="task-header">
             <div>
@@ -1001,32 +1226,70 @@ export default function PomodoroApp() {
             </div>
           </div>
 
+          {/* AVISO PARA USUÁRIOS NÃO LOGADOS (ADICIONADO) */}
+          {!session && (
+            <div
+              style={{
+                background: "rgba(255, 255, 255, 0.95)",
+                borderRadius: "16px",
+                padding: "1.5rem",
+                marginBottom: "2rem",
+                textAlign: "center",
+                border: "2px dashed #fbbf24",
+              }}
+            >
+              <span style={{ fontSize: "2rem", display: "block", marginBottom: "0.5rem" }}>
+                🔒
+              </span>
+              <p style={{ fontWeight: 600, color: "#1a1a1a", marginBottom: "0.25rem" }}>
+                Suas tarefas não serão salvas
+              </p>
+              <p style={{ fontSize: "0.875rem", color: "#666" }}>
+                Faça login para manter suas tarefas!
+              </p>
+            </div>
+          )}
+
           <div className="tasks-container">
-            {tasks.length === 0 ? (
+            {isLoadingTasks ? (
+              <div className="empty-state">
+                <div className="empty-state-icon">⏳</div>
+                <p>Carregando tarefas...</p>
+              </div>
+            ) : tasks.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-state-icon">📝</div>
                 <p>Nenhuma tarefa ainda</p>
-                <p style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                <p style={{ fontSize: "0.875rem", marginTop: "0.5rem" }}>
                   Adicione sua primeira tarefa abaixo!
                 </p>
               </div>
             ) : (
               tasks.map((task, index) => (
-                <div 
-                  key={task.id} 
-                  className={`task-item ${task.completed ? 'completed' : ''} ${index === currentTaskIndex && !task.completed ? 'current' : ''}`}
+                <div
+                  key={task.id}
+                  className={`task-item ${task.completed ? "completed" : ""} ${
+                    index === currentTaskIndex && !task.completed ? "current" : ""
+                  }`}
                   onClick={() => toggleTask(task.id)}
                 >
-                  <div className="task-checkbox">
-                    {task.completed && <Check size={14} />}
-                  </div>
+                  <div className="task-checkbox">{task.completed && <Check size={14} />}</div>
+
+                  {/* ICON DA CATEGORIA (ADICIONADO) */}
+                  <span style={{ fontSize: "1.25rem" }}>
+                    {TASK_CATEGORIES[task.category]?.icon || "📌"}
+                  </span>
+
                   <div className="task-content">
                     <div className="task-text">{task.text}</div>
+                    {/* opcional: mostrar label da categoria em texto pequeno */}
+                    {TASK_CATEGORIES[task.category] && (
+                      <div style={{ fontSize: "0.75rem", color: "#888", marginTop: 6 }}>
+                        {TASK_CATEGORIES[task.category].label}
+                      </div>
+                    )}
                   </div>
-                  <button 
-                    className="delete-task-btn"
-                    onClick={(e) => deleteTask(task.id, e)}
-                  >
+                  <button className="delete-task-btn" onClick={(e) => deleteTask(task.id, e)}>
                     <Trash2 size={16} />
                   </button>
                 </div>
@@ -1036,29 +1299,66 @@ export default function PomodoroApp() {
 
           <div className="add-task-container">
             {showAddTask ? (
-              <div className="add-task-input-container">
-                <input
-                  type="text"
-                  className="add-task-input"
-                  placeholder="Digite sua tarefa..."
-                  value={newTaskText}
-                  onChange={(e) => setNewTaskText(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && addTask()}
-                  autoFocus
-                />
-                <button className="add-task-submit" onClick={addTask}>
-                  <Plus size={20} />
-                </button>
-                <button 
-                  className="control-btn secondary" 
-                  style={{ width: 44, height: 44 }}
-                  onClick={() => {
-                    setShowAddTask(false);
-                    setNewTaskText('');
+              <div>
+                {/* Seletor de categoria (ADICIONADO) */}
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "0.5rem",
+                    marginBottom: "0.75rem",
+                    flexWrap: "wrap",
                   }}
                 >
-                  <X size={18} />
-                </button>
+                  {Object.values(TASK_CATEGORIES).map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat.id)}
+                      style={{
+                        padding: "0.5rem 0.75rem",
+                        border:
+                          selectedCategory === cat.id ? `2px solid ${cat.color}` : "2px solid #e5e7eb",
+                        background: selectedCategory === cat.id ? `${cat.color}15` : "white",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.375rem",
+                        fontSize: "0.8rem",
+                        fontWeight: 600,
+                        color: selectedCategory === cat.id ? cat.color : "#666",
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      <span>{cat.icon}</span>
+                      <span>{cat.label}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="add-task-input-container">
+                  <input
+                    type="text"
+                    className="add-task-input"
+                    placeholder="Digite sua tarefa..."
+                    value={newTaskText}
+                    onChange={(e) => setNewTaskText(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && addTask()}
+                    autoFocus
+                  />
+                  <button className="add-task-submit" onClick={addTask}>
+                    <Plus size={20} />
+                  </button>
+                  <button
+                    className="control-btn secondary"
+                    style={{ width: 44, height: 44 }}
+                    onClick={() => {
+                      setShowAddTask(false);
+                      setNewTaskText("");
+                    }}
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
               </div>
             ) : (
               <button className="add-task-btn" onClick={() => setShowAddTask(true)}>
@@ -1073,47 +1373,44 @@ export default function PomodoroApp() {
         <div className="right-panel">
           {/* TIMER */}
           <div className="timer-card">
-            <div className={`status-badge ${isBreak ? 'break' : ''}`}>
-              <div style={{ width: 8, height: 8, background: 'currentColor', borderRadius: '50%' }} />
-              {isBreak ? 'Intervalo' : 'Tempo de Foco'}
+            <div className={`status-badge ${isBreak ? "break" : ""}`}>
+              <div style={{ width: 8, height: 8, background: "currentColor", borderRadius: "50%" }} />
+              {isBreak ? "Intervalo" : "Tempo de Foco"}
             </div>
 
             <div className="timer-display">
-              {String(minutes).padStart(2, '0')}:{String(secs).padStart(2, '0')}
+              {String(minutes).padStart(2, "0")}:{String(secs).padStart(2, "0")}
             </div>
 
             <div className="timer-controls">
               <button className="control-btn secondary" onClick={() => timer.reset(isBreak ? breakTime : focusTime)}>
                 <RotateCcw size={20} />
               </button>
-              <button 
-                className="control-btn primary" 
+              <button
+                className="control-btn primary"
                 onClick={timer.isActive ? timer.pause : handleStart}
                 disabled={!selectedMood}
               >
                 {timer.isActive ? <Pause size={28} /> : <Play size={28} style={{ marginLeft: 2 }} />}
               </button>
-              <button className="control-btn secondary" onClick={() => {
-                setIsBreak(!isBreak);
-                timer.reset(isBreak ? focusTime : breakTime);
-              }}>
+              <button
+                className="control-btn secondary"
+                onClick={() => {
+                  setIsBreak(!isBreak);
+                  timer.reset(isBreak ? focusTime : breakTime);
+                }}
+              >
                 <SkipForward size={20} />
               </button>
             </div>
 
             {selectedMood ? (
-              <div 
-                className="mood-display" 
-                onClick={() => setShowMoodSelector(true)}
-              >
+              <div className="mood-display" onClick={() => setShowMoodSelector(true)}>
                 {React.createElement(selectedMood.icon, { size: 20 })}
                 <span>Humor: {selectedMood.label}</span>
               </div>
             ) : (
-              <div 
-                className="mood-display mood-display-pulse" 
-                onClick={() => setShowMoodSelector(true)}
-              >
+              <div className="mood-display mood-display-pulse" onClick={() => setShowMoodSelector(true)}>
                 <span>✨ Selecione seu humor para começar!</span>
               </div>
             )}
@@ -1132,8 +1429,8 @@ export default function PomodoroApp() {
               <div className="progress-bar" style={{ width: `${progress}%` }} />
             </div>
           </div>
-                      <LofiPlayer selectedMood={selectedMood} />
 
+          <LofiPlayer selectedMood={selectedMood} />
         </div>
       </div>
     </>
