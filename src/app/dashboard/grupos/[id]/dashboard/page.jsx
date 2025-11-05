@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { TiPlus } from "react-icons/ti";
 import { BiMenuAltLeft } from "react-icons/bi";
 import { IoFlashOutline } from "react-icons/io5";
-import Sidebar from "@/components/teste/SideBar";
+import Sidebar from "@/components/dashboard/teste/SideBar";
 import BottomNavbar from "@/components/dashboard/bottomNavBar";
 import GroupBanner from "@/components/dashboard/groupBanner";
 import EventCard from "@/components/dashboard/eventCard";
