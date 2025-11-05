@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -178,6 +179,29 @@ export default function RegisterForm() {
 
         .form-group {
           margin-bottom: 1.5rem;
+        }
+          .back-button {
+          position: absolute;
+          top: 2rem;
+          left: 2rem;
+          width: 48px;
+          height: 48px;
+          background: white;
+          border: 2px solid #e5e7eb;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s;
+          text-decoration: none;
+          color: #1a1a1a;
+        }
+
+        .back-button:hover {
+          border-color: #667eea;
+          transform: translateX(-4px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .form-label {
@@ -359,6 +383,9 @@ export default function RegisterForm() {
 
       <div className="pomodoro-register">
         <div className="register-card">
+          <Link href="/" className="back-button">
+            <ArrowLeft size={24} />
+          </Link>
           <div className="logo-container">
             <div className="logo">
               <img

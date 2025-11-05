@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Github, Mail, Lock, Sparkles } from "lucide-react";
+import { Github, Mail, Lock, Sparkles, ArrowLeft } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Alert from "@/components/ui/Alert";
@@ -151,6 +151,30 @@ function LoginFormContent() {
             opacity: 1;
             transform: translateY(0);
           }
+        }
+
+        .back-button {
+          position: absolute;
+          top: 2rem;
+          left: 2rem;
+          width: 48px;
+          height: 48px;
+          background: white;
+          border: 2px solid #e5e7eb;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s;
+          text-decoration: none;
+          color: #1a1a1a;
+        }
+
+        .back-button:hover {
+          border-color: #667eea;
+          transform: translateX(-4px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .logo-container {
@@ -363,6 +387,13 @@ function LoginFormContent() {
             padding: 2rem;
           }
 
+          .back-button {
+            top: 1.5rem;
+            left: 1.5rem;
+            width: 40px;
+            height: 40px;
+          }
+
           .login-title h1 {
             font-size: 1.5rem;
           }
@@ -375,6 +406,10 @@ function LoginFormContent() {
 
       <div className="pomodoro-login">
         <div className="login-card">
+          <Link href="/" className="back-button">
+            <ArrowLeft size={24} />
+          </Link>
+
           <div className="logo-container">
             <div className="logo">
               <img
@@ -440,7 +475,7 @@ function LoginFormContent() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: "8px", // espaçamento entre o ícone e o texto
+                gap: "8px",
               }}
             >
               {loading ? (
