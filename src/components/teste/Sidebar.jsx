@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
-import { Calendar, TrendingUp, Users, Trophy, LogOut, Menu, X } from "lucide-react";
+import {
+  Calendar,
+  TrendingUp,
+  Users,
+  Trophy,
+  LogOut,
+  Menu,
+  X,
+} from "lucide-react";
 
 export default function Sidebar({ activePage, onPageChange }) {
   const { data: session, status } = useSession();
@@ -114,34 +122,47 @@ export default function Sidebar({ activePage, onPageChange }) {
         className="hamburger-btn fixed top-4 left-4 z-50 md:hidden p-3 rounded-xl"
         aria-label="Toggle menu"
       >
-        {isOpen ? <X size={24} color="#374151" /> : <Menu size={24} color="#374151" />}
+        {isOpen ? (
+          <X size={24} color="#374151" />
+        ) : (
+          <Menu size={24} color="#374151" />
+        )}
       </button>
 
       {/* Sidebar Mobile */}
       <div
         className={`mobile-sidebar md:hidden fixed top-16 left-4 right-4 z-40 rounded-2xl overflow-hidden ${
-          isOpen ? 'open' : 'closed'
+          isOpen ? "open" : "closed"
         }`}
-        style={{ display: isOpen || undefined ? 'block' : 'none' }}
+        style={{ display: isOpen || undefined ? "block" : "none" }}
       >
         <div className="p-4">
           <div className="flex items-center gap-2 pb-4 border-b border-gray-200">
-<div className="logo">
+            <div className="logo">
               <img
                 src="/images/pomofy.webp"
                 alt="Logo Pomofy"
                 className="w-10 h-10 object-contain"
               />
-            </div>            <h1 className="text-lg font-bold text-gray-800">Pomofy</h1>
+            </div>{" "}
+            <h1 className="text-lg font-bold text-gray-800">Pomofy</h1>
           </div>
 
           {isLoggedIn ? (
             <nav className="flex flex-col py-2">
               {[
                 { key: "timer", label: "Timer", icon: <Calendar size={20} /> },
-                { key: "progress", label: "Progresso", icon: <TrendingUp size={20} /> },
+                {
+                  key: "progress",
+                  label: "Progresso",
+                  icon: <TrendingUp size={20} />,
+                },
                 { key: "rooms", label: "Salas", icon: <Users size={20} /> },
-                { key: "ranking", label: "Ranking", icon: <Trophy size={20} /> },
+                {
+                  key: "ranking",
+                  label: "Ranking",
+                  icon: <Trophy size={20} />,
+                },
               ].map((item) => (
                 <a
                   key={item.key}
@@ -205,7 +226,9 @@ export default function Sidebar({ activePage, onPageChange }) {
                   ?
                 </div>
                 <div className="flex-1">
-                  <div className="user-name-mobile text-purple-600">Clique para fazer login</div>
+                  <div className="user-name-mobile text-purple-600">
+                    Clique para fazer login
+                  </div>
                 </div>
               </a>
             )}
@@ -217,17 +240,29 @@ export default function Sidebar({ activePage, onPageChange }) {
       <div className="sidebar ml-0 md:-ml-[150px] hidden md:flex flex-col justify-between">
         <div>
           <div className="sidebar-header flex items-center gap-2 p-4">
-            <div className="logo text-2xl">🍅</div>
-            <h1 className="text-lg font-bold">FocusFlow</h1>
+            <img
+          src="/images/pomofy.webp"
+          alt="Pomofy Logo"
+          className="w-14 h-14 rounded-full object-cover ring-2 ring-green-500/30"
+        />
+            <h1 className="text-lg font-bold">Pomofy</h1>
           </div>
 
           {isLoggedIn ? (
             <nav className="sidebar-nav flex flex-col">
               {[
                 { key: "timer", label: "Timer", icon: <Calendar size={20} /> },
-                { key: "progress", label: "Progresso", icon: <TrendingUp size={20} /> },
+                {
+                  key: "progress",
+                  label: "Progresso",
+                  icon: <TrendingUp size={20} />,
+                },
                 { key: "rooms", label: "Salas", icon: <Users size={20} /> },
-                { key: "ranking", label: "Ranking", icon: <Trophy size={20} /> },
+                {
+                  key: "ranking",
+                  label: "Ranking",
+                  icon: <Trophy size={20} />,
+                },
               ].map((item) => (
                 <a
                   key={item.key}
@@ -236,8 +271,10 @@ export default function Sidebar({ activePage, onPageChange }) {
                     e.preventDefault();
                     onPageChange(item.key);
                   }}
-                  className={`nav-item flex items-center gap-3 p-3 hover:bg-gray-100 transition rounded-md ${
-                    activePage === item.key ? "bg-gray-200 font-semibold" : ""
+                  className={`nav-item flex items-center gap-3 p-3 border-2 border-transparent ${
+                    activePage === item.key
+                      ? "text-black font-semibold" // Ativo: texto preto e sem borda
+                      : "hover:border-gray-300 hover:scale-105 transition-all rounded-md" // Inativo: borda na cor de hover
                   }`}
                 >
                   {item.icon}
@@ -271,7 +308,9 @@ export default function Sidebar({ activePage, onPageChange }) {
                 )}
                 <div className="user-details">
                   <div className="user-name font-medium">{user.name}</div>
-                  <div className="user-email text-sm text-white">{user.email}</div>
+                  <div className="user-email text-sm text-white">
+                    {user.email}
+                  </div>
                 </div>
               </div>
               <button
@@ -291,7 +330,9 @@ export default function Sidebar({ activePage, onPageChange }) {
                 ?
               </div>
               <div className="flex-1">
-                <div className="user-name font-medium text-purple-300">Clique para fazer login</div>
+                <div className="user-name font-medium text-purple-300">
+                  Clique para fazer login
+                </div>
               </div>
             </a>
           )}
