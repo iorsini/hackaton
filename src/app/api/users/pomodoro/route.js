@@ -4,6 +4,33 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 
+// Definição dos moods e seus tempos
+const MOODS = {
+  CREATIVE: { focusTime: 25, breakTime: 5 },
+  UNMOTIVATED: { focusTime: 15, breakTime: 5 },
+  STRESSED: { focusTime: 20, breakTime: 7 },
+  FOCUSED: { focusTime: 30, breakTime: 5 },
+  TIRED: { focusTime: 15, breakTime: 10 },
+  ENERGIZED: { focusTime: 35, breakTime: 5 },
+  CUSTOM: { focusTime: 25, breakTime: 5 },
+};
+
+// Função para calcular pomodoros baseado no tempo e mood
+function calculatePomodoros(focusTimeMinutes, moodId) {
+  // Se não tiver mood, usa o padrão de 25 minutos
+  const standardFocusTime = moodId && MOODS[moodId.toUpperCase()] 
+    ? MOODS[moodId.toUpperCase()].focusTime 
+    : 25;
+  
+  // Calcula quantos pomodoros equivalem ao tempo focado
+  // Exemplo: 30 minutos com mood FOCUSED (30min) = 1 pomodoro
+  // Exemplo: 30 minutos com mood UNMOTIVATED (15min) = 2 pomodoros
+  const pomodoros = Math.round(focusTimeMinutes / standardFocusTime);
+  
+  // Garante pelo menos 1 pomodoro se focou algum tempo
+  return Math.max(pomodoros, focusTimeMinutes > 0 ? 1 : 0);
+}
+
 export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);
@@ -16,17 +43,27 @@ export async function POST(request) {
     }
 
     const body = await request.json();
-    const { focusTimeMinutes } = body; // tempo de foco em minutos
+    const { focusTimeMinutes, moodId } = body;
+
+    if (!focusTimeMinutes || focusTimeMinutes <= 0) {
+      return Response.json(
+        { error: "Tempo de foco inválido" },
+        { status: 400 }
+      );
+    }
 
     await connectDB();
 
-    // Incrementar pomodoro e tempo de foco
+    // Calcula quantos pomodoros com base no mood
+    const pomodorosToAdd = calculatePomodoros(focusTimeMinutes, moodId);
+
+    // Incrementar pomodoros calculados e tempo de foco
     const user = await User.findOneAndUpdate(
       { email: session.user.email },
       {
         $inc: {
-          totalPomodoros: 1,
-          "stats.totalFocusTime": focusTimeMinutes || 25,
+          totalPomodoros: pomodorosToAdd,
+          "stats.totalFocusTime": focusTimeMinutes,
         },
       },
       { new: true }
@@ -41,8 +78,10 @@ export async function POST(request) {
 
     return Response.json({
       success: true,
+      pomodorosAdded: pomodorosToAdd,
       totalPomodoros: user.totalPomodoros,
       totalFocusTime: user.stats.totalFocusTime,
+      moodUsed: moodId || "default",
     });
   } catch (error) {
     console.error("Erro ao registrar pomodoro:", error);
@@ -66,7 +105,14 @@ export async function PATCH(request) {
     }
 
     const body = await request.json();
-    const { breakTimeMinutes } = body;
+    const { breakTimeMinutes, moodId } = body;
+
+    if (!breakTimeMinutes || breakTimeMinutes <= 0) {
+      return Response.json(
+        { error: "Tempo de pausa inválido" },
+        { status: 400 }
+      );
+    }
 
     await connectDB();
 
@@ -74,7 +120,7 @@ export async function PATCH(request) {
       { email: session.user.email },
       {
         $inc: {
-          "stats.totalBreakTime": breakTimeMinutes || 5,
+          "stats.totalBreakTime": breakTimeMinutes,
         },
       },
       { new: true }
@@ -90,6 +136,8 @@ export async function PATCH(request) {
     return Response.json({
       success: true,
       totalBreakTime: user.stats.totalBreakTime,
+      breakTimeAdded: breakTimeMinutes,
+      moodUsed: moodId || "default",
     });
   } catch (error) {
     console.error("Erro ao registrar pausa:", error);
