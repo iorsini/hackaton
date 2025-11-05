@@ -22,7 +22,7 @@ import {
 
 
 export default function StorePage() {
-  const [pomodoros, setPomodoros] = useState(3450);
+  const [pomodots, setPomodots] = useState(150);
   const [view, setView] = useState("grid");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [purchasedItems, setPurchasedItems] = useState([]);
@@ -156,8 +156,8 @@ export default function StorePage() {
       return;
     }
 
-    if (pomodoros >= item.price) {
-      setPomodoros(pomodoros - item.price);
+    if (pomodots >= item.price) {
+      setPomodots(pomodots - item.price);
       setPurchasedItems([...purchasedItems, item.id]);
     }
   };
@@ -182,7 +182,7 @@ export default function StorePage() {
           <div className="flex items-center gap-2">
             <div className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-purple-100 to-blue-100 px-3 py-1.5 rounded-full border border-purple-200">
               <GiTomato className="w-4 h-4 text-purple-600" />
-              <span className="text-sm font-bold text-purple-800">{pomodoros} Pomodoros</span>
+              <span className="text-sm font-bold text-purple-800">{pomodots} Pomodots</span>
             </div>
           </div>
         </div>
@@ -199,14 +199,14 @@ export default function StorePage() {
               <div>
                 <h2 className="text-xl font-bold mb-1">Seus Pontos</h2>
                 <p className="text-sm text-white/80">
-                  Troque Pomodoros por recompensas exclusivas
+                  Troque Pomodots por recompensas exclusivas
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
               <GiTomato className="w-5 h-5 text-yellow-300" />
-              <span className="text-2xl font-bold">{pomodoros}</span>
-              <span className="text-sm text-white/80">Pomodoros</span>
+              <span className="text-2xl font-bold">{pomodots}</span>
+              <span className="text-sm text-white/80">Pomodots</span>
             </div>
           </div>
 
@@ -280,7 +280,7 @@ export default function StorePage() {
         >
           {filteredItems.map((item) => {
             const purchased = isPurchased(item.id);
-            const canAfford = pomodoros >= item.price;
+            const canAfford = pomodots >= item.price;
 
             return (
               <div
@@ -353,7 +353,7 @@ export default function StorePage() {
                           canAfford ? "text-neutral-800" : "text-neutral-400"
                         }`}
                       >
-                        {item.price} Pomodoros
+                        {item.price} Pomodots
                       </span>
                     </div>
 
@@ -378,7 +378,7 @@ export default function StorePage() {
                       ) : (
                         <>
                           <Lock className="w-4 h-4" />
-                          Pomodoros Insuficiente
+                          Pomodots Insuficiente
                         </>
                       )}
                     </button>
