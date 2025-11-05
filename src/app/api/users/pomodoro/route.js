@@ -17,18 +17,13 @@ const MOODS = {
 
 // Função para calcular pomodoros baseado no tempo e mood
 function calculatePomodoros(focusTimeMinutes, moodId) {
-  // Se não tiver mood, usa o padrão de 25 minutos
-  const standardFocusTime = moodId && MOODS[moodId.toUpperCase()] 
-    ? MOODS[moodId.toUpperCase()].focusTime 
-    : 25;
+  // 🔥 NOVO: Cada minuto focado = 1 pomodoro!
+  // Não importa o mood, o que conta é quantos minutos você realmente focou
+  // Exemplo: focou 1 min = 1 pomodoro
+  // Exemplo: focou 25 min = 25 pomodoros
+  // Exemplo: focou 35 min = 35 pomodoros
   
-  // Calcula quantos pomodoros equivalem ao tempo focado
-  // Exemplo: 30 minutos com mood FOCUSED (30min) = 1 pomodoro
-  // Exemplo: 30 minutos com mood UNMOTIVATED (15min) = 2 pomodoros
-  const pomodoros = Math.round(focusTimeMinutes / standardFocusTime);
-  
-  // Garante pelo menos 1 pomodoro se focou algum tempo
-  return Math.max(pomodoros, focusTimeMinutes > 0 ? 1 : 0);
+  return Math.max(Math.floor(focusTimeMinutes), focusTimeMinutes > 0 ? 1 : 0);
 }
 
 export async function POST(request) {
@@ -54,7 +49,7 @@ export async function POST(request) {
 
     await connectDB();
 
-    // Calcula quantos pomodoros com base no mood
+    // Calcula quantos pomodoros com base no tempo focado
     const pomodorosToAdd = calculatePomodoros(focusTimeMinutes, moodId);
 
     // Incrementar pomodoros calculados e tempo de foco
