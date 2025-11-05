@@ -949,7 +949,7 @@ export default function PomodoroApp() {
           background: rgba(255, 255, 255, 0.95);
           backdrop-filter: blur(20px);
           border-radius: 24px;
-          padding: 2rem;
+          padding: 1rem;
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
         }
 
@@ -1385,8 +1385,63 @@ export default function PomodoroApp() {
               {isBreak ? "Intervalo" : "Tempo de Foco"}
             </div>
 
-            <div className="timer-display">
-              {String(minutes).padStart(2, "0")}:{String(secs).padStart(2, "0")}
+            {/* CIRCULAR TIMER */}
+            <div style={{ position: "relative", width: 220, height: 150, margin: "1rem auto 1.5rem" }}>
+              <svg width="220" height="150" viewBox="0 0 220 150">
+                {/* Background arc */}
+                <path
+                  d="M 10 120 A 100 100 0 0 1 210 120"
+                  fill="none"
+                  stroke="#f0f0f0"
+                  strokeWidth="14"
+                  strokeLinecap="round"
+                />
+                {/* Progress arc */}
+                <path
+                  d="M 10 120 A 100 100 0 0 1 210 120"
+                  fill="none"
+                  stroke={selectedMood ? selectedMood.gradient.match(/#[a-f0-9]{6}/i)[0] : "#667eea"}
+                  strokeWidth="14"
+                  strokeLinecap="round"
+                  strokeDasharray={314}
+                  strokeDashoffset={314 - (314 * timer.seconds / ((isBreak ? breakTime : focusTime) * 60))}
+                  style={{ 
+                    transition: "stroke-dashoffset 1s linear, stroke 0.3s ease"
+                  }}
+                />
+              </svg>
+              
+              {/* Timer text in center */}
+              <div style={{
+                position: "absolute",
+                top: "70%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                textAlign: "center"
+              }}>
+                <div style={{ 
+                  fontSize: "3rem", 
+                  fontWeight: 700,
+                  color: "#1a1a1a",
+                  lineHeight: 1,
+                  marginBottom: "0.4rem"
+                }}>
+                  {String(minutes).padStart(2, "0")}:{String(secs).padStart(2, "0")}
+                </div>
+                <div style={{ 
+                  fontSize: "0.8rem", 
+                  color: "#999", 
+                  fontWeight: 600,
+                  maxWidth: "160px",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap"
+                }}>
+                  {tasks[currentTaskIndex] && !tasks[currentTaskIndex].completed 
+                    ? tasks[currentTaskIndex].text
+                    : "Nenhuma tarefa"}
+                </div>
+              </div>
             </div>
 
             <div className="timer-controls">
