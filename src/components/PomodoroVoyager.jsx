@@ -108,7 +108,7 @@ function StreakSparkline({ cadence }) {
   );
 }
 
-export function OdysseyGamification() {
+export function OdysseyGamefication() {
   return (
     <section className="w-full max-w-6xl mx-auto grid gap-8 md:grid-cols-[2fr_1fr] text-slate-100">
       <div className="bg-slate-950/70 backdrop-blur rounded-3xl border border-slate-800 shadow-2xl shadow-slate-950/50 p-8">
@@ -338,7 +338,7 @@ export function ProfileAurora({ name = "Clara Vega", discipline = "Design Narrat
 export default function PomodoroVoyage() {
   return (
     <div className="space-y-16 py-10 px-6 bg-gradient-to-b from-slate-950 via-slate-900 to-black text-slate-100">
-      <OdysseyGamification />
+      <OdysseyGamefication />
       <ProfileAurora />
     </div>
   );
