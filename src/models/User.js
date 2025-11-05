@@ -1,69 +1,57 @@
-import mongoose, { Schema, models } from "mongoose";
+// models/User.js
+import mongoose from "mongoose";
 
-const UserSchema = new Schema(
+const UserSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
-      trim: true,
+      required: [true, "Nome é obrigatório"],
     },
     email: {
       type: String,
-      required: true,
+      required: [true, "Email é obrigatório"],
       unique: true,
       lowercase: true,
-      trim: true,
-      index: true,
     },
     password: {
       type: String,
-      minlength: 6,
-      select: false,
+      select: false, // Não retorna a senha por padrão
     },
     avatar: {
       type: String,
-      default: "/images/default-avatar.png",
-    },
-    image: {
-      type: String,
       default: null,
     },
-
-    // Configurações de pomodoro
-    settings: {
-      focusDuration: { type: Number, default: 25 },
-      shortBreak: { type: Number, default: 5 },
-      longBreak: { type: Number, default: 15 },
-      longBreakInterval: { type: Number, default: 4 },
+    provider: {
+      type: String,
+      enum: ["credentials", "google", "github"],
+      default: "credentials",
     },
-
-    // Estatísticas
+    totalPomodoros: {
+      type: Number,
+      default: 0,
+    },
+    // Estatísticas adicionais
     stats: {
-      totalMinutes: { type: Number, default: 0 }, // all time
-      dailyMinutes: { type: Number, default: 0 },
-      weeklyMinutes: { type: Number, default: 0 },
-      monthlyMinutes: { type: Number, default: 0 },
-      yearlyMinutes: { type: Number, default: 0 },
-      lastActivity: { type: Date, default: null }, // última vez que completou um ciclo
-    },
-
-    // Streak
-    streak: {
-      current: { type: Number, default: 0 },
-      best: { type: Number, default: 0 },
-      lastUpdated: { type: Date, default: null },
-    },
-
-    // Grupos
-    groups: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Group",
+      totalFocusTime: {
+        type: Number,
+        default: 0, // em minutos
       },
-    ],
+      totalBreakTime: {
+        type: Number,
+        default: 0, // em minutos
+      },
+      longestStreak: {
+        type: Number,
+        default: 0,
+      },
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-const User = models.User || mongoose.model("User", UserSchema);
-export default User;
+// Remover o índice manual para evitar duplicação
+// UserSchema.index({ email: 1 }); <- REMOVIDO (já tem unique: true)
+
+export default mongoose.models.User || mongoose.model("User", UserSchema);

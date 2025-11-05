@@ -1,39 +1,107 @@
 "use client";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { User, Mail, Calendar, Award, Target, TrendingUp, Camera, ArrowLeft, LogOut } from "lucide-react";
-import ProfileHeader from "@/components/profile/ProfileHeader";
-import AvatarUpload from "@/components/profile/AvatarUpload";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useState, useEffect } from "react";
+import { User, Mail, Calendar, Award, Target, TrendingUp, Camera, ArrowLeft, LogOut, AlertTriangle, Trash2 } from "lucide-react";
 
-export default function ProfilePage() {
+function ProfilePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState('profile');
+  const [profileData, setProfileData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  if (status === "loading") {
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetchProfileData();
+    } else if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
+
+  const fetchProfileData = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/users/profile");
+      
+      if (!response.ok) {
+        throw new Error("Erro ao carregar dados do perfil");
+      }
+
+      const data = await response.json();
+      setProfileData(data);
+      setError(null);
+    } catch (err) {
+      console.error("Erro ao buscar perfil:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/" });
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      const response = await fetch("/api/users/delete", {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        await signOut({ callbackUrl: "/" });
+      } else {
+        alert("Erro ao deletar conta. Tente novamente.");
+      }
+    } catch (error) {
+      console.error("Erro ao deletar conta:", error);
+      alert("Erro ao deletar conta. Tente novamente.");
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("pt-BR", {
+      month: "long",
+      year: "numeric"
+    });
+  };
+
+  if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 flex items-center justify-center">
-        <LoadingSpinner size="lg" />
+        <div className="text-white text-xl">Carregando perfil...</div>
       </div>
     );
   }
 
-  if (!session) {
-    router.push("/login");
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 flex items-center justify-center">
+        <div className="bg-white p-6 rounded-lg shadow-xl">
+          <p className="text-red-500 mb-4">Erro: {error}</p>
+          <button 
+            onClick={fetchProfileData}
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+          >
+            Tentar Novamente
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session || !profileData) {
     return null;
   }
 
-  // Mock data - você pode substituir com dados reais da API
-  const stats = {
-    totalPomodoros: 47,
-    totalTasks: 123,
-    completedTasks: 98,
-    streakDays: 7
-  };
-
-  const completionRate = Math.round((stats.completedTasks / stats.totalTasks) * 100);
+  const { user, stats } = profileData;
+  const completionRate = stats.completionRate || 0;
+  const monthlyCompletionRate = stats.tasksThisMonth > 0 
+    ? Math.round((stats.completedTasksThisMonth / stats.tasksThisMonth) * 100)
+    : 0;
 
   return (
     <>
@@ -265,8 +333,8 @@ export default function ProfilePage() {
         .logout-button {
           width: 100%;
           padding: 1rem;
-          background: #fee;
-          border: 2px solid #fcc;
+          background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+          border: 2px solid transparent;
           border-radius: 12px;
           cursor: pointer;
           display: flex;
@@ -276,13 +344,148 @@ export default function ProfilePage() {
           color: #dc2626;
           font-weight: 600;
           font-size: 0.875rem;
-          transition: all 0.2s;
+          transition: all 0.3s;
           margin-top: 2rem;
+          box-shadow: 0 2px 10px rgba(220, 38, 38, 0.15);
         }
         .logout-button:hover {
-          background: #dc2626;
-          border-color: #dc2626;
+          background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
           color: white;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(220, 38, 38, 0.35);
+        }
+        .danger-zone {
+          margin-top: 2rem;
+          padding: 1.5rem;
+          background: rgba(254, 226, 226, 0.3);
+          border: 2px solid #ef4444;
+          border-radius: 16px;
+        }
+        .danger-zone-title {
+          font-size: 1rem;
+          font-weight: 700;
+          color: #dc2626;
+          margin-bottom: 0.75rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+        .danger-zone-subtitle {
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: #991b1b;
+          margin-bottom: 0.5rem;
+        }
+        .danger-zone-text {
+          font-size: 0.8rem;
+          color: #7f1d1d;
+          margin-bottom: 1rem;
+          line-height: 1.5;
+        }
+        .delete-account-btn {
+          width: 100%;
+          padding: 0.875rem;
+          background: transparent;
+          border: 2px solid #dc2626;
+          border-radius: 10px;
+          cursor: pointer;
+          color: #dc2626;
+          font-weight: 600;
+          font-size: 0.875rem;
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+        }
+        .delete-account-btn:hover {
+          background: #dc2626;
+          color: white;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+        .modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(4px);
+          z-index: 9998;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .modal-content {
+          background: white;
+          border-radius: 20px;
+          padding: 2rem;
+          max-width: 480px;
+          width: 90%;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          animation: modalSlideIn 0.3s ease;
+        }
+        @keyframes modalSlideIn {
+          from {
+            opacity: 0;
+            transform: scale(0.9) translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+        .modal-icon {
+          width: 64px;
+          height: 64px;
+          background: linear-gradient(135deg, #fecaca 0%, #dc2626 100%);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 1.5rem;
+          color: white;
+        }
+        .modal-title {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #1a1a1a;
+          text-align: center;
+          margin-bottom: 1rem;
+        }
+        .modal-text {
+          font-size: 0.95rem;
+          color: #666;
+          text-align: center;
+          margin-bottom: 2rem;
+          line-height: 1.6;
+        }
+        .modal-actions {
+          display: flex;
+          gap: 1rem;
+        }
+        .modal-btn {
+          flex: 1;
+          padding: 0.875rem;
+          border: none;
+          border-radius: 10px;
+          cursor: pointer;
+          font-weight: 600;
+          font-size: 0.875rem;
+          transition: all 0.2s;
+        }
+        .modal-btn-cancel {
+          background: #f3f4f6;
+          color: #374151;
+        }
+        .modal-btn-cancel:hover {
+          background: #e5e7eb;
+        }
+        .modal-btn-delete {
+          background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+          color: white;
+        }
+        .modal-btn-delete:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
         }
         @media (max-width: 968px) {
           .profile-grid {
@@ -290,6 +493,9 @@ export default function ProfilePage() {
           }
           .profile-container {
             padding: 1rem;
+          }
+          .stats-grid {
+            grid-template-columns: 1fr;
           }
         }
       `}</style>
@@ -306,16 +512,16 @@ export default function ProfilePage() {
             <div className="avatar-section">
               <div className="avatar-wrapper">
                 <img 
-                  src={session.user.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(session.user.name)}&size=120&background=667eea&color=fff`}
-                  alt={session.user.name}
+                  src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&size=120&background=667eea&color=fff`}
+                  alt={user.name}
                   className="avatar-image"
                 />
                 <button className="avatar-upload-btn">
                   <Camera size={20} />
                 </button>
               </div>
-              <h2 className="user-name">{session.user.name}</h2>
-              <p className="user-email">{session.user.email}</p>
+              <h2 className="user-name">{user.name}</h2>
+              <p className="user-email">{user.email}</p>
             </div>
 
             <div className="info-section">
@@ -325,7 +531,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="info-content">
                   <div className="info-label">Nome Completo</div>
-                  <div className="info-value">{session.user.name}</div>
+                  <div className="info-value">{user.name}</div>
                 </div>
               </div>
 
@@ -335,7 +541,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="info-content">
                   <div className="info-label">Email</div>
-                  <div className="info-value">{session.user.email}</div>
+                  <div className="info-value">{user.email}</div>
                 </div>
               </div>
 
@@ -345,7 +551,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="info-content">
                   <div className="info-label">Membro desde</div>
-                  <div className="info-value">Novembro 2024</div>
+                  <div className="info-value">{formatDate(user.createdAt)}</div>
                 </div>
               </div>
 
@@ -355,15 +561,34 @@ export default function ProfilePage() {
                 </div>
                 <div className="info-content">
                   <div className="info-label">Sequência</div>
-                  <div className="info-value">{stats.streakDays} dias 🔥</div>
+                  <div className="info-value">{stats.streakDays} dias</div>
                 </div>
               </div>
             </div>
 
-            <button className="logout-button" onClick={() => router.push('/api/auth/signout')}>
+            <button className="logout-button" onClick={handleLogout}>
               <LogOut size={20} />
               Sair da Conta
             </button>
+
+            {/* Danger Zone */}
+            <div className="danger-zone">
+              <div className="danger-zone-title">
+                <AlertTriangle size={20} />
+                Danger Zone
+              </div>
+              <div className="danger-zone-subtitle">Delete this account</div>
+              <p className="danger-zone-text">
+                Once you delete an account, there is no going back. Please be certain.
+              </p>
+              <button
+                className="delete-account-btn"
+                onClick={() => setShowDeleteModal(true)}
+              >
+                <Trash2 size={18} />
+                Delete account
+              </button>
+            </div>
           </div>
 
           {/* RIGHT COLUMN - Stats & Progress */}
@@ -415,10 +640,10 @@ export default function ProfilePage() {
             <div className="progress-item">
               <div className="progress-header">
                 <span className="progress-label">Tarefas do Mês</span>
-                <span className="progress-value">{stats.completedTasks}/{stats.totalTasks}</span>
+                <span className="progress-value">{stats.completedTasksThisMonth}/{stats.tasksThisMonth}</span>
               </div>
               <div className="progress-bar-container">
-                <div className="progress-bar" style={{ width: `${completionRate}%` }} />
+                <div className="progress-bar" style={{ width: `${monthlyCompletionRate}%` }} />
               </div>
             </div>
 
@@ -428,7 +653,7 @@ export default function ProfilePage() {
                 <span className="progress-value">{stats.totalPomodoros}/100</span>
               </div>
               <div className="progress-bar-container">
-                <div className="progress-bar" style={{ width: `${(stats.totalPomodoros / 100) * 100}%` }} />
+                <div className="progress-bar" style={{ width: `${Math.min((stats.totalPomodoros / 100) * 100, 100)}%` }} />
               </div>
             </div>
 
@@ -438,36 +663,84 @@ export default function ProfilePage() {
                 <span className="progress-value">{stats.streakDays}/30</span>
               </div>
               <div className="progress-bar-container">
-                <div className="progress-bar" style={{ width: `${(stats.streakDays / 30) * 100}%` }} />
+                <div className="progress-bar" style={{ width: `${Math.min((stats.streakDays / 30) * 100, 100)}%` }} />
+              </div>
+            </div>
+
+            <div className="progress-item">
+              <div className="progress-header">
+                <span className="progress-label">Total de Tarefas</span>
+                <span className="progress-value">{stats.completedTasks}/{stats.totalTasks}</span>
+              </div>
+              <div className="progress-bar-container">
+                <div className="progress-bar" style={{ width: `${completionRate}%` }} />
               </div>
             </div>
 
             {/* Achievement Section */}
-            <div style={{ 
-              marginTop: '2rem',
-              padding: '1.5rem',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              borderRadius: '16px',
-              color: 'white'
-            }}>
-              <h4 style={{ 
-                fontSize: '1rem',
-                fontWeight: '700',
-                marginBottom: '0.75rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
+            {stats.streakDays >= 7 && (
+              <div style={{ 
+                marginTop: '2rem',
+                padding: '1.5rem',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                borderRadius: '16px',
+                color: 'white'
               }}>
-                <Award size={20} />
-                Conquista Recente
-              </h4>
-              <p style={{ fontSize: '0.875rem', opacity: 0.9 }}>
-                🎉 Parabéns! Você completou 7 dias seguidos de produtividade!
-              </p>
-            </div>
+                <h4 style={{ 
+                  fontSize: '1rem',
+                  fontWeight: '700',
+                  marginBottom: '0.75rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <Award size={20} />
+                  Conquista Recente
+                </h4>
+                <p style={{ fontSize: '0.875rem', opacity: 0.9 }}>
+                  Parabéns! Você completou {stats.streakDays} dias seguidos de produtividade!
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Delete Account Modal */}
+      {showDeleteModal && (
+        <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon">
+              <AlertTriangle size={32} />
+            </div>
+            <h2 className="modal-title">Deletar Conta?</h2>
+            <p className="modal-text">
+              Esta ação é <strong>permanente</strong> e não pode ser desfeita. 
+              Todos os seus dados, incluindo tarefas, pomodoros e progresso serão perdidos para sempre.
+            </p>
+            <div className="modal-actions">
+              <button
+                className="modal-btn modal-btn-cancel"
+                onClick={() => setShowDeleteModal(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                className="modal-btn modal-btn-delete"
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  handleDeleteAccount();
+                }}
+              >
+                <Trash2 size={18} />
+                Deletar Permanentemente
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
+
+export default ProfilePage;
