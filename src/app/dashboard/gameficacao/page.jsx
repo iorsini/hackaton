@@ -7,6 +7,8 @@ import Link from "next/link";
 
 import AvatarPomofy from "@/components/gameficacao/AvatarPomofy";
 import ProgressBar from "@/components/gameficacao/ProgressBar";
+import Footer from "@/components/layout/Footer";
+
 
 export default function GameficacaoPage() {
   const [xp, setXp] = useState(1850);
@@ -95,6 +97,9 @@ export default function GameficacaoPage() {
       <>
             <Link href="app/dashboard/gameficacao">Voltar</Link>
             </>
+                <>
+<Footer/></>
     </div>
+
   );
 }
