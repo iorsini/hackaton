@@ -1143,10 +1143,14 @@ export default function PomodoroApp() {
           }
 
           .login-btn {
-            position: static;
-            width: 100%;
-            margin-bottom: 1rem;
-          }
+  position: static;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  margin-right: 1rem;
+  margin-left: auto; /* empurra o botão pra direita */
+  display: flex; /* garante que o auto funcione */
+  justify-content: flex-end; /* se tiver conteúdo interno */
+}
 
           .timer-display {
             font-size: 4.5rem;
@@ -1170,11 +1174,13 @@ export default function PomodoroApp() {
         }
       `}</style>
 
-      {/* LOGIN BUTTON */}
-      <button className="login-btn" onClick={handleLogin}>
-        <LogIn size={20} />
-        Login
-      </button>
+      {/* LOGIN BUTTON - só aparece se NÃO estiver logado */}
+      {status !== "loading" && !session && (
+        <button className="login-btn" onClick={handleLogin}>
+          <LogIn size={20} />
+          Login
+        </button>
+      )}
 
       {/* NOTIFICATION POPUP */}
       {showNotification && (

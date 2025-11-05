@@ -125,7 +125,11 @@ export default function LofiPlayer({ selectedMood }) {
         .lofi-visualizer.playing {
           animation: pulse-bg 3s ease-in-out infinite;
         }
-
+        @media (max-width: 768px) {
+          .lofi-card {
+            margin-top: 4rem;
+          }
+        }
         @keyframes pulse-bg {
           0%, 100% {
           }
