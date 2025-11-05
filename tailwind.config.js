@@ -18,3 +18,20 @@ module.exports = {
   },
   plugins: [],
 }
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  darkMode: "class",
+  content: ["./src/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    extend: {
+      colors: {
+        fundoClaro: "#f9fafb",
+        fundoEscuro: "#111827",
+        textoClaro: "#111827",
+        textoEscuro: "#f9fafb",
+      },
+    },
+  },
+  plugins: [],
+};
