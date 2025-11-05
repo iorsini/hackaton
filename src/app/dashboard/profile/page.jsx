@@ -693,7 +693,7 @@ function ProfilePage() {
                   <Target size={24} />
                 </div>
                 <div className="stat-value">{stats.totalPomodoros}</div>
-                <div className="stat-label">Pomodoros</div>
+                <div className="stat-label">Pomodots</div>
               </div>
 
               <div className="stat-card">
@@ -839,7 +839,7 @@ function ProfilePage() {
             <h2 className="modal-title">Deletar Conta?</h2>
             <p className="modal-text">
               Esta ação é <strong>permanente</strong> e não pode ser desfeita.
-              Todos os seus dados, incluindo tarefas, pomodoros e progresso
+              Todos os seus dados, incluindo tarefas, pomodots e progresso
               serão perdidos para sempre.
             </p>
             <div className="modal-actions">
