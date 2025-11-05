@@ -892,6 +892,7 @@ export default function PomodoroApp() {
         .add-task-input-container {
           display: flex;
           gap: 0.5rem;
+          color: gray
         }
 
         .add-task-input {
