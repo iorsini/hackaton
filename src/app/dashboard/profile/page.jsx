@@ -709,7 +709,7 @@ function ProfilePage() {
                   <TrendingUp size={24} />
                 </div>
                 <div className="stat-value">{completionRate}%</div>
-                <div className="stat-label">Taxa de Conclusão</div>
+                <div className="stat-label">Taxa de Conclusão de Tarefas</div>
               </div>
 
               <div className="stat-card">
