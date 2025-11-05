@@ -1,4 +1,4 @@
-// components/gamification/AchievementsPanel.jsx
+// components/gamefication/AchievementsPanel.jsx
 import { Trophy } from 'lucide-react';
 
 export default function AchievementsPanel({ 
