@@ -37,7 +37,7 @@ export default function SobrePage() {
       role: "Full-Stack Developer", 
       github: "https://github.com/iorsini",
       linkedin: "https://www.linkedin.com/in/isadora-barradas/",
-      avatar: "/images/isadora.jpeg",
+      avatar: "/images/isadora.jpg",
     },
     {
       name: "Jhonathan Tinoco",
