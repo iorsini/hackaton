@@ -1,20 +1,20 @@
-import { Inter } from 'next/font/google';
-import SessionProvider from '@/components/SessionProvider';
-import './globals.css';
+"use client";
 
-const inter = Inter({ subsets: ['latin'] });
+import { Inter } from "next/font/google";
+import { ThemeProvider } from "next-themes";
+import SessionProvider from "@/components/SessionProvider";
+import "./globals.css";
 
-export const metadata = {
-  title: 'Pomodoro Timer - Foco & Produtividade',
-  description: 'Timer Pomodoro adaptável ao seu humor',
-};
+const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({ children }) {
   return (
     <html lang="pt-BR">
       <body className={inter.className}>
         <SessionProvider>
-          {children}
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            {children}
+          </ThemeProvider>
         </SessionProvider>
       </body>
     </html>
