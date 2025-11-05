@@ -2,114 +2,89 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, X, ChevronDown } from "lucide-react";
+import { MessageCircle, X } from "lucide-react";
 
 export default function FaqWidget() {
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null);
 
-  const toggle = (i) => setActiveIndex(activeIndex === i ? null : i);
-
   const faqs = [
     {
-      pergunta: "O que é o Pomofy?",
-      resposta:
-        "Um temporizador baseado na técnica Pomodoro. Feito para te ajudar a equilibrar foco e pausas com empatia e leveza.",
+      question: "Como funciona o Pomofy?",
+      answer:
+        "O Pomofy usa a técnica Pomodoro para ajudar você a manter o foco e gerenciar melhor seu tempo.",
     },
     {
-      pergunta: "Posso personalizar meu humor?",
-      resposta:
-        "Sim! Antes de iniciar cada sessão, podes escolher teu mood. O Pomofy adapta o ritmo conforme teu estado emocional.",
+      question: "Posso personalizar o tempo de foco e pausa?",
+      answer:
+        "Sim! Você pode ajustar a duração dos ciclos conforme sua rotina e preferências.",
     },
     {
-      pergunta: "O Pomofy é gratuito?",
-      resposta:
-        "Totalmente. O objetivo é cuidar da tua rotina, não te cobrar por ela.",
-    },
-    {
-      pergunta: "O que acontece nas pausas?",
-      resposta:
-        "Durante as pausas, o Pomofy te convida a respirar e fazer pequenos gestos de cuidado.",
+      question: "O modo escuro está disponível?",
+      answer:
+        "Sim! O Pomofy conta com dark mode e ajustes de tema para melhorar o conforto visual.",
     },
   ];
 
   return (
-    <div className="fixed bottom-0 right-0 w-full h-0">
-      {/* Botão flutuante */}
-      <motion.button
-        onClick={() => setOpen(!open)}
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.96 }}
-        aria-label="Ajuda Pomofy"
-        className="
-          absolute bottom-5 right-5
-          bg-gradient-to-br from-green-500 to-emerald-500
-          text-white
-          p-3 rounded-full shadow-lg
-          hover:shadow-xl hover:brightness-105
-          transition-all duration-200
-          z-30
-        "
-      >
-        {open ? <X className="w-4 h-4" /> : <MessageCircle className="w-4 h-4" />}
-      </motion.button>
+    <div className="fixed bottom-6 right-6 z-50">
+      {/* Botão para abrir o widget */}
+      {!open && (
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setOpen(true)}
+          className="bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-all"
+        >
+          <MessageCircle className="w-6 h-6" />
+        </motion.button>
+      )}
 
-      {/* Caixa de FAQ */}
+      {/* Caixa do FAQ */}
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: 25 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 25 }}
-            transition={{ duration: 0.25 }}
-            className="
-              absolute bottom-16 right-5
-              w-[85vw] max-w-[300px]
-              bg-white/95 text-green-900
-              rounded-2xl shadow-xl border border-green-200
-              backdrop-blur-md
-              z-20 overflow-hidden
-            "
+            exit={{ opacity: 0, y: 40 }}
+            transition={{ duration: 0.3 }}
+            className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-5 rounded-2xl shadow-xl w-80 border border-gray-200 dark:border-gray-700"
           >
-            {/* Header */}
-            <div className="px-4 py-2 flex justify-between items-center border-b border-green-100 bg-green-50/70">
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-sm">Assistente Pomofy</h3>
-              </div>
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-semibold text-lg">FAQ</h3>
               <button
                 onClick={() => setOpen(false)}
-                className="text-green-800/60 hover:text-green-800 transition"
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Conteúdo */}
-            <div className="p-3 max-h-[40vh] overflow-y-auto text-sm">
+            <div className="space-y-3">
               {faqs.map((faq, i) => (
-                <div key={i} className="border-b border-green-100/70 py-2">
+                <div key={i} className="border-b border-gray-200 dark:border-gray-700 pb-2">
                   <button
-                    onClick={() => toggle(i)}
-                    className="w-full flex justify-between items-center text-left font-medium text-green-800"
+                    onClick={() => setActiveIndex(activeIndex === i ? null : i)}
+                    className="w-full text-left font-medium flex justify-between items-center"
                   >
-                    {faq.pergunta}
-                    <ChevronDown
-                      className={`w-3.5 h-3.5 text-green-700 transition-transform duration-300 ${
-                        activeIndex === i ? "rotate-180" : ""
-                      }`}
-                    />
+                    <span>{faq.question}</span>
+                    <motion.span
+                      animate={{ rotate: activeIndex === i ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      ▼
+                    </motion.span>
                   </button>
-
-                  <AnimatePresence initial={false}>
+                  <AnimatePresence>
                     {activeIndex === i && (
                       <motion.p
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="mt-1.5 text-xs text-green-700/90 leading-relaxed"
+                        transition={{ duration: 0.3 }}
+                        className="text-sm text-gray-600 dark:text-gray-300 mt-2"
                       >
-                        {faq.resposta}
+                        {faq.answer}
                       </motion.p>
                     )}
                   </AnimatePresence>
