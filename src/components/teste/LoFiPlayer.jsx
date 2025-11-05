@@ -1,12 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { Play, Pause, Volume2, VolumeX, Music, SkipForward, X } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Music, SkipForward } from "lucide-react";
 
 export default function LofiPlayer({ selectedMood }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.05);
   const [isMuted, setIsMuted] = useState(false);
   const [currentStation, setCurrentStation] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const audioRef = useRef(null);
 
   // Estações de lofi/chill que funcionam via stream
@@ -44,6 +43,7 @@ export default function LofiPlayer({ selectedMood }) {
     } else {
       audioRef.current.play().catch(err => {
         console.log("Erro ao tocar:", err);
+        // Tenta próxima estação se falhar
         handleNextStation();
       });
       setIsPlaying(true);
@@ -77,189 +77,9 @@ export default function LofiPlayer({ selectedMood }) {
     }, 100);
   };
 
-  const PlayerContent = () => (
-    <>
-      <div className={`lofi-visualizer ${isPlaying ? "playing" : ""}`}>
-        <div className="visualizer-bars">
-          {[...Array(7)].map((_, i) => (
-            <div
-              key={i}
-              className={`visualizer-bar ${isPlaying ? "playing" : ""}`}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="lofi-controls">
-        <button className="play-btn" onClick={togglePlay}>
-          {isPlaying ? <Pause size={24} /> : <Play size={24} style={{ marginLeft: 2 }} />}
-        </button>
-
-        <button className="skip-btn" onClick={handleNextStation} title="Próxima estação">
-          <SkipForward size={18} />
-        </button>
-
-        <div className="volume-control">
-          <button className="volume-btn" onClick={toggleMute}>
-            {isMuted || volume === 0 ? (
-              <VolumeX size={20} />
-            ) : (
-              <Volume2 size={20} />
-            )}
-          </button>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={volume}
-            onChange={handleVolumeChange}
-            className="volume-slider"
-          />
-        </div>
-      </div>
-    </>
-  );
-
   return (
     <>
       <style jsx>{`
-        /* Mobile: Botão flutuante */
-        .floating-music-btn {
-          display: none;
-        }
-
-        @media (max-width: 768px) {
-          .floating-music-btn {
-            display: flex;
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: ${
-              selectedMood?.gradient ||
-              "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-            };
-            color: white;
-            border: none;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-            z-index: 999;
-            transition: all 0.3s ease;
-          }
-
-          .floating-music-btn:hover {
-            transform: scale(1.1);
-          }
-
-          .floating-music-btn.playing {
-            animation: pulse-float 2s ease-in-out infinite;
-          }
-
-          @keyframes pulse-float {
-            0%, 100% {
-              box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-            }
-            50% {
-              box-shadow: 0 8px 32px rgba(102, 126, 234, 0.5);
-            }
-          }
-
-          .modal-overlay {
-            display: flex;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            align-items: flex-end;
-            animation: fadeIn 0.3s ease;
-          }
-
-          @keyframes fadeIn {
-            from {
-              opacity: 0;
-            }
-            to {
-              opacity: 1;
-            }
-          }
-
-          .modal-content {
-            width: 100%;
-            background: white;
-            border-radius: 24px 24px 0 0;
-            padding: 1.5rem;
-            animation: slideUp 0.3s ease;
-            max-height: 80vh;
-            overflow-y: auto;
-          }
-
-          @keyframes slideUp {
-            from {
-              transform: translateY(100%);
-            }
-            to {
-              transform: translateY(0);
-            }
-          }
-
-          .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-          }
-
-          .modal-title {
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin: 0;
-          }
-
-          .close-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: none;
-            background: #f5f5f5;
-            color: #666;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-          }
-
-          .close-btn:hover {
-            background: #e8e8e8;
-            color: #333;
-          }
-
-          .desktop-card {
-            display: none;
-          }
-        }
-
-        /* Desktop: Card normal */
-        @media (min-width: 769px) {
-          .modal-overlay,
-          .floating-music-btn {
-            display: none !important;
-          }
-        }
-
         .lofi-card {
           background: rgba(255, 255, 255, 0.95);
           backdrop-filter: blur(20px);
@@ -292,7 +112,7 @@ export default function LofiPlayer({ selectedMood }) {
 
         .lofi-visualizer {
           width: 100%;
-          height: 80px;
+          height: 0px;
           border-radius: 16px;
           margin-bottom: 1rem;
           display: flex;
@@ -300,6 +120,17 @@ export default function LofiPlayer({ selectedMood }) {
           justify-content: center;
           overflow: hidden;
           position: relative;
+        }
+
+        .lofi-visualizer.playing {
+          animation: pulse-bg 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-bg {
+          0%, 100% {
+          }
+          50% {
+          }
         }
 
         .visualizer-bars {
@@ -458,41 +289,16 @@ export default function LofiPlayer({ selectedMood }) {
           border: none;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
+
+        .lofi-info {
+          margin-top: 1rem;
+          text-align: center;
+          font-size: 0.875rem;
+          color: #999;
+        }
       `}</style>
 
-      {/* Botão flutuante (mobile) */}
-      <button 
-        className={`floating-music-btn ${isPlaying ? 'playing' : ''}`}
-        onClick={() => setIsModalOpen(true)}
-      >
-        <Music size={24} />
-      </button>
-
-      {/* Modal (mobile) */}
-      {isModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3 className="modal-title">
-                <Music size={20} />
-                Lofi Radio
-              </h3>
-              <button className="close-btn" onClick={() => setIsModalOpen(false)}>
-                <X size={20} />
-              </button>
-            </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <span className="lofi-station">{lofiStations[currentStation].name}</span>
-            </div>
-
-            <PlayerContent />
-          </div>
-        </div>
-      )}
-
-      {/* Card desktop */}
-      <div className="lofi-card desktop-card">
+      <div className="lofi-card">
         <div className="lofi-header">
           <h3>
             <Music size={20} />
@@ -501,19 +307,59 @@ export default function LofiPlayer({ selectedMood }) {
           <span className="lofi-station">{lofiStations[currentStation].name}</span>
         </div>
 
-        <PlayerContent />
-      </div>
+        <div className={`lofi-visualizer ${isPlaying ? "playing" : ""}`}>
+          <div className="visualizer-bars">
+            {[...Array(7)].map((_, i) => (
+              <div
+                key={i}
+                className={`visualizer-bar ${isPlaying ? "playing" : ""}`}
+              />
+            ))}
+          </div>
+        </div>
 
-      {/* Hidden audio element */}
-      <audio
-        ref={audioRef}
-        src={lofiStations[currentStation].url}
-        preload="none"
-        onError={() => {
-          console.log("Erro ao carregar stream");
-          setIsPlaying(false);
-        }}
-      />
+        <div className="lofi-controls">
+          <button className="play-btn" onClick={togglePlay}>
+            {isPlaying ? <Pause size={24} /> : <Play size={24} style={{ marginLeft: 2 }} />}
+          </button>
+
+          <button className="skip-btn" onClick={handleNextStation} title="Próxima estação">
+            <SkipForward size={18} />
+          </button>
+
+          <div className="volume-control">
+            <button className="volume-btn" onClick={toggleMute}>
+              {isMuted || volume === 0 ? (
+                <VolumeX size={20} />
+              ) : (
+                <Volume2 size={20} />
+              )}
+            </button>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={volume}
+              onChange={handleVolumeChange}
+              className="volume-slider"
+            />
+          </div>
+        </div>
+
+        
+
+        {/* Hidden audio element */}
+        <audio
+          ref={audioRef}
+          src={lofiStations[currentStation].url}
+          preload="none"
+          onError={() => {
+            console.log("Erro ao carregar stream");
+            setIsPlaying(false);
+          }}
+        />
+      </div>
     </>
   );
 }

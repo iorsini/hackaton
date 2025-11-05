@@ -698,6 +698,7 @@ export default function PomodoroApp() {
         .add-task-input-container {
           display: flex;
           gap: 0.5rem;
+          color: gray
         }
 
         .add-task-input {
@@ -1221,8 +1222,7 @@ export default function PomodoroApp() {
               <div className="progress-bar" style={{ width: `${progress}%` }} />
             </div>
           </div>
-                      <LofiPlayer selectedMood={selectedMood} />
-
+          <LofiPlayer selectedMood={selectedMood} />
         </div>
       </div>
     </>
