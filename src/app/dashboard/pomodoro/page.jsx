@@ -303,7 +303,7 @@ export default function PomodoroApp() {
     if ("Notification" in window && Notification.permission === "granted") {
       new Notification("Pomodoro Timer", { body: message });
     }
-  };
+  }; 
 
   const handleTimerComplete = async () => {
     if (audioRef.current) {
