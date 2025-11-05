@@ -28,6 +28,7 @@ import {
   Wind,
   Lock,
   ListTodo,
+  Settings,
 } from "lucide-react";
 import Sidebar from "@/components/teste/Sidebar";
 import LofiPlayer from "@/components/teste/LoFiPlayer";
@@ -188,6 +189,24 @@ const MOODS = {
       "Olhe pela janela e respire",
     ],
   },
+  CUSTOM: {
+    id: "custom",
+    label: "Do Contra",
+    focusTime: 25,
+    breakTime: 5,
+gradient: "linear-gradient(135deg, #312e81 0%, #9333ea 100%)",
+    icon: Settings,
+    focusMessages: [
+      "Nem sempre com vontade, mas sempre capaz.",
+      "Hoje é no modo 'faço porque preciso'.",
+      "Tá difícil, mas o difícil também conta.",
+    ],
+    breakMessages: [
+      "Respira. Reclamar também é uma forma de processar.",
+      "Dá um tempo, ninguém é produtivo o tempo todo.",
+      "Olha pro teto por uns segundos, vai te fazer bem.",
+    ],
+  },
 };
 
 // ============================================
@@ -252,6 +271,9 @@ export default function PomodoroApp() {
   const [isBreak, setIsBreak] = useState(false);
   const [pomodorosCompleted, setPomodorosCompleted] = useState(0);
   const [showMoodSelector, setShowMoodSelector] = useState(false);
+  const [showCustomConfig, setShowCustomConfig] = useState(false);
+  const [customFocusTime, setCustomFocusTime] = useState(25);
+  const [customBreakTime, setCustomBreakTime] = useState(5);
 
   // Notification states
   const [showNotification, setShowNotification] = useState(false);
@@ -263,7 +285,12 @@ export default function PomodoroApp() {
   // Helper para renderizar ícones de categoria
   const getCategoryIcon = (categoryId) => {
     const IconComponent = TASK_CATEGORIES[categoryId]?.Icon || Pin;
-    return <IconComponent size={20} color={TASK_CATEGORIES[categoryId]?.color || "#6b7280"} />;
+    return (
+      <IconComponent
+        size={20}
+        color={TASK_CATEGORIES[categoryId]?.color || "#6b7280"}
+      />
+    );
   };
 
   const showNotif = (message) => {
@@ -305,7 +332,11 @@ export default function PomodoroApp() {
       setIsBreak(true);
       timer.reset(breakTime);
 
-      const messages = selectedMood?.breakMessages || ["Beba água!", "Alongue-se!", "Descanse os olhos"];
+      const messages = selectedMood?.breakMessages || [
+        "Beba água!",
+        "Alongue-se!",
+        "Descanse os olhos",
+      ];
       showNotif(messages[Math.floor(Math.random() * messages.length)]);
     } else {
       // Completou uma pausa
@@ -327,14 +358,19 @@ export default function PomodoroApp() {
 
       setIsBreak(false);
 
-      const nextIndex = tasks.findIndex((t, i) => i > currentTaskIndex && !t.completed);
+      const nextIndex = tasks.findIndex(
+        (t, i) => i > currentTaskIndex && !t.completed
+      );
       if (nextIndex !== -1) {
         setCurrentTaskIndex(nextIndex);
       }
 
       timer.reset(focusTime);
 
-      const messages = selectedMood?.focusMessages || ["Vamos lá!", "Foco total!"];
+      const messages = selectedMood?.focusMessages || [
+        "Vamos lá!",
+        "Foco total!",
+      ];
       showNotif(messages[Math.floor(Math.random() * messages.length)]);
     }
   };
@@ -464,18 +500,24 @@ export default function PomodoroApp() {
 
         if (!res.ok) {
           setTasks(
-            tasks.map((t) => (t.id === id ? { ...t, completed: !newCompleted } : t))
+            tasks.map((t) =>
+              t.id === id ? { ...t, completed: !newCompleted } : t
+            )
           );
           showNotif("Erro ao atualizar tarefa");
         }
       } catch (error) {
         console.error("Erro ao toggle task:", error);
         setTasks(
-          tasks.map((t) => (t.id === id ? { ...t, completed: !newCompleted } : t))
+          tasks.map((t) =>
+            t.id === id ? { ...t, completed: !newCompleted } : t
+          )
         );
       }
     } else {
-      setTasks(tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)));
+      setTasks(
+        tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+      );
     }
   };
 
@@ -508,12 +550,38 @@ export default function PomodoroApp() {
   };
 
   const handleMoodChange = (mood) => {
+    if (mood.id === "custom") {
+      setShowCustomConfig(true);
+      return;
+    }
+
     setSelectedMood(mood);
     setShowMoodSelector(false);
+    setShowCustomConfig(false);
     if (!timer.isActive) {
       timer.reset(mood.focusTime);
     }
-    showNotif(`Humor "${mood.label}" selecionado! ${mood.focusTime}min de foco`);
+    showNotif(
+      `Humor "${mood.label}" selecionado! ${mood.focusTime}min de foco`
+    );
+  };
+
+  const handleCustomMoodConfirm = () => {
+    const customMood = {
+      ...MOODS.CUSTOM,
+      focusTime: customFocusTime,
+      breakTime: customBreakTime,
+    };
+
+    setSelectedMood(customMood);
+    setShowMoodSelector(false);
+    setShowCustomConfig(false);
+    if (!timer.isActive) {
+      timer.reset(customFocusTime);
+    }
+    showNotif(
+      `Modo personalizado: ${customFocusTime}min de foco, ${customBreakTime}min de pausa!`
+    );
   };
 
   // ROOM HANDLERS
@@ -529,13 +597,13 @@ export default function PomodoroApp() {
   const handleRoomCreated = (room) => {
     setShowRoomModal(false);
     setSelectedRoom(room);
-    window.dispatchEvent(new Event('roomsUpdated'));
+    window.dispatchEvent(new Event("roomsUpdated"));
   };
 
   const handleRoomJoined = (room) => {
     setShowRoomModal(false);
     setSelectedRoom(room);
-    window.dispatchEvent(new Event('roomsUpdated'));
+    window.dispatchEvent(new Event("roomsUpdated"));
   };
 
   const handleRoomSelect = (room) => {
@@ -547,7 +615,8 @@ export default function PomodoroApp() {
   };
 
   const completedTasks = tasks.filter((t) => t.completed).length;
-  const progress = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
+  const progress =
+    tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
 
   const handleLogin = () => {
     window.location.href = "/login";
@@ -561,25 +630,40 @@ export default function PomodoroApp() {
     switch (activePage) {
       case "timer":
         return renderTimerPage();
-      
+
       case "progress":
         return (
           <div className="page-wrapper">
             <div className="page-card">
-              <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "1rem" }}>
-                <Target size={32} style={{ display: "inline", marginRight: "0.5rem", verticalAlign: "middle" }} />
+              <h1
+                style={{
+                  fontSize: "2rem",
+                  fontWeight: 700,
+                  marginBottom: "1rem",
+                }}
+              >
+                <Target
+                  size={32}
+                  style={{
+                    display: "inline",
+                    marginRight: "0.5rem",
+                    verticalAlign: "middle",
+                  }}
+                />
                 Seu Progresso
               </h1>
               <p style={{ color: "#666", marginBottom: "2rem" }}>
                 Acompanhe suas estatísticas e evolução
               </p>
-              <div style={{ 
-                padding: "3rem", 
-                textAlign: "center", 
-                background: "#f9fafb", 
-                borderRadius: "16px",
-                border: "2px dashed #d1d5db"
-              }}>
+              <div
+                style={{
+                  padding: "3rem",
+                  textAlign: "center",
+                  background: "#f9fafb",
+                  borderRadius: "16px",
+                  border: "2px dashed #d1d5db",
+                }}
+              >
                 <p style={{ color: "#6b7280", fontSize: "1.125rem" }}>
                   Componente de Progresso será implementado aqui
                 </p>
@@ -587,7 +671,7 @@ export default function PomodoroApp() {
             </div>
           </div>
         );
-      
+
       case "rooms":
         return (
           <div className="rooms-wrapper">
@@ -596,7 +680,14 @@ export default function PomodoroApp() {
                 <button onClick={handleBackToRooms} className="back-btn-rooms">
                   Voltar para Salas
                 </button>
-                <h1 style={{ fontSize: "2rem", fontWeight: 700, marginTop: "1rem", color: 'gray' }}>
+                <h1
+                  style={{
+                    fontSize: "2rem",
+                    fontWeight: 700,
+                    marginTop: "1rem",
+                    color: "gray",
+                  }}
+                >
                   {selectedRoom.name}
                 </h1>
                 <p style={{ color: "#665", marginTop: "0.5rem" }}>
@@ -611,25 +702,40 @@ export default function PomodoroApp() {
             )}
           </div>
         );
-      
+
       case "ranking":
         return (
           <div className="page-wrapper">
             <div className="page-card">
-              <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "1rem" }}>
-                <Target size={32} style={{ display: "inline", marginRight: "0.5rem", verticalAlign: "middle" }} />
+              <h1
+                style={{
+                  fontSize: "2rem",
+                  fontWeight: 700,
+                  marginBottom: "1rem",
+                }}
+              >
+                <Target
+                  size={32}
+                  style={{
+                    display: "inline",
+                    marginRight: "0.5rem",
+                    verticalAlign: "middle",
+                  }}
+                />
                 Ranking
               </h1>
               <p style={{ color: "#666", marginBottom: "2rem" }}>
                 Veja os usuários mais dedicados
               </p>
-              <div style={{ 
-                padding: "3rem", 
-                textAlign: "center", 
-                background: "#f9fafb", 
-                borderRadius: "16px",
-                border: "2px dashed #d1d5db"
-              }}>
+              <div
+                style={{
+                  padding: "3rem",
+                  textAlign: "center",
+                  background: "#f9fafb",
+                  borderRadius: "16px",
+                  border: "2px dashed #d1d5db",
+                }}
+              >
                 <p style={{ color: "#6b7280", fontSize: "1.125rem" }}>
                   Componente de Ranking será implementado aqui
                 </p>
@@ -637,7 +743,7 @@ export default function PomodoroApp() {
             </div>
           </div>
         );
-      
+
       default:
         return renderTimerPage();
     }
@@ -655,7 +761,7 @@ export default function PomodoroApp() {
             </h2>
           </div>
         </div>
-        
+
         {!session && (
           <div
             style={{
@@ -667,10 +773,22 @@ export default function PomodoroApp() {
               border: "2px dashed #fbbf24",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: "0.5rem" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginBottom: "0.5rem",
+              }}
+            >
               <Lock size={40} color="#fbbf24" />
             </div>
-            <p style={{ fontWeight: 600, color: "#1a1a1a", marginBottom: "0.25rem" }}>
+            <p
+              style={{
+                fontWeight: 600,
+                color: "#1a1a1a",
+                marginBottom: "0.25rem",
+              }}
+            >
               Suas tarefas não serão salvas
             </p>
             <p style={{ fontSize: "0.875rem", color: "#666" }}>
@@ -706,21 +824,38 @@ export default function PomodoroApp() {
                 }`}
                 onClick={() => toggleTask(task.id)}
               >
-                <div className="task-checkbox">{task.completed && <Check size={14} />}</div>
+                <div className="task-checkbox">
+                  {task.completed && <Check size={14} />}
+                </div>
 
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
                   {getCategoryIcon(task.category)}
                 </div>
 
                 <div className="task-content">
                   <div className="task-text">{task.text}</div>
                   {TASK_CATEGORIES[task.category] && (
-                    <div style={{ fontSize: "0.75rem", color: "#888", marginTop: 6 }}>
+                    <div
+                      style={{
+                        fontSize: "0.75rem",
+                        color: "#888",
+                        marginTop: 6,
+                      }}
+                    >
                       {TASK_CATEGORIES[task.category].label}
                     </div>
                   )}
                 </div>
-                <button className="delete-task-btn" onClick={(e) => deleteTask(task.id, e)}>
+                <button
+                  className="delete-task-btn"
+                  onClick={(e) => deleteTask(task.id, e)}
+                >
                   <Trash2 size={16} />
                 </button>
               </div>
@@ -748,8 +883,13 @@ export default function PomodoroApp() {
                       style={{
                         padding: "0.5rem 0.75rem",
                         border:
-                          selectedCategory === cat.id ? `2px solid ${cat.color}` : "2px solid #e5e7eb",
-                        background: selectedCategory === cat.id ? `${cat.color}15` : "white",
+                          selectedCategory === cat.id
+                            ? `2px solid ${cat.color}`
+                            : "2px solid #e5e7eb",
+                        background:
+                          selectedCategory === cat.id
+                            ? `${cat.color}15`
+                            : "white",
                         borderRadius: "8px",
                         cursor: "pointer",
                         display: "flex",
@@ -794,7 +934,10 @@ export default function PomodoroApp() {
               </div>
             </div>
           ) : (
-            <button className="add-task-btn" onClick={() => setShowAddTask(true)}>
+            <button
+              className="add-task-btn"
+              onClick={() => setShowAddTask(true)}
+            >
               <Plus size={18} />
               Adicionar Tarefa
             </button>
@@ -806,11 +949,25 @@ export default function PomodoroApp() {
       <div className="right-panel">
         <div className="timer-card">
           <div className={`status-badge ${isBreak ? "break" : ""}`}>
-            <div style={{ width: 8, height: 8, background: "currentColor", borderRadius: "50%" }} />
+            <div
+              style={{
+                width: 8,
+                height: 8,
+                background: "currentColor",
+                borderRadius: "50%",
+              }}
+            />
             {isBreak ? "Intervalo" : "Tempo de Foco"}
           </div>
 
-          <div style={{ position: "relative", width: 220, height: 150, margin: "1rem auto 1.5rem" }}>
+          <div
+            style={{
+              position: "relative",
+              width: 220,
+              height: 150,
+              margin: "1rem auto 1.5rem",
+            }}
+          >
             <svg width="220" height="150" viewBox="0 0 220 150">
               <path
                 d="M 10 120 A 100 100 0 0 1 210 120"
@@ -822,43 +979,58 @@ export default function PomodoroApp() {
               <path
                 d="M 10 120 A 100 100 0 0 1 210 120"
                 fill="none"
-                stroke={selectedMood ? selectedMood.gradient.match(/#[a-f0-9]{6}/i)[0] : "#667eea"}
+                stroke={
+                  selectedMood
+                    ? selectedMood.gradient.match(/#[a-f0-9]{6}/i)[0]
+                    : "#667eea"
+                }
                 strokeWidth="14"
                 strokeLinecap="round"
                 strokeDasharray={314}
-                strokeDashoffset={314 - (314 * timer.seconds / ((isBreak ? breakTime : focusTime) * 60))}
-                style={{ 
-                  transition: "stroke-dashoffset 1s linear, stroke 0.3s ease"
+                strokeDashoffset={
+                  314 -
+                  (314 * timer.seconds) /
+                    ((isBreak ? breakTime : focusTime) * 60)
+                }
+                style={{
+                  transition: "stroke-dashoffset 1s linear, stroke 0.3s ease",
                 }}
               />
             </svg>
-            
-            <div style={{
-              position: "absolute",
-              top: "70%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              textAlign: "center"
-            }}>
-              <div style={{ 
-                fontSize: "3rem", 
-                fontWeight: 700,
-                color: "#1a1a1a",
-                lineHeight: 1,
-                marginBottom: "0.4rem"
-              }}>
-                {String(minutes).padStart(2, "0")}:{String(secs).padStart(2, "0")}
+
+            <div
+              style={{
+                position: "absolute",
+                top: "70%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                textAlign: "center",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "3rem",
+                  fontWeight: 700,
+                  color: "#1a1a1a",
+                  lineHeight: 1,
+                  marginBottom: "0.4rem",
+                }}
+              >
+                {String(minutes).padStart(2, "0")}:
+                {String(secs).padStart(2, "0")}
               </div>
-              <div style={{ 
-                fontSize: "0.8rem", 
-                color: "#999", 
-                fontWeight: 600,
-                maxWidth: "160px",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap"
-              }}>
-                {tasks[currentTaskIndex] && !tasks[currentTaskIndex].completed 
+              <div
+                style={{
+                  fontSize: "0.8rem",
+                  color: "#999",
+                  fontWeight: 600,
+                  maxWidth: "160px",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {tasks[currentTaskIndex] && !tasks[currentTaskIndex].completed
                   ? tasks[currentTaskIndex].text
                   : "Nenhuma tarefa"}
               </div>
@@ -866,7 +1038,10 @@ export default function PomodoroApp() {
           </div>
 
           <div className="timer-controls">
-            <button className="control-btn secondary" onClick={() => timer.reset(isBreak ? breakTime : focusTime)}>
+            <button
+              className="control-btn secondary"
+              onClick={() => timer.reset(isBreak ? breakTime : focusTime)}
+            >
               <RotateCcw size={20} />
             </button>
             <button
@@ -874,7 +1049,11 @@ export default function PomodoroApp() {
               onClick={timer.isActive ? timer.pause : handleStart}
               disabled={!selectedMood}
             >
-              {timer.isActive ? <Pause size={28} /> : <Play size={28} style={{ marginLeft: 2 }} />}
+              {timer.isActive ? (
+                <Pause size={28} />
+              ) : (
+                <Play size={28} style={{ marginLeft: 2 }} />
+              )}
             </button>
             <button
               className="control-btn secondary"
@@ -888,12 +1067,18 @@ export default function PomodoroApp() {
           </div>
 
           {selectedMood ? (
-            <div className="mood-display" onClick={() => setShowMoodSelector(true)}>
+            <div
+              className="mood-display"
+              onClick={() => setShowMoodSelector(true)}
+            >
               {React.createElement(selectedMood.icon, { size: 20 })}
               <span>Humor: {selectedMood.label}</span>
             </div>
           ) : (
-            <div className="mood-display mood-display-pulse" onClick={() => setShowMoodSelector(true)}>
+            <div
+              className="mood-display mood-display-pulse"
+              onClick={() => setShowMoodSelector(true)}
+            >
               <Sparkles size={20} />
               <span>Selecione seu humor para começar!</span>
             </div>
@@ -906,7 +1091,8 @@ export default function PomodoroApp() {
             <div className="progress-percentage">{progress}%</div>
           </div>
           <div className="progress-info">
-            {completedTasks}/{tasks.length} tarefas concluídas • {pomodorosCompleted} pomodoros
+            {completedTasks}/{tasks.length} tarefas concluídas •{" "}
+            {pomodorosCompleted} pomodoros
           </div>
           <div className="progress-bar-container">
             <div className="progress-bar" style={{ width: `${progress}%` }} />
@@ -929,7 +1115,10 @@ export default function PomodoroApp() {
 
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    background: ${
+      selectedMood?.gradient ||
+      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+    };
     min-height: 100vh;
     overflow-x: hidden;
     transition: background 0.8s ease;
@@ -1017,7 +1206,10 @@ export default function PomodoroApp() {
   .notification-icon {
     width: 44px;
     height: 44px;
-    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    background: ${
+      selectedMood?.gradient ||
+      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+    };
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -1074,6 +1266,12 @@ export default function PomodoroApp() {
     max-width: 560px;
     width: 90%;
     animation: fadeInScale 0.3s ease;
+    transition: all 0.3s ease;
+  }
+
+  .mood-selector-card.expanded {
+    max-width: 640px;
+    min-height: 500px;
   }
 
   @keyframes fadeInScale {
@@ -1155,6 +1353,135 @@ export default function PomodoroApp() {
     opacity: 0.85;
   }
 
+  /* ===== CUSTOM CONFIG ===== */
+  .custom-config {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .custom-config-header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .custom-config-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-top: 0.5rem;
+  }
+
+  .custom-config-header p {
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  .custom-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .custom-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .custom-input-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .input-with-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .time-control-btn {
+    width: 44px;
+    height: 44px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #666;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .time-control-btn:hover {
+    border-color: #8b5cf6;
+    color: #8b5cf6;
+    background: #f5f3ff;
+  }
+
+  .custom-time-input {
+    flex: 1;
+    padding: 0.875rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-align: center;
+    color: purple;
+    background-color: white;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .custom-time-input:focus {
+    border-color: #8b5cf6;
+    background: #faf9ff;
+  }
+
+  .custom-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .custom-btn {
+    flex: 1;
+    padding: 0.875rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+  }
+
+  .custom-btn.secondary {
+    background: #f3f4f6;
+    color: #666;
+  }
+
+  .custom-btn.secondary:hover {
+    background: #e5e7eb;
+  }
+
+  .custom-btn.primary {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    color: white;
+    box-shadow: 0 6px 18px rgba(139, 92, 246, 0.3);
+  }
+
+  .custom-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+  }
+
   /* ===== TASK LIST CARD ===== */
   .task-list-card {
     flex: 0 0 400px;
@@ -1226,7 +1553,10 @@ export default function PomodoroApp() {
   }
 
   .task-item.current {
-    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    background: ${
+      selectedMood?.gradient ||
+      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+    };
     box-shadow: 0 6px 18px rgba(102, 126, 234, 0.3);
   }
 
@@ -1350,7 +1680,10 @@ export default function PomodoroApp() {
 
   .add-task-submit {
     padding: 0.75rem 1.125rem;
-    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    background: ${
+      selectedMood?.gradient ||
+      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+    };
     color: white;
     border: none;
     border-radius: 11px;
@@ -1401,7 +1734,10 @@ export default function PomodoroApp() {
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    background: ${
+      selectedMood?.gradient ||
+      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+    };
     color: white;
     border-radius: 18px;
     font-size: 0.85rem;
@@ -1434,7 +1770,10 @@ export default function PomodoroApp() {
   .control-btn.primary {
     width: 72px;
     height: 72px;
-    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    background: ${
+      selectedMood?.gradient ||
+      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+    };
     color: white;
     box-shadow: 0 8px 26px rgba(102, 126, 234, 0.4);
   }
@@ -1464,7 +1803,10 @@ export default function PomodoroApp() {
 
   .mood-display {
     padding: 0.875rem 1.75rem;
-    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    background: ${
+      selectedMood?.gradient ||
+      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+    };
     color: white;
     border-radius: 14px;
     display: flex;
@@ -1516,7 +1858,10 @@ export default function PomodoroApp() {
   .progress-percentage {
     font-size: 2.25rem;
     font-weight: 700;
-    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    background: ${
+      selectedMood?.gradient ||
+      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+    };
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1538,7 +1883,10 @@ export default function PomodoroApp() {
 
   .progress-bar {
     height: 100%;
-    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    background: ${
+      selectedMood?.gradient ||
+      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+    };
     transition: width 0.5s ease;
     border-radius: 4px;
   }
@@ -1636,29 +1984,145 @@ export default function PomodoroApp() {
 
       {showMoodSelector && (
         <>
-          <div className="mood-overlay" onClick={() => setShowMoodSelector(false)} />
-          <div className="mood-selector-card">
+          <div
+            className="mood-overlay"
+            onClick={() => {
+              setShowMoodSelector(false);
+              setShowCustomConfig(false);
+            }}
+          />
+          <div
+            className={`mood-selector-card ${
+              showCustomConfig ? "expanded" : ""
+            }`}
+          >
             <div className="mood-selector-header">
               <h2>Como você está se sentindo?</h2>
               <p>Vamos ajustar o timer para seu estado de espírito</p>
             </div>
-            <div className="mood-grid">
-              {Object.values(MOODS).map((mood) => {
-                const Icon = mood.icon;
-                return (
+
+            {!showCustomConfig ? (
+              <div className="mood-grid">
+                {Object.values(MOODS).map((mood) => {
+                  const Icon = mood.icon;
+                  return (
+                    <button
+                      key={mood.id}
+                      onClick={() => handleMoodChange(mood)}
+                      className={`mood-btn ${
+                        selectedMood?.id === mood.id ? "selected" : ""
+                      }`}
+                      style={
+                        selectedMood?.id === mood.id
+                          ? { background: mood.gradient }
+                          : {}
+                      }
+                    >
+                      <Icon size={28} />
+                      <span className="mood-label">{mood.label}</span>
+                      <span className="mood-time">
+                        {mood.id === "custom"
+                          ? "Personalize"
+                          : `${mood.focusTime}min foco`}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="custom-config">
+                <div className="custom-config-header">
+                  <Settings size={32} color="#8b5cf6" />
+                  <h3>Configure seus tempos</h3>
+                  <p>Defina quanto tempo você quer focar e descansar</p>
+                </div>
+
+                <div className="custom-inputs">
+                  <div className="custom-input-group">
+                    <label>Tempo de Foco (minutos)</label>
+                    <div className="input-with-controls">
+                      <button
+                        onClick={() =>
+                          setCustomFocusTime(Math.max(1, customFocusTime - 5))
+                        }
+                        className="time-control-btn"
+                      >
+                        -
+                      </button>
+                      <input
+                        type="number"
+                        min="1"
+                        max="120"
+                        value={customFocusTime}
+                        onChange={(e) =>
+                          setCustomFocusTime(
+                            Math.max(1, parseInt(e.target.value) || 1)
+                          )
+                        }
+                        className="custom-time-input"
+                      />
+                      <button
+                        onClick={() =>
+                          setCustomFocusTime(Math.min(120, customFocusTime + 5))
+                        }
+                        className="time-control-btn"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="custom-input-group">
+                    <label>Tempo de Pausa (minutos)</label>
+                    <div className="input-with-controls">
+                      <button
+                        onClick={() =>
+                          setCustomBreakTime(Math.max(1, customBreakTime - 5))
+                        }
+                        className="time-control-btn"
+                      >
+                        -
+                      </button>
+                      <input
+                        type="number"
+                        min="1"
+                        max="60"
+                        value={customBreakTime}
+                        onChange={(e) =>
+                          setCustomBreakTime(
+                            Math.max(1, parseInt(e.target.value) || 1)
+                          )
+                        }
+                        className="custom-time-input"
+                      />
+                      <button
+                        onClick={() =>
+                          setCustomBreakTime(Math.min(60, customBreakTime + 5))
+                        }
+                        className="time-control-btn"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="custom-actions">
                   <button
-                    key={mood.id}
-                    onClick={() => handleMoodChange(mood)}
-                    className={`mood-btn ${selectedMood?.id === mood.id ? "selected" : ""}`}
-                    style={selectedMood?.id === mood.id ? { background: mood.gradient } : {}}
+                    onClick={() => setShowCustomConfig(false)}
+                    className="custom-btn secondary"
                   >
-                    <Icon size={28} />
-                    <span className="mood-label">{mood.label}</span>
-                    <span className="mood-time">{mood.focusTime}min foco</span>
+                    Voltar
                   </button>
-                );
-              })}
-            </div>
+                  <button
+                    onClick={handleCustomMoodConfirm}
+                    className="custom-btn primary"
+                  >
+                    Confirmar
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </>
       )}

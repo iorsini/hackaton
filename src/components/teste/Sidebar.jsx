@@ -329,11 +329,11 @@ export default function Sidebar({ activePage, onPageChange }) {
                 </div>
               </div>
               <button
-                className="logout-btn text-gray-500 hover:text-red-500 transition"
+                className="logout-btn text-white hover:text-red-500 transition"
                 onClick={handleLogout}
                 aria-label="Logout"
               >
-                <LogOut size={18} />
+                <LogOut size={25} />
               </button>
             </>
           ) : (
