@@ -11,11 +11,8 @@ export default function Home() {
   useEffect(() => {
     if (status === 'loading') return; // Espera carregar
     
-    if (session) {
-      router.push('/dashboard/pomodoro');
-    } else {
-      router.push('/login');
-    }
+    // Sempre redireciona para o dashboard, com ou sem login
+    router.push('/dashboard/pomodoro');
   }, [session, status, router]);
 
   // Tela de loading enquanto verifica
