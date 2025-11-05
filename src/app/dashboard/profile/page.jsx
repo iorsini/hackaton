@@ -2,7 +2,6 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import LoadingScreen from "@/components/ui/LoadingScreen";
 import { 
   User, Mail, Calendar, Award, Target, TrendingUp, 
   ArrowLeft, LogOut, AlertTriangle, Trash2, 
@@ -120,7 +119,9 @@ function ProfilePage() {
 
   if (status === "loading" || loading) {
     return (
-      <LoadingScreen />
+      <div className="min-h-screen linear-gradient(135deg, #667eea 0%, #764ba2 100%) flex items-center justify-center">
+        <div className="text-white text-xl">Carregando perfil...</div>
+      </div>
     );
   }
 
