@@ -30,7 +30,7 @@ import {
   ListTodo,
   Settings,
 } from "lucide-react";
-import Sidebar from "@/components/dashboard/teste/SideBar";
+import Sidebar from "@/components/teste/Sidebar";
 import LofiPlayer from "@/components/teste/LoFiPlayer";
 import RoomsPage from "@/components/pomodoro/RoomsPage";
 import RoomModal from "@/components/pomodoro/RoomModal";
