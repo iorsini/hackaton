@@ -17,34 +17,50 @@ export default function Home() {
 
   // Tela de loading enquanto verifica
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-    }}>
-      <div style={{ 
-        textAlign: 'center',
-        color: 'white'
-      }}>
-        <div style={{ 
-          fontSize: '4rem',
-          marginBottom: '1rem',
-          animation: 'pulse 2s ease-in-out infinite'
-        }}>
-          🍅
-        </div>
-        <p style={{ fontSize: '1.5rem', fontWeight: '600' }}>
-          Carregando...
-        </p>
-      </div>
-      <style jsx>{`
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.1); }
+  <div
+    style={{
+      minHeight: "100vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "column",
+      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+    }}
+  >
+    <img
+      src="/images/pomofy.webp"
+      alt="Pomofy Logo"
+      style={{
+        width: "220px",          // 👈 aumenta o tamanho da logo
+        height: "auto",
+        borderRadius: "24px",    // 👈 bordas suaves
+        background: "white",     // 👈 mantém contraste com o fundo roxo
+        padding: "1rem",
+        boxShadow: "0 8px 40px rgba(0, 0, 0, 0.25)",
+        animation: "pulse 2s ease-in-out infinite",
+      }}
+    />
+    <p
+      style={{
+        fontSize: "1.5rem",
+        fontWeight: "600",
+        color: "white",
+        marginTop: "1.5rem",
+      }}
+    >
+      Carregando...
+    </p>
+
+    <style jsx>{`
+      @keyframes pulse {
+        0%, 100% {
+          transform: scale(1);
         }
-      `}</style>
-    </div>
-  );
+        50% {
+          transform: scale(1.08);
+        }
+      }
+    `}</style>
+  </div>
+);
 }

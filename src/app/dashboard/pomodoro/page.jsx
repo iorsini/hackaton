@@ -18,48 +18,58 @@ import {
   LogIn,
   Check,
   Trash2,
+  Briefcase,
+  Dumbbell,
+  Heart,
+  BookOpen,
+  Home,
+  Pin,
+  Sparkles,
+  Target,
+  Wind,
+  Lock,
 } from "lucide-react";
 import Sidebar from "@/components/teste/Sidebar";
 import LofiPlayer from "@/components/teste/LoFiPlayer";
 
 // ============================================
-// TASK CATEGORIES (ADICIONADO)
+// TASK CATEGORIES
 // ============================================
 const TASK_CATEGORIES = {
   trabalho: {
     id: "trabalho",
     label: "Trabalho",
-    icon: "💼",
+    Icon: Briefcase,
     color: "#3b82f6",
   },
   "saude-fisica": {
     id: "saude-fisica",
     label: "Saúde Física",
-    icon: "💪",
+    Icon: Dumbbell,
     color: "#10b981",
   },
   "saude-mental": {
     id: "saude-mental",
     label: "Saúde Mental",
-    icon: "🧘",
+    Icon: Heart,
     color: "#a855f7",
   },
   estudo: {
     id: "estudo",
     label: "Estudo",
-    icon: "📚",
+    Icon: BookOpen,
     color: "#f59e0b",
   },
   pessoal: {
     id: "pessoal",
     label: "Pessoal",
-    icon: "🏠",
+    Icon: Home,
     color: "#ec4899",
   },
   outros: {
     id: "outros",
     label: "Outros",
-    icon: "📌",
+    Icon: Pin,
     color: "#6b7280",
   },
 };
@@ -76,12 +86,12 @@ const MOODS = {
     gradient: "linear-gradient(135deg, #a855f7 0%, #ec4899 100%)",
     icon: Brain,
     focusMessages: [
-      "Deixe as ideias fluírem! 🎨",
+      "Deixe as ideias fluírem!",
       "Sua criatividade está no auge!",
       "Momento perfeito para inovar!",
     ],
     breakMessages: [
-      "Beba água e deixe sua mente vagar 💧",
+      "Beba água e deixe sua mente vagar",
       "Alongue os ombros e respire fundo",
       "Olhe para longe e relaxe os olhos",
     ],
@@ -94,12 +104,12 @@ const MOODS = {
     gradient: "linear-gradient(135deg, #64748b 0%, #475569 100%)",
     icon: Frown,
     focusMessages: [
-      "Você consegue! Um passo de cada vez 💪",
+      "Você consegue! Um passo de cada vez",
       "Pequenos progressos ainda são progressos",
       "Seja gentil consigo mesmo hoje",
     ],
     breakMessages: [
-      "Respire fundo 3 vezes e beba água 💧",
+      "Respire fundo 3 vezes e beba água",
       "Levante e caminhe um pouco",
       "Alongue o corpo todo devagar",
     ],
@@ -112,13 +122,13 @@ const MOODS = {
     gradient: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
     icon: Zap,
     focusMessages: [
-      "Respire fundo. Você está indo bem 🧘",
+      "Respire fundo. Você está indo bem",
       "Um passo de cada vez. Sem pressa",
       "Foco no presente, não no resultado",
     ],
     breakMessages: [
-      "RESPIRE: 4 segundos dentro, 4 fora 🫁",
-      "Beba água gelada devagar 💧",
+      "RESPIRE: 4 segundos dentro, 4 fora",
+      "Beba água gelada devagar",
       "Alongue pescoço e ombros",
     ],
   },
@@ -130,13 +140,13 @@ const MOODS = {
     gradient: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
     icon: Smile,
     focusMessages: [
-      "Foco impecável! Continue assim 🎯",
+      "Foco impecável! Continue assim",
       "Você está no flow perfeito",
       "Mantenha esse ritmo incrível!",
     ],
     breakMessages: [
-      "Olhe para longe por 20 segundos 👀",
-      "Beba água e hidrate-se 💧",
+      "Olhe para longe por 20 segundos",
+      "Beba água e hidrate-se",
       "Levante e movimente as pernas",
     ],
   },
@@ -148,12 +158,12 @@ const MOODS = {
     gradient: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",
     icon: Coffee,
     focusMessages: [
-      "Devagar e sempre. Você consegue 😴",
+      "Devagar e sempre. Você consegue",
       "Está tudo bem ir no seu ritmo",
       "Faça o que puder por agora",
     ],
     breakMessages: [
-      "Beba água ou café ☕💧",
+      "Beba água ou café",
       "Considere um cochilo de 5min",
       "Alongue todo o corpo",
     ],
@@ -166,12 +176,12 @@ const MOODS = {
     gradient: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
     icon: Battery,
     focusMessages: [
-      "Energia máxima! Você está voando! ⚡",
+      "Energia máxima! Você está voando!",
       "Incrível! Mantenha esse ritmo",
       "Aproveite esse pico de produtividade",
     ],
     breakMessages: [
-      "Beba água para manter a energia 💧",
+      "Beba água para manter a energia",
       "Alongamento rápido de 30 segundos",
       "Olhe pela janela e respire",
     ],
@@ -220,10 +230,8 @@ const useTimer = (initialMinutes, onComplete) => {
 // MAIN APP
 // ============================================
 export default function PomodoroApp() {
-  // === session (ADICIONADO) ===
   const { data: session, status } = useSession();
 
-  // existing states
   const [tasks, setTasks] = useState([]);
   const [selectedMood, setSelectedMood] = useState(null);
   const [isBreak, setIsBreak] = useState(false);
@@ -234,14 +242,18 @@ export default function PomodoroApp() {
   const [showMoodSelector, setShowMoodSelector] = useState(false);
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
   const [showAddTask, setShowAddTask] = useState(false);
-
-  // === new states for categories & loading (ADICIONADOS) ===
   const [selectedCategory, setSelectedCategory] = useState("outros");
-  const [showCategorySelector, setShowCategorySelector] = useState(false); // not heavily used but kept per request
+  const [showCategorySelector, setShowCategorySelector] = useState(false);
   const [isLoadingTasks, setIsLoadingTasks] = useState(true);
 
   const focusTime = selectedMood?.focusTime || 25;
   const breakTime = selectedMood?.breakTime || 5;
+
+  // Helper para renderizar ícones de categoria
+  const getCategoryIcon = (categoryId) => {
+    const IconComponent = TASK_CATEGORIES[categoryId]?.Icon || Pin;
+    return <IconComponent size={20} color={TASK_CATEGORIES[categoryId]?.color || "#6b7280"} />;
+  };
 
   const showNotif = (message) => {
     setNotificationMessage(message);
@@ -255,7 +267,6 @@ export default function PomodoroApp() {
 
   const handleTimerComplete = () => {
     if (!isBreak) {
-      // Completar task atual
       if (tasks[currentTaskIndex] && !tasks[currentTaskIndex].completed) {
         const newTasks = [...tasks];
         newTasks[currentTaskIndex].completed = true;
@@ -266,13 +277,11 @@ export default function PomodoroApp() {
       setIsBreak(true);
       timer.reset(breakTime);
 
-      const messages =
-        selectedMood?.breakMessages || ["Beba água! 💧", "Alongue-se!", "Descanse os olhos"];
+      const messages = selectedMood?.breakMessages || ["Beba água!", "Alongue-se!", "Descanse os olhos"];
       showNotif(messages[Math.floor(Math.random() * messages.length)]);
     } else {
       setIsBreak(false);
 
-      // Avançar para próxima task não completada
       const nextIndex = tasks.findIndex((t, i) => i > currentTaskIndex && !t.completed);
       if (nextIndex !== -1) {
         setCurrentTaskIndex(nextIndex);
@@ -280,7 +289,7 @@ export default function PomodoroApp() {
 
       timer.reset(focusTime);
 
-      const messages = selectedMood?.focusMessages || ["Vamos lá! 💪", "Foco total!"];
+      const messages = selectedMood?.focusMessages || ["Vamos lá!", "Foco total!"];
       showNotif(messages[Math.floor(Math.random() * messages.length)]);
     }
   };
@@ -289,7 +298,7 @@ export default function PomodoroApp() {
 
   const handleStart = () => {
     if (!selectedMood) {
-      showNotif("Selecione seu humor primeiro! 😊");
+      showNotif("Selecione seu humor primeiro!");
       setShowMoodSelector(true);
       return;
     }
@@ -301,23 +310,15 @@ export default function PomodoroApp() {
     }
 
     if (!isBreak) {
-      const messages = selectedMood?.focusMessages || ["Foco! 💪"];
+      const messages = selectedMood?.focusMessages || ["Foco!"];
       showNotif(messages[Math.floor(Math.random() * messages.length)]);
     }
   };
 
-  // =========================================
-  // API Integration: loadTasks, addTask, toggleTask, deleteTask, updateTaskText
-  // - When session exists -> call API endpoints
-  // - When no session -> use local-only behavior (tasks kept in memory)
-  // =========================================
-
-  // CARREGAR TASKS AO LOGAR
   useEffect(() => {
     if (session?.user) {
       loadTasks();
     } else {
-      // reset local tasks (we keep whatever was local but set loading false)
       setIsLoadingTasks(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -333,21 +334,20 @@ export default function PomodoroApp() {
         setTasks(
           data.tasks.map((t) => ({
             ...t,
-            id: t._id, // MongoDB _id -> id
+            id: t._id,
           }))
         );
       } else {
-        showNotif("Erro ao carregar tarefas 😢");
+        showNotif("Erro ao carregar tarefas");
       }
     } catch (error) {
       console.error("Erro ao carregar tasks:", error);
-      showNotif("Erro ao carregar tarefas 😢");
+      showNotif("Erro ao carregar tarefas");
     } finally {
       setIsLoadingTasks(false);
     }
   };
 
-  // adicionar tarefa (usa API se estiver logado, caso contrário cria localmente)
   const addTask = async () => {
     if (!newTaskText.trim()) return;
 
@@ -374,17 +374,16 @@ export default function PomodoroApp() {
           ]);
           setNewTaskText("");
           setShowAddTask(false);
-          showNotif("Tarefa adicionada! ✅");
+          showNotif("Tarefa adicionada!");
         } else {
           console.error("Erro do servidor ao adicionar task:", data);
-          showNotif("Erro ao adicionar tarefa 😢");
+          showNotif("Erro ao adicionar tarefa");
         }
       } catch (error) {
         console.error("Erro ao adicionar task:", error);
-        showNotif("Erro ao adicionar tarefa 😢");
+        showNotif("Erro ao adicionar tarefa");
       }
     } else {
-      // local fallback (não salva no backend)
       setTasks([
         {
           id: Date.now(),
@@ -407,7 +406,6 @@ export default function PomodoroApp() {
       if (!task) return;
       const newCompleted = !task.completed;
 
-      // Otimistic update
       setTasks(
         tasks.map((t) => (t.id === id ? { ...t, completed: newCompleted } : t))
       );
@@ -420,11 +418,10 @@ export default function PomodoroApp() {
         });
 
         if (!res.ok) {
-          // Reverter se der erro
           setTasks(
             tasks.map((t) => (t.id === id ? { ...t, completed: !newCompleted } : t))
           );
-          showNotif("Erro ao atualizar tarefa 😢");
+          showNotif("Erro ao atualizar tarefa");
         }
       } catch (error) {
         console.error("Erro ao toggle task:", error);
@@ -433,7 +430,6 @@ export default function PomodoroApp() {
         );
       }
     } else {
-      // local toggle
       setTasks(tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)));
     }
   };
@@ -442,7 +438,6 @@ export default function PomodoroApp() {
     e.stopPropagation();
 
     if (session?.user) {
-      // Otimistic delete
       const oldTasks = [...tasks];
       setTasks(tasks.filter((t) => t.id !== id));
 
@@ -453,17 +448,16 @@ export default function PomodoroApp() {
 
         if (!res.ok) {
           setTasks(oldTasks);
-          showNotif("Erro ao deletar tarefa 😢");
+          showNotif("Erro ao deletar tarefa");
         } else {
-          showNotif("Tarefa removida! 🗑️");
+          showNotif("Tarefa removida!");
         }
       } catch (error) {
         console.error("Erro ao deletar task:", error);
         setTasks(oldTasks);
-        showNotif("Erro ao deletar tarefa 😢");
+        showNotif("Erro ao deletar tarefa");
       }
     } else {
-      // local delete
       setTasks(tasks.filter((t) => t.id !== id));
     }
   };
@@ -482,26 +476,21 @@ export default function PomodoroApp() {
         if (res.ok) {
           const data = await res.json();
           setTasks(tasks.map((t) => (t.id === id ? { ...data.task, id: data.task._id } : t)));
-          showNotif("Tarefa atualizada! ✏️");
+          showNotif("Tarefa atualizada!");
         } else {
           const error = await res.json();
           console.error("Erro do servidor:", error);
-          showNotif("Erro ao atualizar tarefa 😢");
+          showNotif("Erro ao atualizar tarefa");
         }
       } catch (error) {
         console.error("Erro ao atualizar texto:", error);
-        showNotif("Erro ao atualizar tarefa 😢");
+        showNotif("Erro ao atualizar tarefa");
       }
     } else {
-      // local update
       setTasks(tasks.map((t) => (t.id === id ? { ...t, text: newText.trim() } : t)));
       showNotif("Tarefa atualizada localmente (faça login para salvar).");
     }
   };
-
-  // =========================================
-  // End API integration
-  // =========================================
 
   const handleMoodChange = (mood) => {
     setSelectedMood(mood);
@@ -525,656 +514,661 @@ export default function PomodoroApp() {
   return (
     <>
       <style>{`
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-
-        body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
-          min-height: 100vh;
-          overflow-x: hidden;
-          transition: background 0.8s ease;
-        }
-
-        .app-container {
-          min-height: 100vh;
-          padding: 2rem;
-          display: flex;
-          gap: 2rem;
-          max-width: 1600px;
-          margin: 0 auto;
-        }
-
-        /* ===== NOTIFICATION POPUP ===== */
-        .notification-popup {
-          position: fixed;
-          top: 2rem;
-          right: 2rem;
-          background: white;
-          padding: 1.5rem 2rem;
-          border-radius: 16px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-          z-index: 1000;
-          animation: slideInRight 0.4s ease;
-          max-width: 400px;
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-        }
-
-        @keyframes slideInRight {
-          from {
-            opacity: 0;
-            transform: translateX(100px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        .notification-icon {
-          width: 48px;
-          height: 48px;
-          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.5rem;
-          flex-shrink: 0;
-        }
-
-        .notification-text {
-          flex: 1;
-          font-size: 1rem;
-          font-weight: 600;
-          color: #1a1a1a;
-          line-height: 1.4;
-        }
-
-        /* ===== LOGIN BUTTON ===== */
-        .login-btn {
-          position: fixed;
-          top: 2rem;
-          right: 2rem;
-          padding: 0.875rem 1.5rem;
-          background: white;
-          border: none;
-          border-radius: 12px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-weight: 600;
-          color: #1a1a1a;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-          transition: all 0.2s;
-          z-index: 100;
-        }
-
-        .login-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
-        }
-
-        /* ===== MOOD SELECTOR CARD ===== */
-        .mood-selector-card {
-          position: fixed;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: white;
-          border-radius: 24px;
-          padding: 3rem;
-          box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
-          z-index: 999;
-          max-width: 600px;
-          width: 90%;
-          animation: fadeInScale 0.3s ease;
-        }
-
-        @keyframes fadeInScale {
-          from {
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-          }
-        }
-
-        .mood-overlay {
-          position: fixed;
-          inset: 0;
-          background: rgba(0, 0, 0, 0.6);
-          backdrop-filter: blur(4px);
-          z-index: 998;
-        }
-
-        .mood-selector-header {
-          text-align: center;
-          margin-bottom: 2rem;
-        }
-
-        .mood-selector-header h2 {
-          font-size: 1.75rem;
-          font-weight: 700;
-          color: #1a1a1a;
-          margin-bottom: 0.5rem;
-        }
-
-        .mood-selector-header p {
-          font-size: 1rem;
-          color: #666;
-        }
-
-        .mood-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 1rem;
-        }
-
-        .mood-btn {
-          padding: 1.5rem 1rem;
-          border: 2px solid #e5e7eb;
-          background: white;
-          border-radius: 16px;
-          cursor: pointer;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 0.75rem;
-          transition: all 0.2s;
-          color: #666;
-        }
-
-        .mood-btn:hover {
-          border-color: #d1d5db;
-          transform: translateY(-4px);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-        }
-
-        .mood-btn.selected {
-          border-color: transparent;
-          color: white;
-          transform: scale(1.05);
-          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
-        }
-
-        .mood-label {
-          font-size: 0.9rem;
-          font-weight: 600;
-        }
-
-        .mood-time {
-          font-size: 0.8rem;
-          opacity: 0.8;
-        }
-
-        /* ===== TASK LIST CARD ===== */
-        .task-list-card {
-          flex: 0 0 420px;
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(20px);
-          border-radius: 24px;
-          padding: 2rem;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-          display: flex;
-          flex-direction: column;
-          max-height: calc(100vh - 4rem);
-        }
-
-        .task-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 1.5rem;
-        }
-
-        .task-header h2 {
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: #1a1a1a;
-        }
-
-        .task-count {
-          color: #666;
-          font-size: 0.875rem;
-          margin-left: 0.5rem;
-        }
-
-        .tasks-container {
-          flex: 1;
-          overflow-y: auto;
-          margin: 1rem -0.5rem;
-          padding: 0 0.5rem;
-        }
-
-        .tasks-container::-webkit-scrollbar {
-          width: 6px;
-        }
-
-        .tasks-container::-webkit-scrollbar-thumb {
-          background: #ddd;
-          border-radius: 3px;
-        }
-
-        .task-item {
-          display: flex;
-          align-items: center;
-          gap: 0.875rem;
-          padding: 1rem;
-          margin-bottom: 0.75rem;
-          border-radius: 12px;
-          transition: all 0.2s;
-          cursor: pointer;
-          background: #fff;
-          border: 2px solid transparent;
-        }
-
-        .task-item:hover {
-          background: #f9f9f9;
-          border-color: #e5e7eb;
-        }
-
-        .task-item.completed {
-          opacity: 0.6;
-        }
-
-        .task-item.current {
-          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
-          box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .task-item.current * {
-          color: white !important;
-        }
-
-        .task-checkbox {
-          width: 22px;
-          height: 22px;
-          border: 2px solid #ddd;
-          border-radius: 6px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-          background: white;
-          transition: all 0.2s;
-        }
-
-        .task-item.completed .task-checkbox {
-          background: #10b981;
-          border-color: #10b981;
-        }
-
-        .task-item.current .task-checkbox {
-          border-color: white;
-          background: rgba(255, 255, 255, 0.2);
-        }
-
-        .task-content {
-          flex: 1;
-          min-width: 0;
-        }
-
-        .task-text {
-          font-weight: 600;
-          font-size: 0.875rem;
-          color: #1a1a1a;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-
-        .task-item.completed .task-text {
-          text-decoration: line-through;
-        }
-
-        .delete-task-btn {
-          opacity: 0;
-          width: 32px;
-          height: 32px;
-          border: none;
-          background: #fee;
-          color: #dc2626;
-          border-radius: 8px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.2s;
-          flex-shrink: 0;
-        }
-
-        .task-item:hover .delete-task-btn {
-          opacity: 1;
-        }
-
-        .delete-task-btn:hover {
-          background: #dc2626;
-          color: white;
-        }
-
-        .add-task-container {
-          margin-top: 1rem;
-        }
-
-        .add-task-btn {
-          width: 100%;
-          padding: 0.875rem;
-          border: 2px dashed #ddd;
-          background: white;
-          border-radius: 12px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-          color: #666;
-          font-weight: 600;
-          font-size: 0.875rem;
-          transition: all 0.2s;
-        }
-
-        .add-task-btn:hover {
-          border-color: ${selectedMood?.gradient?.split(" ")[2] || "#667eea"};
-          color: ${selectedMood?.gradient?.split(" ")[2] || "#667eea"};
-          background: #f8f9ff;
-        }
-
-        .add-task-input-container {
-          display: flex;
-          gap: 0.5rem;
-          color: gray
-        }
-
-        .add-task-input {
-          flex: 1;
-          padding: 0.875rem;
-          border: 2px solid #e5e7eb;
-          border-radius: 12px;
-          font-size: 0.875rem;
-          outline: none;
-          transition: all 0.2s;
-        }
-
-        .add-task-input:focus {
-          border-color: ${selectedMood?.gradient?.split(" ")[2] || "#667eea"};
-        }
-
-        .add-task-submit {
-          padding: 0.875rem 1.25rem;
-          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
-          color: white;
-          border: none;
-          border-radius: 12px;
-          cursor: pointer;
-          font-weight: 600;
-          transition: all 0.2s;
-        }
-
-        .add-task-submit:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .empty-state {
-          text-align: center;
-          padding: 3rem 1rem;
-          color: #999;
-        }
-
-        .empty-state-icon {
-          font-size: 3rem;
-          margin-bottom: 1rem;
-        }
-
-        /* ===== RIGHT PANEL ===== */
-        .right-panel {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          gap: 2rem;
-        }
-
-        /* ===== PROGRESS CARD ===== */
-        .progress-card {
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(20px);
-          border-radius: 24px;
-          padding: 1rem;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-        }
-
-        .progress-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 1rem;
-        }
-
-        .progress-header h3 {
-          font-size: 1.125rem;
-          font-weight: 700;
-          color: #1a1a1a;
-        }
-
-        .progress-percentage {
-          font-size: 2.5rem;
-          font-weight: 700;
-          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        .progress-info {
-          font-size: 0.875rem;
-          color: #666;
-          margin-top: 0.5rem;
-        }
-
-        .progress-bar-container {
-          margin-top: 1rem;
-          height: 8px;
-          background: #f0f0f0;
-          border-radius: 4px;
-          overflow: hidden;
-        }
-
-        .progress-bar {
-          height: 100%;
-          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
-          transition: width 0.5s ease;
-          border-radius: 4px;
-        }
-
-        /* ===== TIMER CARD ===== */
-        .timer-card {
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(20px);
-          border-radius: 24px;
-          padding: 3rem 2rem;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-
-        .status-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.5rem 1rem;
-          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
-          color: white;
-          border-radius: 20px;
-          font-size: 0.875rem;
-          font-weight: 600;
-          margin-bottom: 2rem;
-        }
-
-        .status-badge.break {
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-
-        .timer-display {
-          font-size: 7rem;
-          font-weight: 700;
-          color: #1a1a1a;
-          line-height: 1;
-          margin-bottom: 2rem;
-          letter-spacing: -0.02em;
-        }
-
-        .timer-controls {
-          display: flex;
-          gap: 1rem;
-          align-items: center;
-          margin-bottom: 2rem;
-        }
-
-        .control-btn {
-          border: none;
-          border-radius: 50%;
-          cursor: pointer;
-          transition: all 0.2s;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: white;
-        }
-
-        .control-btn.primary {
-          width: 80px;
-          height: 80px;
-          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
-          color: white;
-          box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-        }
-
-        .control-btn.primary:hover {
-          transform: scale(1.05);
-          box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
-        }
-
-        .control-btn.primary:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-          transform: scale(1);
-        }
-
-        .control-btn.secondary {
-          width: 56px;
-          height: 56px;
-          background: #f5f5f5;
-          color: #666;
-        }
-
-        .control-btn.secondary:hover {
-          background: #e8e8e8;
-          color: #333;
-        }
-
-        .mood-display {
-          padding: 1rem 2rem;
-          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
-          color: white;
-          border-radius: 16px;
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s;
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .mood-display:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
-        }
-
-        .mood-display-pulse {
-          animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.05); }
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 1200px) {
-          .app-container {
-            flex-direction: column;
-          }
-
-          .task-list-card {
-            flex: none;
-            max-height: none;
-            order: 3;
-          }
-
-          .timer-card {
-            order: 1;
-          }
-
-          .progress-card {
-            order: 2;
-          }
-
-          .login-btn {
-            order: 0;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .app-container {
-            padding: 1rem;
-            gap: 1rem;
-          }
-
-          .login-btn {
-  position: static;
-  margin-bottom: 1rem;
-  margin-top: 1rem;
-  margin-right: 1rem;
-  margin-left: auto; /* empurra o botão pra direita */
-  display: flex; /* garante que o auto funcione */
-  justify-content: flex-end; /* se tiver conteúdo interno */
-}
-
-          .timer-display {
-            font-size: 4.5rem;
-          }
-
-          .control-btn.primary {
-            width: 70px;
-            height: 70px;
-          }
-
-          .mood-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-
-          .notification-popup {
-            top: 1rem;
-            right: 1rem;
-            left: 1rem;
-            max-width: none;
-          }
-        }
-      `}</style>
-
-      {/* LOGIN BUTTON - só aparece se NÃO estiver logado */}
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 0.8s ease;
+  }
+
+  .app-container {
+    min-height: 100vh;
+    padding: 2rem;
+    display: flex;
+    gap: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* ===== NOTIFICATION ===== */
+  .notification-popup {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    background: white;
+    padding: 1.25rem 1.75rem;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    animation: slideInRight 0.4s ease;
+    max-width: 380px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(100px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .notification-icon {
+    width: 44px;
+    height: 44px;
+    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .notification-text {
+    flex: 1;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.4;
+  }
+
+  /* ===== LOGIN BUTTON ===== */
+  .login-btn {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    padding: 0.75rem 1.25rem;
+    background: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #1a1a1a;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s;
+    z-index: 100;
+  }
+
+  .login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  /* ===== MOOD SELECTOR ===== */
+  .mood-selector-card {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    max-width: 560px;
+    width: 90%;
+    animation: fadeInScale 0.3s ease;
+  }
+
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  .mood-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 998;
+  }
+
+  .mood-selector-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .mood-selector-header h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+  }
+
+  .mood-selector-header p {
+    font-size: 0.95rem;
+    color: #666;
+  }
+
+  .mood-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .mood-btn {
+    padding: 1.25rem 0.875rem;
+    border: 2px solid #e5e7eb;
+    background: white;
+    border-radius: 14px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.625rem;
+    transition: all 0.2s;
+    color: #666;
+  }
+
+  .mood-btn:hover {
+    border-color: #d1d5db;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .mood-btn.selected {
+    border-color: transparent;
+    color: white;
+    transform: scale(1.03);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  .mood-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .mood-time {
+    font-size: 0.75rem;
+    opacity: 0.85;
+  }
+
+  /* ===== TASK LIST CARD ===== */
+  .task-list-card {
+    flex: 0 0 400px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 1.75rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 4rem);
+  }
+
+  .task-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+
+  .task-header h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  .task-count {
+    color: #666;
+    font-size: 0.85rem;
+    margin-left: 0.5rem;
+  }
+
+  .tasks-container {
+    flex: 1;
+    overflow-y: auto;
+    margin: 0.75rem -0.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .tasks-container::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .tasks-container::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 3px;
+  }
+
+  .task-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem;
+    margin-bottom: 0.625rem;
+    border-radius: 11px;
+    transition: all 0.2s;
+    cursor: pointer;
+    background: #fff;
+    border: 2px solid transparent;
+  }
+
+  .task-item:hover {
+    background: #f9f9f9;
+    border-color: #e5e7eb;
+  }
+
+  .task-item.completed {
+    opacity: 0.55;
+  }
+
+  .task-item.current {
+    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    box-shadow: 0 6px 18px rgba(102, 126, 234, 0.3);
+  }
+
+  .task-item.current * {
+    color: white !important;
+  }
+
+  .task-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: white;
+    transition: all 0.2s;
+  }
+
+  .task-item.completed .task-checkbox {
+    background: #10b981;
+    border-color: #10b981;
+  }
+
+  .task-item.current .task-checkbox {
+    border-color: white;
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .task-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .task-text {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #1a1a1a;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .task-item.completed .task-text {
+    text-decoration: line-through;
+  }
+
+  .delete-task-btn {
+    opacity: 0;
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: #fee;
+    color: #dc2626;
+    border-radius: 7px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .task-item:hover .delete-task-btn {
+    opacity: 1;
+  }
+
+  .delete-task-btn:hover {
+    background: #dc2626;
+    color: white;
+  }
+
+  .add-task-container {
+    margin-top: 0.875rem;
+  }
+
+  .add-task-btn {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px dashed #ddd;
+    background: white;
+    border-radius: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #666;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+
+  .add-task-btn:hover {
+    border-color: ${selectedMood?.gradient?.split(" ")[2] || "#667eea"};
+    color: ${selectedMood?.gradient?.split(" ")[2] || "#667eea"};
+    background: #f8f9ff;
+  }
+
+  .add-task-input-container {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .add-task-input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 11px;
+    font-size: 0.85rem;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .add-task-input:focus {
+    border-color: ${selectedMood?.gradient?.split(" ")[2] || "#667eea"};
+  }
+
+  .add-task-submit {
+    padding: 0.75rem 1.125rem;
+    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    color: white;
+    border: none;
+    border-radius: 11px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .add-task-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: #999;
+  }
+
+  .empty-state-icon {
+    margin-bottom: 0.875rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* ===== RIGHT PANEL ===== */
+  .right-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* ===== TIMER CARD ===== */
+  .timer-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    color: white;
+    border-radius: 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1.75rem;
+  }
+
+  .status-badge.break {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  }
+
+  .timer-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1.75rem;
+  }
+
+  .control-btn {
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+  }
+
+  .control-btn.primary {
+    width: 72px;
+    height: 72px;
+    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    color: white;
+    box-shadow: 0 8px 26px rgba(102, 126, 234, 0.4);
+  }
+
+  .control-btn.primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 32px rgba(102, 126, 234, 0.5);
+  }
+
+  .control-btn.primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: scale(1);
+  }
+
+  .control-btn.secondary {
+    width: 52px;
+    height: 52px;
+    background: #f5f5f5;
+    color: #666;
+  }
+
+  .control-btn.secondary:hover {
+    background: #e8e8e8;
+    color: #333;
+  }
+
+  .mood-display {
+    padding: 0.875rem 1.75rem;
+    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    color: white;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  }
+
+  .mood-display:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.2);
+  }
+
+  .mood-display-pulse {
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+  }
+
+  /* ===== PROGRESS CARD ===== */
+  .progress-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 1.75rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.875rem;
+  }
+
+  .progress-header h3 {
+    font-size: 1.075rem;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  .progress-percentage {
+    font-size: 2.25rem;
+    font-weight: 700;
+    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .progress-info {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.5rem;
+  }
+
+  .progress-bar-container {
+    margin-top: 1rem;
+    height: 7px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+    transition: width 0.5s ease;
+    border-radius: 4px;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 1200px) {
+    .app-container {
+      flex-direction: column;
+      padding: 1.5rem;
+      gap: 1.25rem;
+    }
+
+    .task-list-card {
+      flex: none;
+      max-height: none;
+      order: 3;
+      max-width: 100%;
+    }
+
+    .timer-card {
+      order: 1;
+    }
+
+    .progress-card {
+      order: 2;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .app-container {
+      padding: 1rem;
+      gap: 1rem;
+    }
+
+    .login-btn {
+      position: static;
+      margin: 0 0 1rem auto;
+      display: flex;
+    }
+
+    .control-btn.primary {
+      width: 64px;
+      height: 64px;
+    }
+
+    .control-btn.secondary {
+      width: 48px;
+      height: 48px;
+    }
+
+    .mood-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.875rem;
+    }
+
+    .mood-selector-card {
+      padding: 2rem;
+    }
+
+    .notification-popup {
+      top: 1rem;
+      right: 1rem;
+      left: 1rem;
+      max-width: none;
+    }
+
+    .task-list-card {
+      padding: 1.5rem;
+    }
+
+    .timer-card {
+      padding: 2rem 1.5rem;
+    }
+
+    .progress-card {
+      padding: 1.5rem;
+    }
+  }
+`}</style>
+
       {status !== "loading" && !session && (
         <button className="login-btn" onClick={handleLogin}>
           <LogIn size={20} />
@@ -1182,15 +1176,15 @@ export default function PomodoroApp() {
         </button>
       )}
 
-      {/* NOTIFICATION POPUP */}
       {showNotification && (
         <div className="notification-popup">
-          <div className="notification-icon">{isBreak ? "☕" : "🎯"}</div>
+          <div className="notification-icon">
+            {isBreak ? <Coffee size={24} /> : <Target size={24} />}
+          </div>
           <div className="notification-text">{notificationMessage}</div>
         </div>
       )}
 
-      {/* MOOD SELECTOR OVERLAY */}
       {showMoodSelector && (
         <>
           <div className="mood-overlay" onClick={() => setShowMoodSelector(false)} />
@@ -1221,7 +1215,6 @@ export default function PomodoroApp() {
       )}
 
       <div className="app-container">
-        {/* TASK LIST */}
         <Sidebar />
         <div className="task-list-card">
           <div className="task-header">
@@ -1233,7 +1226,6 @@ export default function PomodoroApp() {
             </div>
           </div>
 
-          {/* AVISO PARA USUÁRIOS NÃO LOGADOS (ADICIONADO) */}
           {!session && (
             <div
               style={{
@@ -1245,9 +1237,9 @@ export default function PomodoroApp() {
                 border: "2px dashed #fbbf24",
               }}
             >
-              <span style={{ fontSize: "2rem", display: "block", marginBottom: "0.5rem" }}>
-                🔒
-              </span>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: "0.5rem" }}>
+                <Lock size={40} color="#fbbf24" />
+              </div>
               <p style={{ fontWeight: 600, color: "#1a1a1a", marginBottom: "0.25rem" }}>
                 Suas tarefas não serão salvas
               </p>
@@ -1260,12 +1252,16 @@ export default function PomodoroApp() {
           <div className="tasks-container">
             {isLoadingTasks ? (
               <div className="empty-state">
-                <div className="empty-state-icon">⏳</div>
+                <div className="empty-state-icon">
+                  <Wind size={48} color="#999" />
+                </div>
                 <p>Carregando tarefas...</p>
               </div>
             ) : tasks.length === 0 ? (
               <div className="empty-state">
-                <div className="empty-state-icon">📝</div>
+                <div className="empty-state-icon">
+                  <BookOpen size={48} color="#999" />
+                </div>
                 <p>Nenhuma tarefa ainda</p>
                 <p style={{ fontSize: "0.875rem", marginTop: "0.5rem" }}>
                   Adicione sua primeira tarefa abaixo!
@@ -1282,14 +1278,12 @@ export default function PomodoroApp() {
                 >
                   <div className="task-checkbox">{task.completed && <Check size={14} />}</div>
 
-                  {/* ICON DA CATEGORIA (ADICIONADO) */}
-                  <span style={{ fontSize: "1.25rem" }}>
-                    {TASK_CATEGORIES[task.category]?.icon || "📌"}
-                  </span>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    {getCategoryIcon(task.category)}
+                  </div>
 
                   <div className="task-content">
                     <div className="task-text">{task.text}</div>
-                    {/* opcional: mostrar label da categoria em texto pequeno */}
                     {TASK_CATEGORIES[task.category] && (
                       <div style={{ fontSize: "0.75rem", color: "#888", marginTop: 6 }}>
                         {TASK_CATEGORIES[task.category].label}
@@ -1307,7 +1301,6 @@ export default function PomodoroApp() {
           <div className="add-task-container">
             {showAddTask ? (
               <div>
-                {/* Seletor de categoria (ADICIONADO) */}
                 <div
                   style={{
                     display: "flex",
@@ -1316,30 +1309,33 @@ export default function PomodoroApp() {
                     flexWrap: "wrap",
                   }}
                 >
-                  {Object.values(TASK_CATEGORIES).map((cat) => (
-                    <button
-                      key={cat.id}
-                      onClick={() => setSelectedCategory(cat.id)}
-                      style={{
-                        padding: "0.5rem 0.75rem",
-                        border:
-                          selectedCategory === cat.id ? `2px solid ${cat.color}` : "2px solid #e5e7eb",
-                        background: selectedCategory === cat.id ? `${cat.color}15` : "white",
-                        borderRadius: "8px",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.375rem",
-                        fontSize: "0.8rem",
-                        fontWeight: 600,
-                        color: selectedCategory === cat.id ? cat.color : "#666",
-                        transition: "all 0.2s",
-                      }}
-                    >
-                      <span>{cat.icon}</span>
-                      <span>{cat.label}</span>
-                    </button>
-                  ))}
+                  {Object.values(TASK_CATEGORIES).map((cat) => {
+                    const CategoryIcon = cat.Icon;
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => setSelectedCategory(cat.id)}
+                        style={{
+                          padding: "0.5rem 0.75rem",
+                          border:
+                            selectedCategory === cat.id ? `2px solid ${cat.color}` : "2px solid #e5e7eb",
+                          background: selectedCategory === cat.id ? `${cat.color}15` : "white",
+                          borderRadius: "8px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.375rem",
+                          fontSize: "0.8rem",
+                          fontWeight: 600,
+                          color: selectedCategory === cat.id ? cat.color : "#666",
+                          transition: "all 0.2s",
+                        }}
+                      >
+                        <CategoryIcon size={16} />
+                        <span>{cat.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
 
                 <div className="add-task-input-container">
@@ -1376,19 +1372,15 @@ export default function PomodoroApp() {
           </div>
         </div>
 
-        {/* RIGHT PANEL */}
         <div className="right-panel">
-          {/* TIMER */}
           <div className="timer-card">
             <div className={`status-badge ${isBreak ? "break" : ""}`}>
               <div style={{ width: 8, height: 8, background: "currentColor", borderRadius: "50%" }} />
               {isBreak ? "Intervalo" : "Tempo de Foco"}
             </div>
 
-            {/* CIRCULAR TIMER */}
             <div style={{ position: "relative", width: 220, height: 150, margin: "1rem auto 1.5rem" }}>
               <svg width="220" height="150" viewBox="0 0 220 150">
-                {/* Background arc */}
                 <path
                   d="M 10 120 A 100 100 0 0 1 210 120"
                   fill="none"
@@ -1396,7 +1388,6 @@ export default function PomodoroApp() {
                   strokeWidth="14"
                   strokeLinecap="round"
                 />
-                {/* Progress arc */}
                 <path
                   d="M 10 120 A 100 100 0 0 1 210 120"
                   fill="none"
@@ -1411,7 +1402,6 @@ export default function PomodoroApp() {
                 />
               </svg>
               
-              {/* Timer text in center */}
               <div style={{
                 position: "absolute",
                 top: "70%",
@@ -1473,12 +1463,12 @@ export default function PomodoroApp() {
               </div>
             ) : (
               <div className="mood-display mood-display-pulse" onClick={() => setShowMoodSelector(true)}>
-                <span>✨ Selecione seu humor para começar!</span>
+                <Sparkles size={20} />
+                <span>Selecione seu humor para começar!</span>
               </div>
             )}
           </div>
 
-          {/* DAILY PROGRESS */}
           <div className="progress-card">
             <div className="progress-header">
               <h3>Progresso Diário</h3>

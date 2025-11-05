@@ -1,288 +1,1476 @@
 "use client";
+import { useSession } from "next-auth/react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Play,
+  Pause,
+  RotateCcw,
+  Plus,
+  X,
+  Menu,
+  Coffee,
+  Brain,
+  Battery,
+  Zap,
+  Frown,
+  Smile,
+  SkipForward,
+  LogIn,
+  Check,
+  Trash2,
+  Briefcase,
+  Dumbbell,
+  Heart,
+  BookOpen,
+  Home,
+  Pin,
+  Sparkles,
+  Target,
+  Wind,
+  Lock,
+} from "lucide-react";
+import Sidebar from "@/components/teste/Sidebar";
+import LofiPlayer from "@/components/teste/LoFiPlayer";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Timer, Brain, Coffee, Zap, Smile } from "lucide-react";
-import { useRouter } from "next/navigation";
+// ============================================
+// TASK CATEGORIES
+// ============================================
+const TASK_CATEGORIES = {
+  trabalho: {
+    id: "trabalho",
+    label: "Trabalho",
+    Icon: Briefcase,
+    color: "#3b82f6",
+  },
+  "saude-fisica": {
+    id: "saude-fisica",
+    label: "Saúde Física",
+    Icon: Dumbbell,
+    color: "#10b981",
+  },
+  "saude-mental": {
+    id: "saude-mental",
+    label: "Saúde Mental",
+    Icon: Heart,
+    color: "#a855f7",
+  },
+  estudo: {
+    id: "estudo",
+    label: "Estudo",
+    Icon: BookOpen,
+    color: "#f59e0b",
+  },
+  pessoal: {
+    id: "pessoal",
+    label: "Pessoal",
+    Icon: Home,
+    color: "#ec4899",
+  },
+  outros: {
+    id: "outros",
+    label: "Outros",
+    Icon: Pin,
+    color: "#6b7280",
+  },
+};
 
-export default function FocoPage() {
-  const router = useRouter();
+// ============================================
+// MOODS CONFIGURATION
+// ============================================
+const MOODS = {
+  CREATIVE: {
+    id: "creative",
+    label: "Criativo",
+    focusTime: 25,
+    breakTime: 5,
+    gradient: "linear-gradient(135deg, #a855f7 0%, #ec4899 100%)",
+    icon: Brain,
+    focusMessages: [
+      "Deixe as ideias fluírem!",
+      "Sua criatividade está no auge!",
+      "Momento perfeito para inovar!",
+    ],
+    breakMessages: [
+      "Beba água e deixe sua mente vagar",
+      "Alongue os ombros e respire fundo",
+      "Olhe para longe e relaxe os olhos",
+    ],
+  },
+  UNMOTIVATED: {
+    id: "unmotivated",
+    label: "Desmotivado",
+    focusTime: 15,
+    breakTime: 5,
+    gradient: "linear-gradient(135deg, #64748b 0%, #475569 100%)",
+    icon: Frown,
+    focusMessages: [
+      "Você consegue! Um passo de cada vez",
+      "Pequenos progressos ainda são progressos",
+      "Seja gentil consigo mesmo hoje",
+    ],
+    breakMessages: [
+      "Respire fundo 3 vezes e beba água",
+      "Levante e caminhe um pouco",
+      "Alongue o corpo todo devagar",
+    ],
+  },
+  STRESSED: {
+    id: "stressed",
+    label: "Estressado",
+    focusTime: 20,
+    breakTime: 7,
+    gradient: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+    icon: Zap,
+    focusMessages: [
+      "Respire fundo. Você está indo bem",
+      "Um passo de cada vez. Sem pressa",
+      "Foco no presente, não no resultado",
+    ],
+    breakMessages: [
+      "RESPIRE: 4 segundos dentro, 4 fora",
+      "Beba água gelada devagar",
+      "Alongue pescoço e ombros",
+    ],
+  },
+  FOCUSED: {
+    id: "focused",
+    label: "Focado",
+    focusTime: 30,
+    breakTime: 5,
+    gradient: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+    icon: Smile,
+    focusMessages: [
+      "Foco impecável! Continue assim",
+      "Você está no flow perfeito",
+      "Mantenha esse ritmo incrível!",
+    ],
+    breakMessages: [
+      "Olhe para longe por 20 segundos",
+      "Beba água e hidrate-se",
+      "Levante e movimente as pernas",
+    ],
+  },
+  TIRED: {
+    id: "tired",
+    label: "Cansado",
+    focusTime: 15,
+    breakTime: 10,
+    gradient: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",
+    icon: Coffee,
+    focusMessages: [
+      "Devagar e sempre. Você consegue",
+      "Está tudo bem ir no seu ritmo",
+      "Faça o que puder por agora",
+    ],
+    breakMessages: [
+      "Beba água ou café",
+      "Considere um cochilo de 5min",
+      "Alongue todo o corpo",
+    ],
+  },
+  ENERGIZED: {
+    id: "energized",
+    label: "Energizado",
+    focusTime: 35,
+    breakTime: 5,
+    gradient: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+    icon: Battery,
+    focusMessages: [
+      "Energia máxima! Você está voando!",
+      "Incrível! Mantenha esse ritmo",
+      "Aproveite esse pico de produtividade",
+    ],
+    breakMessages: [
+      "Beba água para manter a energia",
+      "Alongamento rápido de 30 segundos",
+      "Olhe pela janela e respire",
+    ],
+  },
+};
 
+// ============================================
+// HOOKS
+// ============================================
+const useTimer = (initialMinutes, onComplete) => {
+  const [seconds, setSeconds] = useState(initialMinutes * 60);
+  const [isActive, setIsActive] = useState(false);
+  const intervalRef = useRef(null);
 
-  const techniques = [
-    {
-      id: "classic",
-      title: "Clássico (25/5)",
-      description:
-        "25 minutos de foco seguidos por 5 minutos de pausa. Ideal para manter ritmo estável e evitar fadiga mental. É a técnica original criada por Francesco Cirillo nos anos 80.",
-      focus: 25,
-      break: 5,
-      color: "#3b82f6",
-      icon: Brain,
-    },
-    {
-      id: "deep",
-      title: "Profundo (50/10)",
-      description:
-        "Sessões longas de 50 minutos com pausas de 10. Recomendado para trabalho analítico e concentração profunda, reduz interrupções e ajuda a entrar em ‘flow’.",
-      focus: 50,
-      break: 10,
-      color: "#10b981",
-      icon: Zap,
-    },
-    {
-      id: "soft",
-      title: "Suave (15/3)",
-      description:
-        "Curto e leve: 15 minutos de foco + 3 de pausa. Ótimo para dias de baixa energia, tarefas pequenas ou para retomar o ritmo de trabalho.",
-      focus: 15,
-      break: 3,
-      color: "#f59e0b",
-      icon: Coffee,
-    },
-    {
-      id: "intense",
-      title: "Intenso (90/20)",
-      description:
-        "90 minutos de imersão total seguidos de 20 de pausa longa. Inspirado em estudos de alto ritmo, ideal para quem já domina o foco prolongado.",
-      focus: 90,
-      break: 20,
-      color: "#ec4899",
-      icon: Smile,
-    },
-  ];
+  useEffect(() => {
+    if (isActive && seconds > 0) {
+      intervalRef.current = setInterval(() => {
+        setSeconds((s) => {
+          if (s <= 1) {
+            setIsActive(false);
+            onComplete?.();
+            return 0;
+          }
+          return s - 1;
+        });
+      }, 1000);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isActive, seconds, onComplete]);
 
-  const scienceText = `Trabalhar em blocos definidos respeita nossos ritmos e reduz sobrecarga cognitiva. Pesquisas da Universidade de Illinois (2011) comprovaram que pequenas pausas restauram a atenção.
-`;
-
-
-  const perguntas = [
-    {
-      id: 1,
-      texto: "Por quanto tempo você costuma manter o foco antes de se distrair?",
-      opcoes: [
-        { label: "Menos de 15 minutos", valor: "curto" },
-        { label: "Cerca de 25 minutos", valor: "medio" },
-        { label: "40-60 minutos", valor: "longo" },
-        { label: "Mais de 1h30", valor: "extenso" },
-      ],
-    },
-    {
-      id: 2,
-      texto: "Como está o teu nível de energia hoje?",
-      opcoes: [
-        { label: "Baixo, cansado", valor: "baixo" },
-        { label: "Normal", valor: "medio" },
-        { label: "Motivado e energizado", valor: "alto" },
-      ],
-    },
-    {
-      id: 3,
-      texto: "Qual tipo de tarefa você vai fazer?",
-      opcoes: [
-        { label: "Criativa ou artística", valor: "criativo" },
-        { label: "Analítica ou técnica", valor: "tecnico" },
-        { label: "Rotineira ou simples", valor: "rotina" },
-      ],
-    },
-  ];
-
-  const [respostas, setRespostas] = useState({});
-  const [etapa, setEtapa] = useState(0);
-  const [resultado, setResultado] = useState(null);
-
-  const handleResposta = (id, valor) => {
-    setRespostas({ ...respostas, [id]: valor });
-    setEtapa(etapa + 1);
+  const start = () => setIsActive(true);
+  const pause = () => setIsActive(false);
+  const reset = (newMinutes) => {
+    setIsActive(false);
+    setSeconds(newMinutes * 60);
   };
 
-  const calcularResultado = () => {
-    const foco = respostas[1];
-    const energia = respostas[2];
-    const tipo = respostas[3];
+  return { seconds, isActive, start, pause, reset };
+};
 
-    if (energia === "baixo" || foco === "curto")
-      setResultado({
-        nome: "Suave (15/3)",
-        descricao:
-          "Perfeito para recomeçar e manter a leveza.",
-        cor: "#f59e0b",
-        icon: Coffee,
-        mood: "tired",
-      });
-    else if (foco === "medio" && energia === "medio")
-      setResultado({
-        nome: "Clássico (25/5)",
-        descricao:
-          "Equilíbrio ideal entre foco e descanso. O método Pomodoro tradicional.",
-        cor: "#3b82f6",
-        icon: Brain,
-        mood: "creative",
-      });
-    else if (foco === "longo" || tipo === "tecnico")
-      setResultado({
-        nome: "Profundo (50/10)",
-        descricao:
-          "Excelente para manter foco intenso em tarefas complexas e analíticas.",
-        cor: "#10b981",
-        icon: Zap,
-        mood: "focused",
-      });
-    else
-      setResultado({
-        nome: "Intenso (90/20)",
-        descricao:
-          "Modo avançado para quem domina a atenção prolongada e quer explorar o ‘flow’.",
-        cor: "#ec4899",
-        icon: Smile,
-        mood: "energized",
-      });
+// ============================================
+// MAIN APP
+// ============================================
+export default function PomodoroApp() {
+  const { data: session, status } = useSession();
+
+  const [tasks, setTasks] = useState([]);
+  const [selectedMood, setSelectedMood] = useState(null);
+  const [isBreak, setIsBreak] = useState(false);
+  const [pomodorosCompleted, setPomodorosCompleted] = useState(0);
+  const [newTaskText, setNewTaskText] = useState("");
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [showMoodSelector, setShowMoodSelector] = useState(false);
+  const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
+  const [showAddTask, setShowAddTask] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("outros");
+  const [showCategorySelector, setShowCategorySelector] = useState(false);
+  const [isLoadingTasks, setIsLoadingTasks] = useState(true);
+
+  const focusTime = selectedMood?.focusTime || 25;
+  const breakTime = selectedMood?.breakTime || 5;
+
+  // Helper para renderizar ícones de categoria
+  const getCategoryIcon = (categoryId) => {
+    const IconComponent = TASK_CATEGORIES[categoryId]?.Icon || Pin;
+    return <IconComponent size={20} color={TASK_CATEGORIES[categoryId]?.color || "#6b7280"} />;
   };
 
-  const handleEscolher = () => {
-    router.push(`/dashboard/pomodoro?mode=${resultado.mood}`);
+  const showNotif = (message) => {
+    setNotificationMessage(message);
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 4000);
+
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification("Pomodoro Timer", { body: message });
+    }
   };
 
+  const handleTimerComplete = () => {
+    if (!isBreak) {
+      if (tasks[currentTaskIndex] && !tasks[currentTaskIndex].completed) {
+        const newTasks = [...tasks];
+        newTasks[currentTaskIndex].completed = true;
+        setTasks(newTasks);
+      }
+
+      setPomodorosCompleted((p) => p + 1);
+      setIsBreak(true);
+      timer.reset(breakTime);
+
+      const messages = selectedMood?.breakMessages || ["Beba água!", "Alongue-se!", "Descanse os olhos"];
+      showNotif(messages[Math.floor(Math.random() * messages.length)]);
+    } else {
+      setIsBreak(false);
+
+      const nextIndex = tasks.findIndex((t, i) => i > currentTaskIndex && !t.completed);
+      if (nextIndex !== -1) {
+        setCurrentTaskIndex(nextIndex);
+      }
+
+      timer.reset(focusTime);
+
+      const messages = selectedMood?.focusMessages || ["Vamos lá!", "Foco total!"];
+      showNotif(messages[Math.floor(Math.random() * messages.length)]);
+    }
+  };
+
+  const timer = useTimer(focusTime, handleTimerComplete);
+
+  const handleStart = () => {
+    if (!selectedMood) {
+      showNotif("Selecione seu humor primeiro!");
+      setShowMoodSelector(true);
+      return;
+    }
+
+    timer.start();
+
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+
+    if (!isBreak) {
+      const messages = selectedMood?.focusMessages || ["Foco!"];
+      showNotif(messages[Math.floor(Math.random() * messages.length)]);
+    }
+  };
+
+  useEffect(() => {
+    if (session?.user) {
+      loadTasks();
+    } else {
+      setIsLoadingTasks(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session]);
+
+  const loadTasks = async () => {
+    try {
+      setIsLoadingTasks(true);
+      const res = await fetch("/api/tasks");
+      const data = await res.json();
+
+      if (res.ok) {
+        setTasks(
+          data.tasks.map((t) => ({
+            ...t,
+            id: t._id,
+          }))
+        );
+      } else {
+        showNotif("Erro ao carregar tarefas");
+      }
+    } catch (error) {
+      console.error("Erro ao carregar tasks:", error);
+      showNotif("Erro ao carregar tarefas");
+    } finally {
+      setIsLoadingTasks(false);
+    }
+  };
+
+  const addTask = async () => {
+    if (!newTaskText.trim()) return;
+
+    if (session?.user) {
+      try {
+        const res = await fetch("/api/tasks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: newTaskText.trim(),
+            category: selectedCategory,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          setTasks([
+            {
+              ...data.task,
+              id: data.task._id,
+            },
+            ...tasks,
+          ]);
+          setNewTaskText("");
+          setShowAddTask(false);
+          showNotif("Tarefa adicionada!");
+        } else {
+          console.error("Erro do servidor ao adicionar task:", data);
+          showNotif("Erro ao adicionar tarefa");
+        }
+      } catch (error) {
+        console.error("Erro ao adicionar task:", error);
+        showNotif("Erro ao adicionar tarefa");
+      }
+    } else {
+      setTasks([
+        {
+          id: Date.now(),
+          text: newTaskText.trim(),
+          completed: false,
+          category: selectedCategory || "outros",
+          createdAt: new Date().toISOString(),
+        },
+        ...tasks,
+      ]);
+      setNewTaskText("");
+      setShowAddTask(false);
+      showNotif("Tarefa adicionada localmente (faça login para salvar).");
+    }
+  };
+
+  const toggleTask = async (id) => {
+    if (session?.user) {
+      const task = tasks.find((t) => t.id === id);
+      if (!task) return;
+      const newCompleted = !task.completed;
+
+      setTasks(
+        tasks.map((t) => (t.id === id ? { ...t, completed: newCompleted } : t))
+      );
+
+      try {
+        const res = await fetch(`/api/tasks/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ completed: newCompleted }),
+        });
+
+        if (!res.ok) {
+          setTasks(
+            tasks.map((t) => (t.id === id ? { ...t, completed: !newCompleted } : t))
+          );
+          showNotif("Erro ao atualizar tarefa");
+        }
+      } catch (error) {
+        console.error("Erro ao toggle task:", error);
+        setTasks(
+          tasks.map((t) => (t.id === id ? { ...t, completed: !newCompleted } : t))
+        );
+      }
+    } else {
+      setTasks(tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)));
+    }
+  };
+
+  const deleteTask = async (id, e) => {
+    e.stopPropagation();
+
+    if (session?.user) {
+      const oldTasks = [...tasks];
+      setTasks(tasks.filter((t) => t.id !== id));
+
+      try {
+        const res = await fetch(`/api/tasks/${id}`, {
+          method: "DELETE",
+        });
+
+        if (!res.ok) {
+          setTasks(oldTasks);
+          showNotif("Erro ao deletar tarefa");
+        } else {
+          showNotif("Tarefa removida!");
+        }
+      } catch (error) {
+        console.error("Erro ao deletar task:", error);
+        setTasks(oldTasks);
+        showNotif("Erro ao deletar tarefa");
+      }
+    } else {
+      setTasks(tasks.filter((t) => t.id !== id));
+    }
+  };
+
+  const updateTaskText = async (id, newText) => {
+    if (!newText.trim()) return;
+
+    if (session?.user) {
+      try {
+        const res = await fetch(`/api/tasks/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: newText.trim() }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setTasks(tasks.map((t) => (t.id === id ? { ...data.task, id: data.task._id } : t)));
+          showNotif("Tarefa atualizada!");
+        } else {
+          const error = await res.json();
+          console.error("Erro do servidor:", error);
+          showNotif("Erro ao atualizar tarefa");
+        }
+      } catch (error) {
+        console.error("Erro ao atualizar texto:", error);
+        showNotif("Erro ao atualizar tarefa");
+      }
+    } else {
+      setTasks(tasks.map((t) => (t.id === id ? { ...t, text: newText.trim() } : t)));
+      showNotif("Tarefa atualizada localmente (faça login para salvar).");
+    }
+  };
+
+  const handleMoodChange = (mood) => {
+    setSelectedMood(mood);
+    setShowMoodSelector(false);
+    if (!timer.isActive) {
+      timer.reset(mood.focusTime);
+    }
+    showNotif(`Humor "${mood.label}" selecionado! ${mood.focusTime}min de foco`);
+  };
+
+  const completedTasks = tasks.filter((t) => t.completed).length;
+  const progress = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
+
+  const handleLogin = () => {
+    window.location.href = "/login";
+  };
+
+  const minutes = Math.floor(timer.seconds / 60);
+  const secs = timer.seconds % 60;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 px-6 py-16 flex flex-col items-center">
-      <motion.h1
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-3xl md:text-4xl font-bold text-slate-800 text-center mb-6"
-      >
-        Foco e Produtividade
-      </motion.h1>
+    <>
+      <style>{`
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
 
-      <p className="text-slate-600 text-center max-w-2xl mb-12">
-        Conhece as variações da Técnica Pomodoro e descobre qual ritmo de foco
-        combina contigo hoje.
-      </p>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+          min-height: 100vh;
+          overflow-x: hidden;
+          transition: background 0.8s ease;
+        }
 
-      {/* ======= CARDS DAS TÉCNICAS ======= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 mb-12 max-w-5xl w-full">
-        {techniques.map((tech) => {
-          const Icon = tech.icon;
-          return (
-            <motion.div
-              key={tech.id}
-              whileHover={{ scale: 1.02 }}
-              className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg flex flex-col justify-between hover:shadow-xl transition-all"
+        .app-container {
+          min-height: 100vh;
+          padding: 2rem;
+          display: flex;
+          gap: 2rem;
+          max-width: 1600px;
+          margin: 0 auto;
+        }
+
+        .notification-popup {
+          position: fixed;
+          top: 2rem;
+          right: 2rem;
+          background: white;
+          padding: 1.5rem 2rem;
+          border-radius: 16px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          z-index: 1000;
+          animation: slideInRight 0.4s ease;
+          max-width: 400px;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        @keyframes slideInRight {
+          from {
+            opacity: 0;
+            transform: translateX(100px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        .notification-icon {
+          width: 48px;
+          height: 48px;
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          flex-shrink: 0;
+        }
+
+        .notification-text {
+          flex: 1;
+          font-size: 1rem;
+          font-weight: 600;
+          color: #1a1a1a;
+          line-height: 1.4;
+        }
+
+        .login-btn {
+          position: fixed;
+          top: 2rem;
+          right: 2rem;
+          padding: 0.875rem 1.5rem;
+          background: white;
+          border: none;
+          border-radius: 12px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-weight: 600;
+          color: #1a1a1a;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+          transition: all 0.2s;
+          z-index: 100;
+        }
+
+        .login-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .mood-selector-card {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: white;
+          border-radius: 24px;
+          padding: 3rem;
+          box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
+          z-index: 999;
+          max-width: 600px;
+          width: 90%;
+          animation: fadeInScale 0.3s ease;
+        }
+
+        @keyframes fadeInScale {
+          from {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+          }
+        }
+
+        .mood-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(4px);
+          z-index: 998;
+        }
+
+        .mood-selector-header {
+          text-align: center;
+          margin-bottom: 2rem;
+        }
+
+        .mood-selector-header h2 {
+          font-size: 1.75rem;
+          font-weight: 700;
+          color: #1a1a1a;
+          margin-bottom: 0.5rem;
+        }
+
+        .mood-selector-header p {
+          font-size: 1rem;
+          color: #666;
+        }
+
+        .mood-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1rem;
+        }
+
+        .mood-btn {
+          padding: 1.5rem 1rem;
+          border: 2px solid #e5e7eb;
+          background: white;
+          border-radius: 16px;
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.75rem;
+          transition: all 0.2s;
+          color: #666;
+        }
+
+        .mood-btn:hover {
+          border-color: #d1d5db;
+          transform: translateY(-4px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .mood-btn.selected {
+          border-color: transparent;
+          color: white;
+          transform: scale(1.05);
+          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .mood-label {
+          font-size: 0.9rem;
+          font-weight: 600;
+        }
+
+        .mood-time {
+          font-size: 0.8rem;
+          opacity: 0.8;
+        }
+
+        .task-list-card {
+          flex: 0 0 420px;
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(20px);
+          border-radius: 24px;
+          padding: 2rem;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+          display: flex;
+          flex-direction: column;
+          max-height: calc(100vh - 4rem);
+        }
+
+        .task-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 1.5rem;
+        }
+
+        .task-header h2 {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: #1a1a1a;
+        }
+
+        .task-count {
+          color: #666;
+          font-size: 0.875rem;
+          margin-left: 0.5rem;
+        }
+
+        .tasks-container {
+          flex: 1;
+          overflow-y: auto;
+          margin: 1rem -0.5rem;
+          padding: 0 0.5rem;
+        }
+
+        .tasks-container::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        .tasks-container::-webkit-scrollbar-thumb {
+          background: #ddd;
+          border-radius: 3px;
+        }
+
+        .task-item {
+          display: flex;
+          align-items: center;
+          gap: 0.875rem;
+          padding: 1rem;
+          margin-bottom: 0.75rem;
+          border-radius: 12px;
+          transition: all 0.2s;
+          cursor: pointer;
+          background: #fff;
+          border: 2px solid transparent;
+        }
+
+        .task-item:hover {
+          background: #f9f9f9;
+          border-color: #e5e7eb;
+        }
+
+        .task-item.completed {
+          opacity: 0.6;
+        }
+
+        .task-item.current {
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+          box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .task-item.current * {
+          color: white !important;
+        }
+
+        .task-checkbox {
+          width: 22px;
+          height: 22px;
+          border: 2px solid #ddd;
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          background: white;
+          transition: all 0.2s;
+        }
+
+        .task-item.completed .task-checkbox {
+          background: #10b981;
+          border-color: #10b981;
+        }
+
+        .task-item.current .task-checkbox {
+          border-color: white;
+          background: rgba(255, 255, 255, 0.2);
+        }
+
+        .task-content {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .task-text {
+          font-weight: 600;
+          font-size: 0.875rem;
+          color: #1a1a1a;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        .task-item.completed .task-text {
+          text-decoration: line-through;
+        }
+
+        .delete-task-btn {
+          opacity: 0;
+          width: 32px;
+          height: 32px;
+          border: none;
+          background: #fee;
+          color: #dc2626;
+          border-radius: 8px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s;
+          flex-shrink: 0;
+        }
+
+        .task-item:hover .delete-task-btn {
+          opacity: 1;
+        }
+
+        .delete-task-btn:hover {
+          background: #dc2626;
+          color: white;
+        }
+
+        .add-task-container {
+          margin-top: 1rem;
+        }
+
+        .add-task-btn {
+          width: 100%;
+          padding: 0.875rem;
+          border: 2px dashed #ddd;
+          background: white;
+          border-radius: 12px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          color: #666;
+          font-weight: 600;
+          font-size: 0.875rem;
+          transition: all 0.2s;
+        }
+
+        .add-task-btn:hover {
+          border-color: ${selectedMood?.gradient?.split(" ")[2] || "#667eea"};
+          color: ${selectedMood?.gradient?.split(" ")[2] || "#667eea"};
+          background: #f8f9ff;
+        }
+
+        .add-task-input-container {
+          display: flex;
+          gap: 0.5rem;
+        }
+
+        .add-task-input {
+          flex: 1;
+          padding: 0.875rem;
+          border: 2px solid #e5e7eb;
+          border-radius: 12px;
+          font-size: 0.875rem;
+          outline: none;
+          transition: all 0.2s;
+        }
+
+        .add-task-input:focus {
+          border-color: ${selectedMood?.gradient?.split(" ")[2] || "#667eea"};
+        }
+
+        .add-task-submit {
+          padding: 0.875rem 1.25rem;
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+          color: white;
+          border: none;
+          border-radius: 12px;
+          cursor: pointer;
+          font-weight: 600;
+          transition: all 0.2s;
+        }
+
+        .add-task-submit:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .empty-state {
+          text-align: center;
+          padding: 3rem 1rem;
+          color: #999;
+        }
+
+        .empty-state-icon {
+          margin-bottom: 1rem;
+          display: flex;
+          justify-content: center;
+        }
+
+        .right-panel {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+        }
+
+        .progress-card {
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(20px);
+          border-radius: 24px;
+          padding: 1rem;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .progress-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1rem;
+        }
+
+        .progress-header h3 {
+          font-size: 1.125rem;
+          font-weight: 700;
+          color: #1a1a1a;
+        }
+
+        .progress-percentage {
+          font-size: 2.5rem;
+          font-weight: 700;
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .progress-info {
+          font-size: 0.875rem;
+          color: #666;
+          margin-top: 0.5rem;
+        }
+
+        .progress-bar-container {
+          margin-top: 1rem;
+          height: 8px;
+          background: #f0f0f0;
+          border-radius: 4px;
+          overflow: hidden;
+        }
+
+        .progress-bar {
+          height: 100%;
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+          transition: width 0.5s ease;
+          border-radius: 4px;
+        }
+
+        .timer-card {
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(20px);
+          border-radius: 24px;
+          padding: 3rem 2rem;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .status-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 1rem;
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+          color: white;
+          border-radius: 20px;
+          font-size: 0.875rem;
+          font-weight: 600;
+          margin-bottom: 2rem;
+        }
+
+        .status-badge.break {
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .timer-display {
+          font-size: 7rem;
+          font-weight: 700;
+          color: #1a1a1a;
+          line-height: 1;
+          margin-bottom: 2rem;
+          letter-spacing: -0.02em;
+        }
+
+        .timer-controls {
+          display: flex;
+          gap: 1rem;
+          align-items: center;
+          margin-bottom: 2rem;
+        }
+
+        .control-btn {
+          border: none;
+          border-radius: 50%;
+          cursor: pointer;
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: white;
+        }
+
+        .control-btn.primary {
+          width: 80px;
+          height: 80px;
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+          color: white;
+          box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .control-btn.primary:hover {
+          transform: scale(1.05);
+          box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+        }
+
+        .control-btn.primary:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          transform: scale(1);
+        }
+
+        .control-btn.secondary {
+          width: 56px;
+          height: 56px;
+          background: #f5f5f5;
+          color: #666;
+        }
+
+        .control-btn.secondary:hover {
+          background: #e8e8e8;
+          color: #333;
+        }
+
+        .mood-display {
+          padding: 1rem 2rem;
+          background: ${selectedMood?.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+          color: white;
+          border-radius: 16px;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .mood-display:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+        }
+
+        .mood-display-pulse {
+          animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+        }
+
+        @media (max-width: 1200px) {
+          .app-container {
+            flex-direction: column;
+          }
+
+          .task-list-card {
+            flex: none;
+            max-height: none;
+            order: 3;
+          }
+
+          .timer-card {
+            order: 1;
+          }
+
+          .progress-card {
+            order: 2;
+          }
+
+          .login-btn {
+            order: 0;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .app-container {
+            padding: 1rem;
+            gap: 1rem;
+          }
+
+          .login-btn {
+            position: static;
+            margin-bottom: 1rem;
+            margin-top: 1rem;
+            margin-right: 1rem;
+            margin-left: auto;
+            display: flex;
+            justify-content: flex-end;
+          }
+
+          .timer-display {
+            font-size: 4.5rem;
+          }
+
+          .control-btn.primary {
+            width: 70px;
+            height: 70px;
+          }
+
+          .mood-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .notification-popup {
+            top: 1rem;
+            right: 1rem;
+            left: 1rem;
+            max-width: none;
+          }
+        }
+      `}</style>
+
+      {status !== "loading" && !session && (
+        <button className="login-btn" onClick={handleLogin}>
+          <LogIn size={20} />
+          Login
+        </button>
+      )}
+
+      {showNotification && (
+        <div className="notification-popup">
+          <div className="notification-icon">
+            {isBreak ? <Coffee size={24} /> : <Target size={24} />}
+          </div>
+          <div className="notification-text">{notificationMessage}</div>
+        </div>
+      )}
+
+      {showMoodSelector && (
+        <>
+          <div className="mood-overlay" onClick={() => setShowMoodSelector(false)} />
+          <div className="mood-selector-card">
+            <div className="mood-selector-header">
+              <h2>Como você está se sentindo?</h2>
+              <p>Vamos ajustar o timer para seu estado de espírito</p>
+            </div>
+            <div className="mood-grid">
+              {Object.values(MOODS).map((mood) => {
+                const Icon = mood.icon;
+                return (
+                  <button
+                    key={mood.id}
+                    onClick={() => handleMoodChange(mood)}
+                    className={`mood-btn ${selectedMood?.id === mood.id ? "selected" : ""}`}
+                    style={selectedMood?.id === mood.id ? { background: mood.gradient } : {}}
+                  >
+                    <Icon size={28} />
+                    <span className="mood-label">{mood.label}</span>
+                    <span className="mood-time">{mood.focusTime}min foco</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
+
+      <div className="app-container">
+        <Sidebar />
+        <div className="task-list-card">
+          <div className="task-header">
+            <div>
+              <h2>
+                Minhas Tarefas
+                <span className="task-count">({tasks.length})</span>
+              </h2>
+            </div>
+          </div>
+
+          {!session && (
+            <div
+              style={{
+                background: "rgba(255, 255, 255, 0.95)",
+                borderRadius: "16px",
+                padding: "1.5rem",
+                marginBottom: "2rem",
+                textAlign: "center",
+                border: "2px dashed #fbbf24",
+              }}
             >
-              <div className="flex items-center gap-3 mb-3">
-                <Icon size={28} color={tech.color} />
-                <h3
-                  className="text-xl font-semibold"
-                  style={{ color: tech.color }}
-                >
-                  {tech.title}
-                </h3>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: "0.5rem" }}>
+                <Lock size={40} color="#fbbf24" />
               </div>
-              <p className="text-slate-700 mb-3">{tech.description}</p>
-              <span className="text-sm text-slate-500">
-                Foco: {tech.focus} min • Pausa: {tech.break} min
-              </span>
-            </motion.div>
-          );
-        })}
-      </div>
+              <p style={{ fontWeight: 600, color: "#1a1a1a", marginBottom: "0.25rem" }}>
+                Suas tarefas não serão salvas
+              </p>
+              <p style={{ fontSize: "0.875rem", color: "#666" }}>
+                Faça login para manter suas tarefas!
+              </p>
+            </div>
+          )}
 
-      <motion.div
-        className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg max-w-3xl mb-14"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
-        viewport={{ once: true }}
-      >
-        <p className="text-slate-700 leading-relaxed whitespace-pre-line text-sm md:text-base">
-          {scienceText}
-        </p>
-      </motion.div>
-
-      <AnimatePresence mode="wait">
-        {!resultado && etapa < perguntas.length && (
-          <motion.div
-            key={etapa}
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -40 }}
-            transition={{ duration: 0.4 }}
-            className="bg-white/90 backdrop-blur-lg p-8 rounded-2xl shadow-xl w-full max-w-md text-center"
-          >
-            <h2 className="text-xl font-semibold text-slate-800 mb-6">
-              {perguntas[etapa].texto}
-            </h2>
-            <div className="flex flex-col gap-4">
-              {perguntas[etapa].opcoes.map((op, i) => (
-                <motion.button
-                  key={i}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => handleResposta(perguntas[etapa].id, op.valor)}
-                  className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md text-slate-700 font-medium transition"
+          <div className="tasks-container">
+            {isLoadingTasks ? (
+              <div className="empty-state">
+                <div className="empty-state-icon">
+                  <Wind size={48} color="#999" />
+                </div>
+                <p>Carregando tarefas...</p>
+              </div>
+            ) : tasks.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-state-icon">
+                  <BookOpen size={48} color="#999" />
+                </div>
+                <p>Nenhuma tarefa ainda</p>
+                <p style={{ fontSize: "0.875rem", marginTop: "0.5rem" }}>
+                  Adicione sua primeira tarefa abaixo!
+                </p>
+              </div>
+            ) : (
+              tasks.map((task, index) => (
+                <div
+                  key={task.id}
+                  className={`task-item ${task.completed ? "completed" : ""} ${
+                    index === currentTaskIndex && !task.completed ? "current" : ""
+                  }`}
+                  onClick={() => toggleTask(task.id)}
                 >
-                  {op.label}
-                </motion.button>
-              ))}
-            </div>
-            <div className="text-sm text-slate-400 mt-6">
-              Pergunta {etapa + 1} de {perguntas.length}
-            </div>
-          </motion.div>
-        )}
+                  <div className="task-checkbox">{task.completed && <Check size={14} />}</div>
 
-        {!resultado && etapa === perguntas.length && (
-          <motion.div
-            key="final"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="bg-white/90 backdrop-blur-lg p-8 rounded-2xl shadow-xl w-full max-w-md text-center"
-          >
-            <h2 className="text-2xl font-bold text-slate-800 mb-6">
-              Pronto para descobrir o teu modo de foco?
-            </h2>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={calcularResultado}
-              className="bg-indigo-500 text-white font-semibold py-3 px-6 rounded-xl flex items-center justify-center gap-2 mx-auto"
-            >
-              <ArrowRight size={18} /> Ver resultado
-            </motion.button>
-          </motion.div>
-        )}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    {getCategoryIcon(task.category)}
+                  </div>
 
-        {resultado && (
-          <motion.div
-            key="resultado"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="bg-white/90 backdrop-blur-lg p-8 rounded-2xl shadow-xl w-full max-w-md text-center"
-          >
-            <div className="flex justify-center mb-4" style={{ color: resultado.cor }}>
-              {<resultado.icon size={48} />}
+                  <div className="task-content">
+                    <div className="task-text">{task.text}</div>
+                    {TASK_CATEGORIES[task.category] && (
+                      <div style={{ fontSize: "0.75rem", color: "#888", marginTop: 6 }}>
+                        {TASK_CATEGORIES[task.category].label}
+                      </div>
+                    )}
+                  </div>
+                  <button className="delete-task-btn" onClick={(e) => deleteTask(task.id, e)}>
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="add-task-container">
+            {showAddTask ? (
+              <div>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "0.5rem",
+                    marginBottom: "0.75rem",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {Object.values(TASK_CATEGORIES).map((cat) => {
+                    const CategoryIcon = cat.Icon;
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => setSelectedCategory(cat.id)}
+                        style={{
+                          padding: "0.5rem 0.75rem",
+                          border:
+                            selectedCategory === cat.id ? `2px solid ${cat.color}` : "2px solid #e5e7eb",
+                          background: selectedCategory === cat.id ? `${cat.color}15` : "white",
+                          borderRadius: "8px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.375rem",
+                          fontSize: "0.8rem",
+                          fontWeight: 600,
+                          color: selectedCategory === cat.id ? cat.color : "#666",
+                          transition: "all 0.2s",
+                        }}
+                      >
+                        <CategoryIcon size={16} />
+                        <span>{cat.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="add-task-input-container">
+                  <input
+                    type="text"
+                    className="add-task-input"
+                    placeholder="Digite sua tarefa..."
+                    value={newTaskText}
+                    onChange={(e) => setNewTaskText(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && addTask()}
+                    autoFocus
+                  />
+                  <button className="add-task-submit" onClick={addTask}>
+                    <Plus size={20} />
+                  </button>
+                  <button
+                    className="control-btn secondary"
+                    style={{ width: 44, height: 44 }}
+                    onClick={() => {
+                      setShowAddTask(false);
+                      setNewTaskText("");
+                    }}
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button className="add-task-btn" onClick={() => setShowAddTask(true)}>
+                <Plus size={18} />
+                Adicionar Tarefa
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="right-panel">
+          <div className="timer-card">
+            <div className={`status-badge ${isBreak ? "break" : ""}`}>
+              <div style={{ width: 8, height: 8, background: "currentColor", borderRadius: "50%" }} />
+              {isBreak ? "Intervalo" : "Tempo de Foco"}
             </div>
-            <h2
-              className="text-2xl font-bold mb-2"
-              style={{ color: resultado.cor }}
-            >
-              {resultado.nome}
-            </h2>
-            <p className="text-slate-600 mb-6">{resultado.descricao}</p>
 
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleEscolher}
-              className="bg-slate-900 text-white font-semibold py-3 px-6 rounded-xl flex items-center justify-center gap-2 mx-auto"
-            >
-              <Timer size={18} /> Ir para o Pomodoro
-            </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+            <div style={{ position: "relative", width: 220, height: 150, margin: "1rem auto 1.5rem" }}>
+              <svg width="220" height="150" viewBox="0 0 220 150">
+                <path
+                  d="M 10 120 A 100 100 0 0 1 210 120"
+                  fill="none"
+                  stroke="#f0f0f0"
+                  strokeWidth="14"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M 10 120 A 100 100 0 0 1 210 120"
+                  fill="none"
+                  stroke={selectedMood ? selectedMood.gradient.match(/#[a-f0-9]{6}/i)[0] : "#667eea"}
+                  strokeWidth="14"
+                  strokeLinecap="round"
+                  strokeDasharray={314}
+                  strokeDashoffset={314 - (314 * timer.seconds / ((isBreak ? breakTime : focusTime) * 60))}
+                  style={{ 
+                    transition: "stroke-dashoffset 1s linear, stroke 0.3s ease"
+                  }}
+                />
+              </svg>
+              
+              <div style={{
+                position: "absolute",
+                top: "70%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                textAlign: "center"
+              }}>
+                <div style={{ 
+                  fontSize: "3rem", 
+                  fontWeight: 700,
+                  color: "#1a1a1a",
+                  lineHeight: 1,
+                  marginBottom: "0.4rem"
+                }}>
+                  {String(minutes).padStart(2, "0")}:{String(secs).padStart(2, "0")}
+                </div>
+                <div style={{ 
+                  fontSize: "0.8rem", 
+                  color: "#999", 
+                  fontWeight: 600,
+                  maxWidth: "160px",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap"
+                }}>
+                  {tasks[currentTaskIndex] && !tasks[currentTaskIndex].completed 
+                    ? tasks[currentTaskIndex].text
+                    : "Nenhuma tarefa"}
+                </div>
+              </div>
+            </div>
+
+            <div className="timer-controls">
+              <button className="control-btn secondary" onClick={() => timer.reset(isBreak ? breakTime : focusTime)}>
+                <RotateCcw size={20} />
+              </button>
+              <button
+                className="control-btn primary"
+                onClick={timer.isActive ? timer.pause : handleStart}
+                disabled={!selectedMood}
+              >
+                {timer.isActive ? <Pause size={28} /> : <Play size={28} style={{ marginLeft: 2 }} />}
+              </button>
+              <button
+                className="control-btn secondary"
+                onClick={() => {
+                  setIsBreak(!isBreak);
+                  timer.reset(isBreak ? focusTime : breakTime);
+                }}
+              >
+                <SkipForward size={20} />
+              </button>
+            </div>
+
+            {selectedMood ? (
+              <div className="mood-display" onClick={() => setShowMoodSelector(true)}>
+                {React.createElement(selectedMood.icon, { size: 20 })}
+                <span>Humor: {selectedMood.label}</span>
+              </div>
+            ) : (
+              <div className="mood-display mood-display-pulse" onClick={() => setShowMoodSelector(true)}>
+                <Sparkles size={20} />
+                <span>Selecione seu humor para começar!</span>
+              </div>
+            )}
+          </div>
+
+          <div className="progress-card">
+            <div className="progress-header">
+              <h3>Progresso Diário</h3>
+              <div className="progress-percentage">{progress}%</div>
+            </div>
+            <div className="progress-info">
+              {completedTasks}/{tasks.length} tarefas concluídas • {pomodorosCompleted} pomodoros
+            </div>
+            <div className="progress-bar-container">
+              <div className="progress-bar" style={{ width: `${progress}%` }} />
+            </div>
+          </div>
+
+          <LofiPlayer selectedMood={selectedMood} />
+        </div>
+      </div>
+    </>
   );
 }
