@@ -83,6 +83,24 @@ function LoginFormContent() {
   return (
     <>
       <style>{`
+        .form-input {
+  color: #1a1a1a; /* texto preto suave */
+  background: white;
+}
+
+/* Corrige a cor dos placeholders */
+.form-input::placeholder {
+  color: #9ca3af; /* cinza visível */
+  opacity: 1; /* garante que a cor seja aplicada */
+}
+
+/* Modo focado (borda e texto com destaque) */
+.form-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  color: #111827; /* um pouco mais escuro ao digitar */
+}
+        
         .pomodoro-login {
           min-height: 100vh;
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

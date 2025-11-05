@@ -62,6 +62,24 @@ export default function RegisterForm() {
   return (
     <>
       <style>{`
+        /* Corrige a cor do texto dos inputs */
+.form-input {
+  color: #1a1a1a; /* texto preto suave */
+  background: white;
+}
+
+/* Corrige a cor dos placeholders */
+.form-input::placeholder {
+  color: #9ca3af; /* cinza visível */
+  opacity: 1; /* garante que a cor seja aplicada */
+}
+        
+.form-input:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+  color: #111827;
+}
+
         .pomodoro-register {
           min-height: 100vh;
           background: linear-gradient(135deg, #10b981 0%, #059669 100%);
