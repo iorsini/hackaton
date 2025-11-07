@@ -8,8 +8,6 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.0-38bdf8)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-![Pomofy Banner](https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=1200&h=400&fit=crop)
-
 ---
 
 ## ✨ Features
@@ -24,12 +22,6 @@
 - Track completion with visual progress
 - Automatic task completion on Pomodoro finish
 
-### 🏠 **Study Rooms**
-- Create collaborative study spaces
-- Invite friends with unique room codes
-- Real-time activity tracking
-- Room-specific leaderboards
-
 ### 📊 **Statistics & Gamification**
 - Track daily, weekly, monthly progress
 - Streak counter for consistency
@@ -39,7 +31,6 @@
 ### 🎨 **Modern UI/UX**
 - Smooth animations with Framer Motion
 - Responsive design (mobile-first)
-- Dark mode ready
 - Beautiful gradients and glassmorphism effects
 
 ### 🔐 **Authentication**
@@ -133,7 +124,6 @@ src/
 │   ├── api/                    # API routes
 │   │   ├── auth/              # Authentication endpoints
 │   │   ├── tasks/             # Task management
-│   │   ├── rooms/             # Study rooms
 │   │   ├── users/             # User management
 │   │   └── cycle/             # Pomodoro cycles
 │   ├── dashboard/             # Dashboard pages
@@ -197,16 +187,6 @@ PATCH  /api/tasks/[id]             # Update task
 DELETE /api/tasks/[id]             # Delete task
 ```
 
-### Rooms
-```
-GET    /api/rooms                  # List user rooms
-POST   /api/rooms/create           # Create room
-POST   /api/rooms/join             # Join room by code
-GET    /api/rooms/[roomId]         # Room details
-GET    /api/rooms/[roomId]/posts   # Room posts
-POST   /api/rooms/[roomId]/posts   # Create post
-```
-
 ### Pomodoro Sessions
 ```
 POST   /api/session/start          # Start session
@@ -266,14 +246,6 @@ Tracks your productivity across different time periods:
 - Streak counter (consecutive days with activity)
 - Focus vs break time ratio
 - Task completion rate
-
-### Study Rooms
-
-Collaborative spaces where you can:
-- Study together with friends
-- Share progress and achievements
-- Compete on leaderboards
-- Post updates and motivational messages
 
 ---
 
