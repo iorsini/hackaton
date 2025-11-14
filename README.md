@@ -1,7 +1,7 @@
 # 🍅 Pomofy - Pomodoro Timer with Empathy
 
 > A modern, empathetic Pomodoro timer that adapts to your mood and helps you stay productive without burnout.
-
+> Refatoração programada para iniciar no dia 15/11/2025 e com previsão de término no dia 22/11/2025
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-18-blue)](https://reactjs.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-6.0-green)](https://www.mongodb.com/)
