@@ -6,7 +6,7 @@ import "@/styles/pomodoro/notifications.css";
 import MoodSelector from "@/components/pomodoro/mood/MoodSelector";
 import "@/styles/pomodoro/mood.css";
 
-
+import TaskList from "@/components/pomodoro/tasks/TaskList";
 
 import {
   Play,
@@ -602,199 +602,23 @@ export default function PomodoroApp() {
 
   const renderTimerPage = () => (
     <>
-      {/* TASK LIST */}
-      <div className="task-list-card">
-        <div className="task-header">
-          <div>
-            <h2>
-              Minhas Tarefas
-              <span className="task-count">({tasks.length})</span>
-            </h2>
-          </div>
-        </div>
-
-        {!session && (
-          <div
-            style={{
-              background: "rgba(255, 255, 255, 0.95)",
-              borderRadius: "16px",
-              padding: "1.5rem",
-              marginBottom: "2rem",
-              textAlign: "center",
-              border: "2px dashed #fbbf24",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                marginBottom: "0.5rem",
-              }}
-            >
-              <Lock size={40} color="#fbbf24" />
-            </div>
-            <p
-              style={{
-                fontWeight: 600,
-                color: "#1a1a1a",
-                marginBottom: "0.25rem",
-              }}
-            >
-              Suas tarefas não serão salvas
-            </p>
-            <p style={{ fontSize: "0.875rem", color: "#666" }}>
-              Faça login para manter suas tarefas!
-            </p>
-          </div>
-        )}
-
-        <div className="tasks-container">
-          {isLoadingTasks ? (
-            <div className="empty-state">
-              <div className="empty-state-icon">
-                <Wind size={48} color="#999" />
-              </div>
-              <p>Carregando tarefas...</p>
-            </div>
-          ) : tasks.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-state-icon">
-                <ListTodo size={48} color="#999" />
-              </div>
-              <p>Nenhuma tarefa ainda</p>
-              <p style={{ fontSize: "0.875rem", marginTop: "0.5rem" }}>
-                Adicione sua primeira tarefa abaixo!
-              </p>
-            </div>
-          ) : (
-            tasks.map((task, index) => (
-              <div
-                key={task.id}
-                className={`task-item ${task.completed ? "completed" : ""} ${
-                  index === currentTaskIndex && !task.completed ? "current" : ""
-                }`}
-                onClick={() => toggleTask(task.id)}
-              >
-                <div className="task-checkbox">
-                  {task.completed && <Check size={14} />}
-                </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {getCategoryIcon(task.category)}
-                </div>
-
-                <div className="task-content">
-                  <div className="task-text">{task.text}</div>
-                  {TASK_CATEGORIES[task.category] && (
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#888",
-                        marginTop: 6,
-                      }}
-                    >
-                      {TASK_CATEGORIES[task.category].label}
-                    </div>
-                  )}
-                </div>
-                <button
-                  className="delete-task-btn"
-                  onClick={(e) => deleteTask(task.id, e)}
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ))
-          )}
-        </div>
-
-        <div className="add-task-container">
-          {showAddTask ? (
-            <div>
-              <div
-                style={{
-                  display: "flex",
-                  gap: "0.5rem",
-                  marginBottom: "0.75rem",
-                  flexWrap: "wrap",
-                }}
-              >
-                {Object.values(TASK_CATEGORIES).map((cat) => {
-                  const CategoryIcon = cat.Icon;
-                  return (
-                    <button
-                      key={cat.id}
-                      onClick={() => setSelectedCategory(cat.id)}
-                      style={{
-                        padding: "0.5rem 0.75rem",
-                        border:
-                          selectedCategory === cat.id
-                            ? `2px solid ${cat.color}`
-                            : "2px solid #e5e7eb",
-                        background:
-                          selectedCategory === cat.id
-                            ? `${cat.color}15`
-                            : "white",
-                        borderRadius: "8px",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.375rem",
-                        fontSize: "0.8rem",
-                        fontWeight: 600,
-                        color: selectedCategory === cat.id ? cat.color : "#666",
-                        transition: "all 0.2s",
-                      }}
-                    >
-                      <CategoryIcon size={16} />
-                      <span>{cat.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="add-task-input-container">
-                <input
-                  type="text"
-                  className="add-task-input"
-                  placeholder="Digite sua tarefa..."
-                  value={newTaskText}
-                  onChange={(e) => setNewTaskText(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && addTask()}
-                  autoFocus
-                />
-                <button className="add-task-submit" onClick={addTask}>
-                  <Plus size={20} />
-                </button>
-                <button
-                  className="control-btn secondary"
-                  style={{ width: 44, height: 44 }}
-                  onClick={() => {
-                    setShowAddTask(false);
-                    setNewTaskText("");
-                  }}
-                >
-                  <X size={18} />
-                </button>
-              </div>
-            </div>
-          ) : (
-            <button
-              className="add-task-btn"
-              onClick={() => setShowAddTask(true)}
-            >
-              <Plus size={18} />
-              Adicionar Tarefa
-            </button>
-          )}
-        </div>
-      </div>
+      <TaskList
+        tasks={tasks}
+        currentTaskIndex={currentTaskIndex}
+        toggleTask={toggleTask}
+        deleteTask={deleteTask}
+        addTask={addTask}
+        isLoadingTasks={isLoadingTasks}
+        session={session}
+        showAddTask={showAddTask}
+        setShowAddTask={setShowAddTask}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        newTaskText={newTaskText}
+        setNewTaskText={setNewTaskText}
+        TASK_CATEGORIES={TASK_CATEGORIES}
+        getCategoryIcon={getCategoryIcon}
+      />
 
       {/* RIGHT PANEL */}
       <div className="right-panel">
@@ -1734,14 +1558,14 @@ export default function PomodoroApp() {
       )}
 
       {showMoodSelector && (
-  <MoodSelector
-    selectedMood={selectedMood}
-    onMoodChange={handleMoodChange}
-    onClose={() => setShowMoodSelector(false)}
-    showCustomConfig={showCustomConfig}
-    setShowCustomConfig={setShowCustomConfig}
-  />
-)}
+        <MoodSelector
+          selectedMood={selectedMood}
+          onMoodChange={handleMoodChange}
+          onClose={() => setShowMoodSelector(false)}
+          showCustomConfig={showCustomConfig}
+          setShowCustomConfig={setShowCustomConfig}
+        />
+      )}
       <div className="app-container">
         <Sidebar activePage={activePage} onPageChange={handlePageChange} />
         {renderPageContent()}
