@@ -1,6 +1,13 @@
 "use client";
 import { useSession } from "next-auth/react";
 import React, { useState, useEffect, useRef } from "react";
+import NotificationPopup from "@/components/pomodoro/notifications/NotificationPopup";
+import "@/styles/pomodoro/notifications.css";
+import MoodSelector from "@/components/pomodoro/mood/MoodSelector";
+import "@/styles/pomodoro/mood.css";
+
+
+
 import {
   Play,
   Pause,
@@ -31,223 +38,12 @@ import {
   ListTodo,
   Settings,
 } from "lucide-react";
+import { useTimer } from "@/hooks/useTimer";
+import { MOODS, TASK_CATEGORIES } from "@/components/constants/moods";
 import Sidebar from "@/components/teste/Sidebar";
 import LofiPlayer from "@/components/teste/LoFiPlayer";
 import RoomsPage from "@/components/pomodoro/RoomsPage";
 import RoomModal from "@/components/pomodoro/RoomModal";
-
-// ============================================
-// TASK CATEGORIES
-// ============================================
-const TASK_CATEGORIES = {
-  trabalho: {
-    id: "trabalho",
-    label: "Trabalho",
-    Icon: Briefcase,
-    color: "#3b82f6",
-  },
-  "saude-fisica": {
-    id: "saude-fisica",
-    label: "Saúde Física",
-    Icon: Dumbbell,
-    color: "#10b981",
-  },
-  "saude-mental": {
-    id: "saude-mental",
-    label: "Saúde Mental",
-    Icon: Heart,
-    color: "#a855f7",
-  },
-  estudo: {
-    id: "estudo",
-    label: "Estudo",
-    Icon: BookOpen,
-    color: "#f59e0b",
-  },
-  pessoal: {
-    id: "pessoal",
-    label: "Pessoal",
-    Icon: Home,
-    color: "#ec4899",
-  },
-  outros: {
-    id: "outros",
-    label: "Outros",
-    Icon: Pin,
-    color: "#6b7280",
-  },
-};
-
-// ============================================
-// MOODS CONFIGURATION
-// ============================================
-const MOODS = {
-  CREATIVE: {
-    id: "creative",
-    label: "Criativo",
-    focusTime: 25,
-    breakTime: 5,
-    gradient: "linear-gradient(135deg, #a855f7 0%, #ec4899 100%)",
-    icon: Brain,
-    focusMessages: [
-      "Deixe as ideias fluírem!",
-      "Sua criatividade está no auge!",
-      "Momento perfeito para inovar!",
-    ],
-    breakMessages: [
-      "Beba água e deixe sua mente vagar",
-      "Alongue os ombros e respire fundo",
-      "Olhe para longe e relaxe os olhos",
-    ],
-  },
-  UNMOTIVATED: {
-    id: "unmotivated",
-    label: "Desmotivado",
-    focusTime: 15,
-    breakTime: 5,
-    gradient: "linear-gradient(135deg, #64748b 0%, #475569 100%)",
-    icon: Frown,
-    focusMessages: [
-      "Você consegue! Um passo de cada vez",
-      "Pequenos progressos ainda são progressos",
-      "Seja gentil consigo mesmo hoje",
-    ],
-    breakMessages: [
-      "Respire fundo 3 vezes e beba água",
-      "Levante e caminhe um pouco",
-      "Alongue o corpo todo devagar",
-    ],
-  },
-  STRESSED: {
-    id: "stressed",
-    label: "Estressado",
-    focusTime: 20,
-    breakTime: 7,
-    gradient: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
-    icon: Zap,
-    focusMessages: [
-      "Respire fundo. Você está indo bem",
-      "Um passo de cada vez. Sem pressa",
-      "Foco no presente, não no resultado",
-    ],
-    breakMessages: [
-      "RESPIRE: 4 segundos dentro, 4 fora",
-      "Beba água gelada devagar",
-      "Alongue pescoço e ombros",
-    ],
-  },
-  FOCUSED: {
-    id: "focused",
-    label: "Focado",
-    focusTime: 30,
-    breakTime: 5,
-    gradient: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
-    icon: Smile,
-    focusMessages: [
-      "Foco impecável! Continue assim",
-      "Você está no flow perfeito",
-      "Mantenha esse ritmo incrível!",
-    ],
-    breakMessages: [
-      "Olhe para longe por 20 segundos",
-      "Beba água e hidrate-se",
-      "Levante e movimente as pernas",
-    ],
-  },
-  TIRED: {
-    id: "tired",
-    label: "Cansado",
-    focusTime: 15,
-    breakTime: 10,
-    gradient: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",
-    icon: Coffee,
-    focusMessages: [
-      "Devagar e sempre. Você consegue",
-      "Está tudo bem ir no seu ritmo",
-      "Faça o que puder por agora",
-    ],
-    breakMessages: [
-      "Beba água ou café",
-      "Considere um cochilo de 5min",
-      "Alongue todo o corpo",
-    ],
-  },
-  ENERGIZED: {
-    id: "energized",
-    label: "Energizado",
-    focusTime: 35,
-    breakTime: 5,
-    gradient: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-    icon: Battery,
-    focusMessages: [
-      "Energia máxima! Você está voando!",
-      "Incrível! Mantenha esse ritmo",
-      "Aproveite esse pico de produtividade",
-    ],
-    breakMessages: [
-      "Beba água para manter a energia",
-      "Alongamento rápido de 30 segundos",
-      "Olhe pela janela e respire",
-    ],
-  },
-  CUSTOM: {
-    id: "custom",
-    label: "Autêntico",
-    focusTime: 25,
-    breakTime: 5,
-    gradient: "linear-gradient(135deg, #312e81 0%, #9333ea 100%)",
-    icon: Sparkle,
-    focusMessages: [
-      "Nem sempre com vontade, mas sempre capaz.",
-      "Hoje é no modo 'faço porque preciso'.",
-      "Tá difícil, mas o difícil também conta.",
-    ],
-    breakMessages: [
-      "Respira. Reclamar também é uma forma de processar.",
-      "Dá um tempo, ninguém é produtivo o tempo todo.",
-      "Olha pro teto por uns segundos, vai te fazer bem.",
-    ],
-  },
-};
-
-// ============================================
-// HOOKS
-// ============================================
-const useTimer = (initialMinutes, onComplete) => {
-  const [seconds, setSeconds] = useState(initialMinutes * 60);
-  const [isActive, setIsActive] = useState(false);
-  const intervalRef = useRef(null);
-
-  useEffect(() => {
-    if (isActive && seconds > 0) {
-      intervalRef.current = setInterval(() => {
-        setSeconds((s) => {
-          if (s <= 1) {
-            setIsActive(false);
-            onComplete?.();
-            return 0;
-          }
-          return s - 1;
-        });
-      }, 1000);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isActive, seconds, onComplete]);
-
-  const start = () => setIsActive(true);
-  const pause = () => setIsActive(false);
-  const reset = (newMinutes) => {
-    setIsActive(false);
-    setSeconds(newMinutes * 60);
-  };
-
-  return { seconds, isActive, start, pause, reset };
-};
-
 // ============================================
 // MAIN APP
 // ============================================
@@ -303,7 +99,7 @@ export default function PomodoroApp() {
     if ("Notification" in window && Notification.permission === "granted") {
       new Notification("Pomodoro Timer", { body: message });
     }
-  }; 
+  };
 
   const handleTimerComplete = async () => {
     if (audioRef.current) {
@@ -1308,107 +1104,7 @@ export default function PomodoroApp() {
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
   }
 
-  /* ===== MOOD SELECTOR ===== */
-  .mood-selector-card {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    border-radius: 24px;
-    padding: 2.5rem;
-    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
-    z-index: 999;
-    max-width: 560px;
-    width: 90%;
-    animation: fadeInScale 0.3s ease;
-    transition: all 0.3s ease;
-  }
-
-  .mood-selector-card.expanded {
-    max-width: 640px;
-    min-height: 500px;
-  }
-
-  @keyframes fadeInScale {
-    from {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.9);
-    }
-    to {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-  }
-
-  .mood-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    z-index: 998;
-  }
-
-  .mood-selector-header {
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-
-  .mood-selector-header h2 {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin-bottom: 0.5rem;
-  }
-
-  .mood-selector-header p {
-    font-size: 0.95rem;
-    color: #666;
-  }
-
-  .mood-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-  }
-
-  .mood-btn {
-    padding: 1.25rem 0.875rem;
-    border: 2px solid #e5e7eb;
-    background: white;
-    border-radius: 14px;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.625rem;
-    transition: all 0.2s;
-    color: #666;
-  }
-
-  .mood-btn:hover {
-    border-color: #d1d5db;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  }
-
-  .mood-btn.selected {
-    border-color: transparent;
-    color: white;
-    transform: scale(1.03);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
-  }
-
-  .mood-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-  }
-
-  .mood-time {
-    font-size: 0.75rem;
-    opacity: 0.85;
-  }
-
+  
   /* ===== CUSTOM CONFIG ===== */
   .custom-config {
     display: flex;
@@ -2030,159 +1726,22 @@ export default function PomodoroApp() {
       )}
 
       {showNotification && (
-        <div className="notification-popup">
-          <div className="notification-icon">
-            {isBreak ? <Coffee size={24} /> : <Target size={24} />}
-          </div>
-          <div className="notification-text">{notificationMessage}</div>
-        </div>
+        <NotificationPopup
+          message={notificationMessage}
+          isBreak={isBreak}
+          selectedMood={selectedMood}
+        />
       )}
 
       {showMoodSelector && (
-        <>
-          <div
-            className="mood-overlay"
-            onClick={() => {
-              setShowMoodSelector(false);
-              setShowCustomConfig(false);
-            }}
-          />
-          <div
-            className={`mood-selector-card ${
-              showCustomConfig ? "expanded" : ""
-            }`}
-          >
-            <div className="mood-selector-header">
-              <h2>Como você está se sentindo?</h2>
-              <p>Vamos ajustar o timer para seu estado de espírito</p>
-            </div>
-
-            {!showCustomConfig ? (
-              <div className="mood-grid">
-                {Object.values(MOODS).map((mood) => {
-                  const Icon = mood.icon;
-                  return (
-                    <button
-                      key={mood.id}
-                      onClick={() => handleMoodChange(mood)}
-                      className={`mood-btn ${
-                        selectedMood?.id === mood.id ? "selected" : ""
-                      }`}
-                      style={
-                        selectedMood?.id === mood.id
-                          ? { background: mood.gradient }
-                          : {}
-                      }
-                    >
-                      <Icon size={28} />
-                      <span className="mood-label">{mood.label}</span>
-                      <span className="mood-time">
-                        {mood.id === "custom"
-                          ? "Personalize"
-                          : `${mood.focusTime}min foco`}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="custom-config">
-                <div className="custom-config-header">
-                  <Settings size={32} color="#8b5cf6" />
-                  <h3>Configure seus tempos</h3>
-                  <p>Defina quanto tempo você quer focar e descansar</p>
-                </div>
-
-                <div className="custom-inputs">
-                  <div className="custom-input-group">
-                    <label>Tempo de Foco (minutos)</label>
-                    <div className="input-with-controls">
-                      <button
-                        onClick={() =>
-                          setCustomFocusTime(Math.max(1, customFocusTime - 5))
-                        }
-                        className="time-control-btn"
-                      >
-                        -
-                      </button>
-                      <input
-                        type="number"
-                        min="1"
-                        max="120"
-                        value={customFocusTime}
-                        onChange={(e) =>
-                          setCustomFocusTime(
-                            Math.max(1, parseInt(e.target.value) || 1)
-                          )
-                        }
-                        className="custom-time-input"
-                      />
-                      <button
-                        onClick={() =>
-                          setCustomFocusTime(Math.min(120, customFocusTime + 5))
-                        }
-                        className="time-control-btn"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="custom-input-group">
-                    <label>Tempo de Pausa (minutos)</label>
-                    <div className="input-with-controls">
-                      <button
-                        onClick={() =>
-                          setCustomBreakTime(Math.max(1, customBreakTime - 5))
-                        }
-                        className="time-control-btn"
-                      >
-                        -
-                      </button>
-                      <input
-                        type="number"
-                        min="1"
-                        max="60"
-                        value={customBreakTime}
-                        onChange={(e) =>
-                          setCustomBreakTime(
-                            Math.max(1, parseInt(e.target.value) || 1)
-                          )
-                        }
-                        className="custom-time-input"
-                      />
-                      <button
-                        onClick={() =>
-                          setCustomBreakTime(Math.min(60, customBreakTime + 5))
-                        }
-                        className="time-control-btn"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="custom-actions">
-                  <button
-                    onClick={() => setShowCustomConfig(false)}
-                    className="custom-btn secondary"
-                  >
-                    Voltar
-                  </button>
-                  <button
-                    onClick={handleCustomMoodConfirm}
-                    className="custom-btn primary"
-                  >
-                    Confirmar
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </>
-      )}
-
+  <MoodSelector
+    selectedMood={selectedMood}
+    onMoodChange={handleMoodChange}
+    onClose={() => setShowMoodSelector(false)}
+    showCustomConfig={showCustomConfig}
+    setShowCustomConfig={setShowCustomConfig}
+  />
+)}
       <div className="app-container">
         <Sidebar activePage={activePage} onPageChange={handlePageChange} />
         {renderPageContent()}
