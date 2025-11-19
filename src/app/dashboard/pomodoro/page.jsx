@@ -5,6 +5,7 @@ import NotificationPopup from "@/components/pomodoro/notifications/NotificationP
 import "@/styles/pomodoro/notifications.css";
 import MoodSelector from "@/components/pomodoro/mood/MoodSelector";
 import "@/styles/pomodoro/mood.css";
+import Timer from "@/components/pomodoro/timer/Timer";
 
 import TaskList from "@/components/pomodoro/tasks/TaskList";
 
@@ -622,158 +623,22 @@ export default function PomodoroApp() {
 
       {/* RIGHT PANEL */}
       <div className="right-panel">
-        <div className="timer-card">
-          <div className={`status-badge ${isBreak ? "break" : ""}`}>
-            <div
-              style={{
-                width: 8,
-                height: 8,
-                background: "currentColor",
-                borderRadius: "50%",
-              }}
-            />
-            {isBreak ? "Intervalo" : "Tempo de Foco"}
-          </div>
-
-          <div
-            style={{
-              position: "relative",
-              width: 220,
-              height: 150,
-              margin: "1rem auto 1.5rem",
-            }}
-          >
-            <svg width="220" height="150" viewBox="0 0 220 150">
-              <path
-                d="M 10 120 A 100 100 0 0 1 210 120"
-                fill="none"
-                stroke="#f0f0f0"
-                strokeWidth="14"
-                strokeLinecap="round"
-              />
-              <path
-                d="M 10 120 A 100 100 0 0 1 210 120"
-                fill="none"
-                stroke={
-                  selectedMood
-                    ? selectedMood.gradient.match(/#[a-f0-9]{6}/i)[0]
-                    : "#667eea"
-                }
-                strokeWidth="14"
-                strokeLinecap="round"
-                strokeDasharray={314}
-                strokeDashoffset={
-                  314 -
-                  (314 * timer.seconds) /
-                    ((isBreak ? breakTime : focusTime) * 60)
-                }
-                style={{
-                  transition: "stroke-dashoffset 1s linear, stroke 0.3s ease",
-                }}
-              />
-            </svg>
-
-            <div
-              style={{
-                position: "absolute",
-                top: "70%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                textAlign: "center",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "3rem",
-                  fontWeight: 700,
-                  color: "#1a1a1a",
-                  lineHeight: 1,
-                  marginBottom: "0.4rem",
-                }}
-              >
-                {String(minutes).padStart(2, "0")}:
-                {String(secs).padStart(2, "0")}
-              </div>
-              <div
-                style={{
-                  fontSize: "0.8rem",
-                  color: "#999",
-                  fontWeight: 600,
-                  maxWidth: "160px",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {tasks[currentTaskIndex] && !tasks[currentTaskIndex].completed
-                  ? tasks[currentTaskIndex].text
-                  : "Nenhuma tarefa"}
-              </div>
-            </div>
-          </div>
-
-          <div className="timer-controls">
-            <button
-              className="control-btn secondary"
-              onClick={() => timer.reset(isBreak ? breakTime : focusTime)}
-            >
-              <RotateCcw size={20} />
-            </button>
-            <button
-              className="control-btn primary"
-              onClick={timer.isActive ? timer.pause : handleStart}
-              disabled={!selectedMood}
-            >
-              {timer.isActive ? (
-                <Pause size={28} />
-              ) : (
-                <Play size={28} style={{ marginLeft: 2 }} />
-              )}
-            </button>
-            <button
-              className="control-btn secondary"
-              onClick={() => {
-                setIsBreak(!isBreak);
-                timer.reset(isBreak ? focusTime : breakTime);
-              }}
-            >
-              <SkipForward size={20} />
-            </button>
-          </div>
-
-          {selectedMood ? (
-            <div
-              className="mood-display"
-              onClick={() => setShowMoodSelector(true)}
-            >
-              {React.createElement(selectedMood.icon, { size: 20 })}
-              <span>Humor: {selectedMood.label}</span>
-            </div>
-          ) : (
-            <div
-              className="mood-display mood-display-pulse"
-              onClick={() => setShowMoodSelector(true)}
-            >
-              <Sparkles size={20} />
-              <span>Selecione seu humor para começar!</span>
-            </div>
-          )}
-        </div>
-
-        <div className="progress-card">
-          <div className="progress-header">
-            <h3>Progresso Diário</h3>
-            <div className="progress-percentage">{progress}%</div>
-          </div>
-          <div className="progress-info">
-            <div>
-              {completedTasks}/{tasks.length} tarefas
-            </div>
-          </div>
-          <div className="progress-bar-container">
-            <div className="progress-bar" style={{ width: `${progress}%` }} />
-          </div>
-        </div>
+        <Timer
+          timer={timer}
+          isBreak={isBreak}
+          setIsBreak={setIsBreak}
+          selectedMood={selectedMood}
+          tasks={tasks}
+          currentTaskIndex={currentTaskIndex}
+          focusTime={focusTime}
+          breakTime={breakTime}
+          minutes={minutes}
+          secs={secs}
+          handleStart={handleStart}
+          setShowMoodSelector={setShowMoodSelector}
+          completedTasks={completedTasks}
+          progress={progress}
+        />
 
         <LofiPlayer selectedMood={selectedMood} />
       </div>

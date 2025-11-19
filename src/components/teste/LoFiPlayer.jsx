@@ -7,6 +7,21 @@ export default function LofiPlayer({ selectedMood }) {
   const [isMuted, setIsMuted] = useState(false);
   const [currentStation, setCurrentStation] = useState(0);
   const audioRef = useRef(null);
+  useEffect(() => {
+  if (!audioRef.current) return;
+
+  // Recarrega quando o humor mudar
+  audioRef.current.src = lofiStations[currentStation].url;
+  audioRef.current.load();
+
+  // Se o player estava tocando, tenta tocar novamente
+  if (isPlaying) {
+    audioRef.current.play().catch(err => {
+      console.warn("Autoplay bloqueado:", err);
+    });
+  }
+}, [selectedMood]);
+
 
   // Estações de lofi/chill que funcionam via stream
   const lofiStations = [
