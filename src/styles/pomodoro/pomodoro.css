@@ -1,0 +1,20 @@
+/* ===== POMODORO APP - ESTILOS CENTRALIZADOS ===== */
+/* Importa todos os módulos de estilo do Pomodoro */
+
+/* Base e Layout */
+@import './layout.css';
+
+/* Tarefas */
+@import './tasks.css';
+
+/* Timer */
+@import './timer.css';
+
+/* Configuração Personalizada */
+@import './custom-config.css';
+
+/* Mood Selector */
+@import './mood.css';
+
+/* Notificações */
+@import './notifications.css';
