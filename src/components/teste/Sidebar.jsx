@@ -73,7 +73,7 @@ export default function Sidebar() {
           <div className="p-4">
             <div className="flex items-center gap-2 pb-4 border-b border-gray-200">
               <img
-                src="/images/pomofy.webp"
+                src="/images/logos.png"
                 alt="Logo Pomofy"
                 className="w-10 h-10 object-contain"
               />
@@ -149,7 +149,7 @@ export default function Sidebar() {
         <div>
           <div className="flex items-center gap-3 p-4 border-b">
             <img
-              src="/images/pomofy.webp"
+              src="/images/logos.png"
               alt="Pomofy Logo"
               className="w-12 h-12 rounded-full object-cover"
             />

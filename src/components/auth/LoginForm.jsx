@@ -413,7 +413,7 @@ function LoginFormContent() {
           <div className="logo-container">
             <div className="logo">
               <img
-                src="/images/pomofy.webp"
+                src="/images/logos.png"
                 alt="Logo de Tomate"
                 className="w-55 h-55 object-contain"
               />

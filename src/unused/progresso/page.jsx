@@ -58,7 +58,7 @@ export default function ProfileDashboard() {
           Produtividade sem Culpa
         </h1>
             <img
-          src="/images/pomofy.webp"
+          src="/images/logos.png"
           alt="Pomofy Logo"
           className="w-14 h-14 rounded-full object-cover ring-2 ring-green-500/30"
         />

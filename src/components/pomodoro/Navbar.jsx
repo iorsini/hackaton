@@ -91,7 +91,7 @@ function Navbar() {
           <div className="navbar-container">
             <div className="logo-icon">
               <img
-                src="/images/pomofy.webp"
+                src="/images/logos.png"
                 alt="Pomofy logo"
                 className="logo-image"
               />
@@ -412,7 +412,7 @@ function Navbar() {
           <a href="/dashboard/pomodoro" className="navbar-logo">
             <div className="logo-icon">
               <img
-                src="/images/pomofy.webp"
+                src="/images/logos.png"
                 alt="Pomofy logo"
                 className="logo-image"
               />

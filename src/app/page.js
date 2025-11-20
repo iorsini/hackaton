@@ -28,7 +28,7 @@ export default function Home() {
     }}
   >
     <img
-      src="/images/pomofy.webp"
+      src="/images/logos.png"
       alt="Pomofy Logo"
       style={{
         width: "220px",          // 👈 aumenta o tamanho da logo
