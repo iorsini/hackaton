@@ -1,0 +1,130 @@
+/* ===== CUSTOM CONFIG ===== */
+.custom-config {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.custom-config-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.custom-config-header h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-top: 0.5rem;
+}
+
+.custom-config-header p {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* ===== CUSTOM INPUTS ===== */
+.custom-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.custom-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.custom-input-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.input-with-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.time-control-btn {
+  width: 44px;
+  height: 44px;
+  border: 2px solid #e5e7eb;
+  background: white;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #666;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.time-control-btn:hover {
+  border-color: #8b5cf6;
+  color: #8b5cf6;
+  background: #f5f3ff;
+}
+
+.custom-time-input {
+  flex: 1;
+  padding: 0.875rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+  color: purple;
+  background-color: white;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.custom-time-input:focus {
+  border-color: #8b5cf6;
+  background: #faf9ff;
+}
+
+/* ===== CUSTOM ACTIONS ===== */
+.custom-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.custom-btn {
+  flex: 1;
+  padding: 0.875rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.custom-btn.secondary {
+  background: #f3f4f6;
+  color: #666;
+}
+
+.custom-btn.secondary:hover {
+  background: #e5e7eb;
+}
+
+.custom-btn.primary {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  color: white;
+  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.3);
+}
+
+.custom-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+}
