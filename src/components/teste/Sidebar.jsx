@@ -50,8 +50,8 @@ export default function Sidebar() {
 
   // 🔹 Lista de páginas
   const menuItems = [
-    { key: "testesfoco", label: "Foco e Concentração", icon: <Focus size={20} />, path: "/dashboard/testefoco" },
-    { key: "desenvolvimento", label: "Técnica de Produtividade", icon: <Brain size={20} />, path: "/dashboard/desenvolvimento" },
+    { key: "testesfoco", label: "Foco e Concentração", icon: <Focus size={20} />, path: "/dashboard/focus" },
+    { key: "desenvolvimento", label: "Técnica de Produtividade", icon: <Brain size={20} />, path: "/dashboard/discover" },
     { key: "Store", label: "Store", icon: <Store size={20} />, path: "/dashboard/store" },
     { key: "Sobre a Pomofy", label: "Sobre a Pomofy", icon: <Info size={20} />, path: "/dashboard/sobre" },
   ];
