@@ -34,9 +34,7 @@ export default function Home() {
         width: "220px",          // 👈 aumenta o tamanho da logo
         height: "auto",
         borderRadius: "24px",    // 👈 bordas suaves
-        background: "white",     // 👈 mantém contraste com o fundo roxo
         padding: "1rem",
-        boxShadow: "0 8px 40px rgba(0, 0, 0, 0.25)",
         animation: "pulse 2s ease-in-out infinite",
       }}
     />
