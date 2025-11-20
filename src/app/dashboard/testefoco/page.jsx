@@ -72,7 +72,7 @@ const CARDS = [
   },
 ];
 
-export default function focusPage() {
+export default function TesteFocoPage() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
