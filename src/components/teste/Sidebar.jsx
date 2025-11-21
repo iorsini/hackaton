@@ -120,8 +120,8 @@ export default function Sidebar() {
                       </div>
                     )}
                     <div>
-                      <div className="font-medium text-gray-900">{user.name}</div>
-                      <div className="text-sm text-gray-500">{user.email}</div>
+                      <div className="font-medium text-gray-900 truncate max-w-[250px]">{user.name}</div>
+                      <div className="text-sm text-gray-500 truncate max-w-[250px]">{user.email}</div>
                     </div>
                   </Link>
                   <button onClick={handleLogout} className="text-gray-500 hover:text-red-500">
@@ -197,8 +197,8 @@ export default function Sidebar() {
                   </div>
                 )}
                 <div>
-                  <div className="font-medium text-gray-800">{user.name}</div>
-                  <div className="text-sm text-gray-500">{user.email}</div>
+                  <div className="font-medium text-gray-800 truncate max-w-[150px]">{user.name}</div>
+                  <div className="text-sm text-gray-500 truncate max-w-[150px]">{user.email}</div>
                 </div>
               </Link>
               <button onClick={handleLogout} className="text-gray-500 hover:text-red-500">
