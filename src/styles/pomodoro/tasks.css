@@ -70,8 +70,10 @@
   opacity: 0.55;
 }
 
-.task-item.current * {
-  color: white !important;
+
+.task-item.current .delete-task-btn {
+  color: #ef4444 !important;
+  background: #ffeaea !important;
 }
 
 .task-checkbox {
@@ -132,7 +134,10 @@
   transition: all 0.2s;
   flex-shrink: 0;
 }
-
+.task-item.current .delete-task-btn:hover {
+  background: #dc2626 !important;
+  color: white !important;
+}
 .task-item:hover .delete-task-btn {
   opacity: 1;
 }
